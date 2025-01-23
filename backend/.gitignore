@@ -172,3 +172,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Ignore all .yml files
+*.yml
+
+# But do not ignore application.yml
+!application.yml
