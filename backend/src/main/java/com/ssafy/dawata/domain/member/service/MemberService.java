@@ -3,6 +3,9 @@ package com.ssafy.dawata.domain.member.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
+import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
+import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 
@@ -29,5 +32,56 @@ public class MemberService {
 		return memberRepository
 			.findById(memberId)
 			.orElseThrow(IllegalArgumentException::new);
+	}
+
+	@Transactional
+	public MemberInfoResponse updateMyInfo(MemberInfoUpdateRequest memberInfoUpdateRequest) {
+		Long id = 1L;
+
+		Member member = memberRepository
+			.findById(id)
+			.orElseThrow(IllegalArgumentException::new);
+
+		//더티 체킹 사용
+		member.updateName(memberInfoUpdateRequest.name());
+
+		return toMemberInfo(member);
+	}
+
+	@Transactional
+	public boolean updateMyImg(String url) {
+		// TODO : 이미지 관련 사항 확정 시 작업 예정
+		return false;
+	}
+
+	@Transactional
+	public boolean withdraw() {
+		Long id = 1L;
+
+		Member member = memberRepository
+			.findById(id)
+			.orElseThrow(IllegalArgumentException::new);
+
+		//더티 체킹 사용
+		member.updateIsWithdrawn(true);
+
+		return member.isWithdrawn();
+	}
+
+	@Transactional(readOnly = true)
+	public AppointmentInfoResponse findAllMyAppointmentInfo() {
+		// TODO : 약속 관련 기능 구현 시 작업 예정
+		return null;
+	}
+
+	private MemberInfoResponse toMemberInfo(Member member) {
+		// TODO : 이미지관련 사항 확정 시 작업 예정
+
+		return MemberInfoResponse.builder()
+			.email(member.getEmail())
+			.name(member.getName())
+			.img(null)
+			.createdAt(member.getCreatedAt())
+			.build();
 	}
 }
