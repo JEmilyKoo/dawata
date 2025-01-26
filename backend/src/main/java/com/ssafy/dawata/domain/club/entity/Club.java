@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "club")
-public class Group extends BaseTimeEntity {
+public class Club extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +27,9 @@ public class Group extends BaseTimeEntity {
 	@Column(nullable = false)
 	private String name;
 
-	@Convert(converter = GroupCategoryConverter.class)
+	@Convert(converter = ClubCategoryConverter.class)
 	@Column(nullable = false)
-	private GroupCategory category;
+	private ClubCategory category;
 
 	//일단은 업데이트 가능하게.
 	@Column(nullable = false, length = 6)
@@ -40,14 +40,14 @@ public class Group extends BaseTimeEntity {
 	private String img;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public Group(String name, GroupCategory category, String teamCode) {
+	public Club(String name, ClubCategory category, String teamCode) {
 		this.name = name;
 		this.category = category;
 		this.teamCode = teamCode;
 	}
 
-	public static Group createGroup(String name, GroupCategory category, String teamCode) {
-		return Group.builder()
+	public static Club createGroup(String name, ClubCategory category, String teamCode) {
+		return Club.builder()
 			.name(name)
 			.category(category)
 			.teamCode(teamCode)
@@ -58,7 +58,7 @@ public class Group extends BaseTimeEntity {
 		this.name = name;
 	}
 
-	public void updateCategory(GroupCategory category) {
+	public void updateCategory(ClubCategory category) {
 		this.category = category;
 	}
 

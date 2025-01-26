@@ -3,7 +3,7 @@ package com.ssafy.dawata.domain.group.entity;
 import lombok.Getter;
 
 @Getter
-public enum GroupCategory {
+public enum ClubCategory {
 	FRIEND(1, "친목"),
 	STUDY(2,"스터디"),
 	HOBBY(3, "취미"),
@@ -14,14 +14,14 @@ public enum GroupCategory {
 	private final int code;
 	private final String name;
 
-	GroupCategory(int code, String name){
+	ClubCategory(int code, String name){
 		this.code = code;
 		this.name=name;
 	}
 
 	//숫자 -> name으로
-	public static GroupCategory fromCodeToName(int code){
-		for (GroupCategory category : GroupCategory.values()){
+	public static ClubCategory fromCodeToName(int code){
+		for (ClubCategory category : ClubCategory.values()){
 			if (code==category.getCode()){
 				return category;
 			}
