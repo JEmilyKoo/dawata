@@ -1,9 +1,9 @@
 package com.ssafy.dawata.domain.club.dto.request;
 
-import com.ssafy.dawata.domain.club.entity.GroupCategory;
-public record UpdateGroupRequest (
+import com.ssafy.dawata.domain.club.entity.ClubCategory;
+public record UpdateClubRequest(
 	String name,
-	GroupCategory category,
+	ClubCategory category,
 	String img
 ){
 }
