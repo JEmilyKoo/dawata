@@ -1,4 +1,4 @@
-package com.ssafy.dawata.domain.group.entity;
+package com.ssafy.dawata.domain.club.entity;
 
 import lombok.Getter;
 

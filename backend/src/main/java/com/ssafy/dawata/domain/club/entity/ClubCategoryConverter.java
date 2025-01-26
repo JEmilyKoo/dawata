@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter (autoApply = true)
-public class ClubCategoryConverter implements AttributeConverter<GroupCategory, Integer> {
+public class ClubCategoryConverter implements AttributeConverter<ClubCategory, Integer> {
 	@Override
 	public Integer convertToDatabaseColumn(ClubCategory attribute) {
 		if (attribute==null)
@@ -14,12 +14,12 @@ public class ClubCategoryConverter implements AttributeConverter<GroupCategory, 
 	}
 
 	@Override
-	public GroupCategory convertToEntityAttribute(Integer dbData) {
+	public ClubCategory convertToEntityAttribute(Integer dbData) {
 
 		if (dbData==null)
 			return null;
 
-		return GroupCategory.fromCodeToName(dbData); //숫자 -> name으로
+		return ClubCategory.fromCodeToName(dbData); //숫자 -> name으로
 	}
 }
 
