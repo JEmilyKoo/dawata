@@ -29,22 +29,30 @@ public class Member extends BaseTimeEntity {
 	@Column
 	private String name;
 
+	@Column
+	private boolean isWithdrawn;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public Member(String email, String name) {
+	public Member(String email, String name, boolean isWithdrawn) {
 		this.email = email;
 		this.name = name;
+		this.isWithdrawn = isWithdrawn;
 	}
 
 	public static Member createMember(String email, String name) {
 		return Member.builder()
 			.email(email)
 			.name(name)
+			.isWithdrawn(false)
 			.build();
 	}
 
 	public void updateName(String name) {
 		this.name = name;
+	}
+
+	public void updateIsWithdrawn(boolean isWithdrawn) {
+		this.isWithdrawn = isWithdrawn;
 	}
 
 }
