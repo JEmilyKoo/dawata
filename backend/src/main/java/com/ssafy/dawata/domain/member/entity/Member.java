@@ -1,7 +1,5 @@
 package com.ssafy.dawata.domain.member.entity;
 
-import org.hibernate.annotations.SQLDelete;
-
 import com.ssafy.dawata.domain.common.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -29,21 +27,20 @@ public class Member extends BaseTimeEntity {
 	@Column
 	private String name;
 
-	@Column
-	private boolean isWithdrawn;
+	@Column(name = "is_withdrawn")
+	private boolean withdrawn = false;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public Member(String email, String name, boolean isWithdrawn) {
+	public Member(String email, String name, boolean withdrawn) {
 		this.email = email;
 		this.name = name;
-		this.isWithdrawn = isWithdrawn;
+		this.withdrawn = withdrawn;
 	}
 
 	public static Member createMember(String email, String name) {
 		return Member.builder()
 			.email(email)
 			.name(name)
-			.isWithdrawn(false)
 			.build();
 	}
 
@@ -51,8 +48,8 @@ public class Member extends BaseTimeEntity {
 		this.name = name;
 	}
 
-	public void updateIsWithdrawn(boolean isWithdrawn) {
-		this.isWithdrawn = isWithdrawn;
+	public void updateIsWithdrawn(boolean withdrawn) {
+		this.withdrawn = withdrawn;
 	}
 
 }

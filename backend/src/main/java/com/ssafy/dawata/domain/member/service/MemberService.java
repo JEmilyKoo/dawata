@@ -48,13 +48,11 @@ public class MemberService {
 		return toMemberInfo(member);
 	}
 
-	@Transactional
 	public boolean updateMyImg(String url) {
 		// TODO : 이미지 관련 사항 확정 시 작업 예정
 		return false;
 	}
 
-	@Transactional
 	public boolean withdraw() {
 		Long id = 1L;
 
