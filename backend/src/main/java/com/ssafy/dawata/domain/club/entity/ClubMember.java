@@ -16,12 +16,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name="club_member")
-public class ClubMember extends BaseTimeEntity {
+public class ClubMember {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -43,23 +44,13 @@ public class ClubMember extends BaseTimeEntity {
 	@Column(nullable = false, columnDefinition = "INT DEFAULT 1")
 	private int createdBy;
 
+
 	@Builder
 	public ClubMember(Member member, Club club, String nickname, String clubName, int createdBy){
 		this.member = member;
 		this.club = club;
-
-		if (nickname!=null){
-			this.nickname = nickname;
-		}else{
-			this.nickname = member.getName();
-		}
-
-		if (clubName!=null){
-			this.clubName = clubName;
-		}else{
-			this.clubName = club.getName();
-		}
-
+		this.nickname = member.getName();
+		this.clubName = club.getName();
 		this.createdBy = createdBy;
 	}
 
@@ -73,11 +64,11 @@ public class ClubMember extends BaseTimeEntity {
 			.build();
 	}
 
-	public void updateNickname(String nickname){
+	public void setNickname(String nickname){
 		this.nickname = nickname;
 	}
 
-	public void updateClubName(String clubName){
+	public void setClubName(String clubName){
 		this.clubName = clubName;
 	}
 
