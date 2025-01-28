@@ -18,6 +18,9 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 	//특정 유저가 클럽에 속해있는지 체크
 	boolean existsByMemberIdAndClubId(Long memberId, Long clubId);
 
+	//특정 유저가 속한 모든 클럽의 멤버아이디 조회
+	List<ClubMember>findAllByMemberId(Long memberId);
+
 	//코드로 클럽 찾기
 	@Query("SELECT clubMember FROM ClubMember clubMember WHERE clubMember.club.teamCode = :teamCode")
 	List<ClubMember>findByTeamCode(@Param("teamCode")String teamCode);
