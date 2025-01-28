@@ -3,6 +3,7 @@ package com.ssafy.dawata.domain.club.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,17 +48,25 @@ public class ClubController {
 
 	// 클럽 정보 수정
 	@PatchMapping("/{clubId}")
-	public ResponseEntity<Void> updateClub(@PathVariable Long clubId, @RequestBody UpdateClubRequest request) {
-		clubService.updateClub(request,clubId);
-		return ResponseEntity.noContent().build();
+	public ResponseEntity<Boolean> updateClub(@PathVariable Long clubId, @RequestBody UpdateClubRequest request) {
+		try {
+			clubService.updateClub(request,clubId);
+			return ResponseEntity.ok(true); // 삭제 성공 시 true 반환
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(false); // 삭제 실패 시 false 반환
+		}
 	}
 
-	// // 클럽 삭제
-	// @DeleteMapping("/{clubId}")
-	// public ResponseEntity<Void> deleteClub(@PathVariable Long clubId, @RequestBody DeleteClubRequest request) {
-	// 	clubService.deleteClub(request);
-	// 	return ResponseEntity.noContent().build();
-	// }
+	// 클럽 삭제
+	@DeleteMapping("/{clubId}")
+	public ResponseEntity<Boolean> deleteClub(@PathVariable Long clubId) {
+		try {
+			clubService.deleteClub(clubId);
+			return ResponseEntity.ok(true);
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(false);
+		}
+	}
 
 	// 클럽 코드 조회
 	@GetMapping("/{clubId}/code")
