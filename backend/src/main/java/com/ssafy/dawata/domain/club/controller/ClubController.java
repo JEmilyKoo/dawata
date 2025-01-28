@@ -1,7 +1,11 @@
 package com.ssafy.dawata.domain.club.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
+import com.ssafy.dawata.domain.club.dto.request.DeleteClubRequest;
+import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
 import com.ssafy.dawata.domain.club.service.ClubService;
 
@@ -33,6 +39,38 @@ public class ClubController {
 		ClubInfoResponse response = clubService.getClubById(clubId);
 		return ResponseEntity.ok(response);
 	}
+
+	// 전체 클럽 조회
+	@GetMapping
+	public ResponseEntity<List<ClubInfoResponse>> getAllClubs() {
+		List<ClubInfoResponse> responses = clubService.getAllClubsByMemberId();
+		return ResponseEntity.ok(responses);
+	}
+
+	// 클럽 정보 수정
+	@PatchMapping("/{clubId}")
+	public ResponseEntity<Void> updateClub(@PathVariable Long clubId, @RequestBody UpdateClubRequest request) {
+		clubService.updateClub(request);
+		return ResponseEntity.noContent().build();
+	}
+
+	// // 클럽 삭제
+	// @DeleteMapping("/{clubId}")
+	// public ResponseEntity<Void> deleteClub(@PathVariable Long clubId, @RequestBody DeleteClubRequest request) {
+	// 	clubService.deleteClub(request);
+	// 	return ResponseEntity.noContent().build();
+	// }
+
+	// 클럽 코드 조회
+	@GetMapping("/{clubId}/code")
+	public ResponseEntity<String> getClubCode(@PathVariable Long clubId) {
+		String code = clubService.getClubCode(clubId);
+		return ResponseEntity.ok(code);
+	}
+
+
+
+
 
 
 
