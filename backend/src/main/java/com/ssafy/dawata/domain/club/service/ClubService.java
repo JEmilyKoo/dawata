@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
+import com.ssafy.dawata.domain.club.dto.request.DeleteClubRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateAdminRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
@@ -112,9 +113,30 @@ public class ClubService {
 		newAdmin.setCreatedBy(0);
 
 		return true;
+	}
 
 
+	//클럽 삭제
+	public boolean deleteClub(DeleteClubRequest request){
+		//클럽장 여부 체크
+		validateAdmin(request.memberId(),request.clubId());
+		Club club = clubRepository.findById(request.clubId())
+			.orElseThrow(()-> new IllegalArgumentException("해당 클럽 존재 X"));
 
+		clubRepository.delete(club);
+		return true;
+	}
+
+	//클럽 코드 조회
+	@Transactional(readOnly = true)
+	public String getClubCode(Long clubId){
+		Member member = memberService.findMyMemberInfo();
+		//클럽 멤버 여부 체크
+		validateMember(member.getId(),clubId);
+
+		Club club = clubRepository.findById(clubId)
+			.orElseThrow(()-> new IllegalArgumentException("해당 클럽 존재 X"));
+		return club.getTeamCode();
 	}
 
 	private void validateMember(Long memberId, Long clubId) {
@@ -125,6 +147,18 @@ public class ClubService {
 		}
 	}
 
+	private void validateAdmin(Long memberId, Long clubId){
+		Optional<ClubMember> checkClubMember = clubMemberRepository.findByMemberIdAndClubId(memberId,clubId);
+		if (checkClubMember.isEmpty()){
+			throw new IllegalArgumentException("해당 멤버가 클럽 멤버가 아님");
+		}
+
+		if (checkClubMember.get().getCreatedBy()!=0){
+			throw new IllegalArgumentException("해당 멤버가 클럽장이 아님");
+		}
+	}
+
+	//수정 예정 ..
 	private String generateTeamCode() {
 		String teamCode="123456";
 		return teamCode;
