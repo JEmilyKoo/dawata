@@ -2,7 +2,7 @@ package com.ssafy.dawata.domain.notice.dto.response;
 
 import java.time.LocalDateTime;
 
-import com.ssafy.dawata.domain.member.entity.Member;
+import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 
 import lombok.Builder;
 
@@ -10,7 +10,7 @@ import lombok.Builder;
 public record NoticeResponse(
 	Long id,
 	String type,
-	Member member,
+	MemberInfoResponse memberInfoResponse,
 	boolean read,
 	boolean deleted,
 	LocalDateTime createdAt

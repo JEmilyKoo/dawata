@@ -9,9 +9,11 @@ import com.ssafy.dawata.domain.notice.enums.NoticeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,7 +47,8 @@ public class Notice {
 	@Column
 	private LocalDateTime createdAt = LocalDateTime.now();
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
 	private Member member;
 
 	@Builder(access = AccessLevel.PRIVATE)

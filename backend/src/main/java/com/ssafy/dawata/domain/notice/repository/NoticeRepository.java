@@ -11,15 +11,23 @@ import com.ssafy.dawata.domain.notice.entity.Notice;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
+	// TODO : 이미지 관련 사항 확정 시 IMAGE 작업 진행 예정
+
 	@Query("""
 		    SELECT new com.ssafy.dawata.domain.notice.dto.response.NoticeResponse(
 		        n.id, 
 		        CONCAT(n.noticeType, '', n.messageType), 
-		        n.member, 
+		        new com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse(
+		            m.email, 
+		            m.name, 
+		            '',
+		            m.createdAt
+		        ), 
 		        n.read, 
 		        n.deleted, 
 		        n.createdAt)
 		    FROM Notice n
+		    JOIN Member m ON n.referenceId = m.id
 		    WHERE n.member.id = :memberId 
 		    AND n.deleted = false
 		""")

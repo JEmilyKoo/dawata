@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -81,6 +83,50 @@ class NoticeControllerTest {
 					contentNode.get(0).get("read").asBoolean());
 				assertEquals(noticeResponse1.deleted(),
 					contentNode.get(0).get("deleted").asBoolean());
+			})
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("알림 읽기 - 성공")
+	void success_updateNoticeRead() throws Exception {
+		// given
+		//when
+		when(noticeService.updateNoticeReadState(1L)).thenReturn(true);
+
+		// then
+		mockMvc.perform(post("/notices/1")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(result -> {
+				Boolean resultBol = objectMapper.readValue(
+					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
+					new TypeReference<Boolean>() {
+					});
+
+				assertTrue(resultBol);
+			})
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("알림 삭제 - 성공")
+	void success_deleteNotice() throws Exception {
+		// given
+		//when
+		when(noticeService.deleteNotice(1L)).thenReturn(true);
+
+		// then
+		mockMvc.perform(delete("/notices/1")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(result -> {
+				Boolean resultBol = objectMapper.readValue(
+					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
+					new TypeReference<Boolean>() {
+					});
+
+				assertTrue(resultBol);
 			})
 			.andDo(print());
 	}
