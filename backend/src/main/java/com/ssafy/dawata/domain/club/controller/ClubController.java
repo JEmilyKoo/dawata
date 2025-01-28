@@ -51,9 +51,9 @@ public class ClubController {
 	public ResponseEntity<Boolean> updateClub(@PathVariable Long clubId, @RequestBody UpdateClubRequest request) {
 		try {
 			clubService.updateClub(request,clubId);
-			return ResponseEntity.ok(true); // 삭제 성공 시 true 반환
+			return ResponseEntity.ok(true);
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(false); // 삭제 실패 시 false 반환
+			return ResponseEntity.status(500).body(false);
 		}
 	}
 
@@ -74,10 +74,6 @@ public class ClubController {
 		String code = clubService.getClubCode(clubId);
 		return ResponseEntity.ok(code);
 	}
-
-
-
-
 
 
 
