@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
-import com.ssafy.dawata.domain.club.dto.request.DeleteClubRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateAdminRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
@@ -18,7 +17,7 @@ import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.club.repository.ClubRepository;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.service.MemberService;
-import com.ssafy.dawata.domain.club.dto.*;
+
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -79,11 +78,11 @@ public class ClubService {
 	}
 
 	//클럽 데이터 수정
-	public void updateClub(UpdateClubRequest request){
+	public void updateClub(UpdateClubRequest request, Long clubId){
 		Member member = memberService.findMyMemberInfo();
-		validateMember(member.getId(),request.clubId());
+		validateMember(member.getId(),clubId);
 
-		Club club = clubRepository.findById(request.clubId()).
+		Club club = clubRepository.findById(clubId).
 			orElseThrow(()-> new IllegalArgumentException("해당 id의 클럽 없음"));
 
 		//클럽명 전달 값 존재 시 반영
@@ -93,15 +92,15 @@ public class ClubService {
 	}
 
 	//클럽장 교체
-	public boolean updateAdmin(UpdateAdminRequest request){
+	public boolean updateAdmin(UpdateAdminRequest request, Long clubId){
 		//멤버 아이디랑 클럽 아이디로 요청자가 해당 클럽의 멤버인지 체크 -> 해당 클럽의 운영자인지 체크
-		Optional<ClubMember> checkCurrentAdmin = clubMemberRepository.findByMemberIdAndClubId(request.currentAdminId(), request.clubId());
+		Optional<ClubMember> checkCurrentAdmin = clubMemberRepository.findByMemberIdAndClubId(request.currentAdminId(), clubId);
 		if (checkCurrentAdmin.isEmpty()||checkCurrentAdmin.get().getCreatedBy()!=0){
 			throw new IllegalArgumentException("요청자가 관리자 아님");
 		}
 
 		//멤버 아이디와 클럽 아이디로 새로운 교체자가 클럽의 기존 멤버인지 체크
-		Optional<ClubMember> checkNewAdmin = clubMemberRepository.findByMemberIdAndClubId(request.newAdminId(),request.clubId());
+		Optional<ClubMember> checkNewAdmin = clubMemberRepository.findByMemberIdAndClubId(request.newAdminId(),clubId);
 		if (checkNewAdmin.isEmpty()){
 			throw new IllegalArgumentException("새로운 관리자가 클럽 멤버가 아님.");
 		}
@@ -117,10 +116,11 @@ public class ClubService {
 
 
 	//클럽 삭제
-	public boolean deleteClub(DeleteClubRequest request){
+	public boolean deleteClub(Long clubId){
 		//클럽장 여부 체크
-		validateAdmin(request.memberId(),request.clubId());
-		Club club = clubRepository.findById(request.clubId())
+		Member member = memberService.findMyMemberInfo();
+		validateAdmin(member.getId(),clubId);
+		Club club = clubRepository.findById(clubId)
 			.orElseThrow(()-> new IllegalArgumentException("해당 클럽 존재 X"));
 
 		clubRepository.delete(club);

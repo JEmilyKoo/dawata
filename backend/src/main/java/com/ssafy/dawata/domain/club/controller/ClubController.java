@@ -3,7 +3,6 @@ package com.ssafy.dawata.domain.club.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
-import com.ssafy.dawata.domain.club.dto.request.DeleteClubRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
 import com.ssafy.dawata.domain.club.service.ClubService;
@@ -50,7 +48,7 @@ public class ClubController {
 	// 클럽 정보 수정
 	@PatchMapping("/{clubId}")
 	public ResponseEntity<Void> updateClub(@PathVariable Long clubId, @RequestBody UpdateClubRequest request) {
-		clubService.updateClub(request);
+		clubService.updateClub(request,clubId);
 		return ResponseEntity.noContent().build();
 	}
 
