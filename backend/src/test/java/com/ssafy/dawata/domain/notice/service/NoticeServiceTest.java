@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 
 import com.ssafy.dawata.domain.notice.dto.response.NoticeResponse;
+import com.ssafy.dawata.domain.notice.entity.Notice;
+import com.ssafy.dawata.domain.notice.enums.NoticeType;
 import com.ssafy.dawata.domain.notice.repository.NoticeRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,5 +61,39 @@ class NoticeServiceTest {
 			noticeSlice.getContent().get(0).deleted());
 		assertEquals(responseSlice.getContent().get(0).createdAt(),
 			noticeSlice.getContent().get(0).createdAt());
+	}
+
+	@Test
+	@DisplayName("알림 읽기 update - 성공")
+	void success_updateNoticeReadState() {
+		// given
+		Notice notice =
+			new Notice(NoticeType.GROUP, 1, 1, false, false);
+
+		// when
+		Mockito.when(noticeRepository.findById(1L))
+			.thenReturn(Optional.of(notice));
+
+		// then
+		boolean resultBol = noticeService.updateNoticeReadState(1L);
+
+		assertTrue(resultBol);
+	}
+
+	@Test
+	@DisplayName("알림 삭제 update - 성공")
+	void success_deleteNotice() {
+		// given
+		Notice notice =
+			new Notice(NoticeType.GROUP, 1, 1, false, false);
+
+		// when
+		Mockito.when(noticeRepository.findById(1L))
+			.thenReturn(Optional.of(notice));
+
+		// then
+		boolean resultBol = noticeService.deleteNotice(1L);
+
+		assertTrue(resultBol);
 	}
 }
