@@ -54,11 +54,11 @@ public class ClubMemberService {
 		}
 
 		//추가할 이메일이 멤버로 존재하는지 체크
-		Member newMember = memberRepository.findById(request.memberId())
+		Member newMember = memberRepository.findByEmail(request.email())
 			.orElseThrow(()-> new IllegalArgumentException("해당 email의 user없음"));
 
 		//추가할 멤버가 이미 클럽 멤버인지 체크
-		if (clubMemberRepository.existsByMemberIdAndClubId(request.memberId(),clubId)){
+		if (clubMemberRepository.existsByMemberIdAndClubId(newMember.getId(),clubId)){
 			throw new IllegalArgumentException("추가할 멤버가 이미 클럽 멤버임");
 		}
 
@@ -95,13 +95,5 @@ public class ClubMemberService {
 
 
 	}
-
-
-
-
-
-
-
-
 
 }
