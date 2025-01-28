@@ -2,11 +2,13 @@ package com.ssafy.dawata.domain.club.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
+import com.ssafy.dawata.domain.club.dto.request.UpdateAdminRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
 import com.ssafy.dawata.domain.club.entity.Club;
@@ -75,6 +77,7 @@ public class ClubService {
 
 	}
 
+	//클럽 데이터 수정
 	public void updateClub(UpdateClubRequest request){
 		Member member = memberService.findMyMemberInfo();
 		validateMember(member.getId(),request.clubId());
@@ -82,15 +85,48 @@ public class ClubService {
 		Club club = clubRepository.findById(request.clubId()).
 			orElseThrow(()-> new IllegalArgumentException("해당 id의 클럽 없음"));
 
+		//클럽명 전달 값 존재 시 반영
 		request.name().ifPresent(club::updateName);
+		//카테고리 전달 값 존재 시 반영
 		request.category().ifPresent(club::updateCategory);
 	}
 
-	private void validateMember(Long id, Long clubId) {
+	//클럽장 교체
+	public boolean updateAdmin(UpdateAdminRequest request){
+		//멤버 아이디랑 클럽 아이디로 요청자가 해당 클럽의 멤버인지 체크 -> 해당 클럽의 운영자인지 체크
+		Optional<ClubMember> checkCurrentAdmin = clubMemberRepository.findByMemberIdAndClubId(request.currentAdminId(), request.clubId());
+		if (checkCurrentAdmin.isEmpty()||checkCurrentAdmin.get().getCreatedBy()!=0){
+			throw new IllegalArgumentException("요청자가 관리자 아님");
+		}
+
+		//멤버 아이디와 클럽 아이디로 새로운 교체자가 클럽의 기존 멤버인지 체크
+		Optional<ClubMember> checkNewAdmin = clubMemberRepository.findByMemberIdAndClubId(request.newAdminId(),request.clubId());
+		if (checkNewAdmin.isEmpty()){
+			throw new IllegalArgumentException("새로운 관리자가 클럽 멤버가 아님.");
+		}
+
+		ClubMember currentAdmin = checkCurrentAdmin.get();
+		ClubMember newAdmin = checkNewAdmin.get();
+
+		currentAdmin.setCreatedBy(1);
+		newAdmin.setCreatedBy(0);
+
+		return true;
+
+
+
+	}
+
+	private void validateMember(Long memberId, Long clubId) {
+		boolean isMember = clubMemberRepository.existsByMemberIdAndClubId(memberId, clubId);
+
+		if (!isMember){
+			throw new IllegalArgumentException("해당 멤버가 클럽 멤버가 아님");
+		}
 	}
 
 	private String generateTeamCode() {
-		String teamCode=null;
+		String teamCode="123456";
 		return teamCode;
 	}
 
