@@ -7,15 +7,21 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ssafy.dawata.domain.club.dto.request.BanClubMemberRequest;
 import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
+import com.ssafy.dawata.domain.club.dto.request.JoinClubByCodeRequest;
+import com.ssafy.dawata.domain.club.dto.request.JoinClubByEmailRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateAdminRequest;
+import com.ssafy.dawata.domain.club.dto.request.UpdateClubMemberRequest;
 import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
+import com.ssafy.dawata.domain.club.dto.response.ClubMemberInfoResponse;
 import com.ssafy.dawata.domain.club.entity.Club;
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.club.repository.ClubRepository;
 import com.ssafy.dawata.domain.member.entity.Member;
+import com.ssafy.dawata.domain.member.repository.MemberRepository;
 import com.ssafy.dawata.domain.member.service.MemberService;
 
 
@@ -27,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ClubService {
 	private final ClubRepository clubRepository;
+	private final MemberRepository memberRepository;
 	private final ClubMemberRepository clubMemberRepository;
 	private final MemberService memberService;
 
@@ -52,12 +59,7 @@ public class ClubService {
 	@Transactional(readOnly = true)
 	public ClubInfoResponse getClubById(Long clubId){
 		Member member = memberService.findMyMemberInfo();
-		//해당 클럽에 속해 있는지 체크
-		validateMember(member.getId(),clubId);
-
-		Club club = clubRepository.findById(clubId)
-			//예외 분리 곧 ..!
-			.orElseThrow(() -> new IllegalArgumentException("해당 id의 클럽 없음"));
+		Club club = validateClubAndMember(clubId, member.getId());
 
 		return ClubInfoResponse.from(club);
 	}
@@ -69,7 +71,6 @@ public class ClubService {
 	public List<ClubInfoResponse> getAllClubsByMemberId(){
 		Member member = memberService.findMyMemberInfo();
 		List<ClubMember> clubMembers = clubMemberRepository.findAllByMemberId(member.getId());
-
 		return clubMembers.stream()
 			.map(clubMember -> ClubInfoResponse.from(clubMember.getClub()))
 			.collect(Collectors.toList());
@@ -77,38 +78,25 @@ public class ClubService {
 	}
 
 	//클럽 데이터 수정
-	public void updateClub(UpdateClubRequest request, Long clubId){
-		//요청 클럽id의 존재 여부 체크
-		Club club = clubRepository.findById(clubId).
-			orElseThrow(()-> new IllegalArgumentException("해당 id의 클럽 없음"));
-
-		//요청자 정보 가져와서 요청 클럽 아이디의 멤버인지 체크
+	public boolean updateClub(UpdateClubRequest request, Long clubId){
+		//클라이언트의 멤버데이터 가져오고
 		Member member = memberService.findMyMemberInfo();
-		validateMember(member.getId(),clubId);
+		//해당 멤버가 팀에 속하는지 체크하고, 해당 클럽 id의 클럽 존재 체크
+		Club club = validateClubAndMember(clubId, member.getId());
 
 
 		//클럽명 요청 값 존재 시 반영
 		request.name().ifPresent(club::updateName);
 		//카테고리 요청 값 존재 시 반영
 		request.category().ifPresent(club::updateCategory);
+		return true;
 	}
 
 	//클럽장 교체
 	public boolean updateAdmin(UpdateAdminRequest request, Long clubId){
-		//멤버 아이디랑 클럽 아이디로 요청자가 해당 클럽의 멤버인지 체크 -> 해당 클럽의 운영자인지 체크
-		Optional<ClubMember> checkCurrentAdmin = clubMemberRepository.findByMemberIdAndClubId(request.currentAdminId(), clubId);
-		if (checkCurrentAdmin.isEmpty()||checkCurrentAdmin.get().getCreatedBy()!=0){
-			throw new IllegalArgumentException("요청자가 관리자 아님");
-		}
+		ClubMember currentAdmin = validateAdmin(request.currentAdminId(), clubId);
+		ClubMember newAdmin = validateMember(request.newAdminId(), clubId);
 
-		//멤버 아이디와 클럽 아이디로 새로운 교체자가 클럽의 기존 멤버인지 체크
-		Optional<ClubMember> checkNewAdmin = clubMemberRepository.findByMemberIdAndClubId(request.newAdminId(),clubId);
-		if (checkNewAdmin.isEmpty()){
-			throw new IllegalArgumentException("새로운 관리자가 클럽 멤버가 아님.");
-		}
-
-		ClubMember currentAdmin = checkCurrentAdmin.get();
-		ClubMember newAdmin = checkNewAdmin.get();
 
 		currentAdmin.setCreatedBy(1);
 		newAdmin.setCreatedBy(0);
@@ -117,15 +105,11 @@ public class ClubService {
 		return true;
 	}
 
-
 	//클럽 삭제
 	public boolean deleteClub(Long clubId){
 		//클럽장 여부 체크
 		Member member = memberService.findMyMemberInfo();
-		validateAdmin(member.getId(),clubId);
-		Club club = clubRepository.findById(clubId)
-			.orElseThrow(()-> new IllegalArgumentException("해당 클럽 존재 X"));
-
+		Club club = validateAdmin(member.getId(), clubId).getClub();
 		clubRepository.delete(club);
 		return true;
 	}
@@ -134,34 +118,183 @@ public class ClubService {
 	@Transactional(readOnly = true)
 	public String getClubCode(Long clubId){
 		Member member = memberService.findMyMemberInfo();
-		//클럽 멤버 여부 체크
-		validateMember(member.getId(),clubId);
-
-		Club club = clubRepository.findById(clubId)
-			.orElseThrow(()-> new IllegalArgumentException("해당 클럽 존재 X"));
+		Club club = validateClubAndMember(clubId, member.getId());
 		return club.getTeamCode();
 	}
 
-	private void validateMember(Long memberId, Long clubId) {
-		boolean isMember = clubMemberRepository.existsByMemberIdAndClubId(memberId, clubId);
+	//클럽 id로 멤버 list 조회
+	@Transactional(readOnly = true)
+	public List<ClubMemberInfoResponse> getClubMembers(Long clubId) {
+		//요청자 정보 갖고오기
+		Member member = memberService.findMyMemberInfo();
+		validateClubAndMember(clubId, member.getId());
+		return clubMemberRepository.findAllByClubId(clubId).stream()
+			.map(ClubMemberInfoResponse::from)
+			.toList();
+	}
 
-		if (!isMember){
-			throw new IllegalArgumentException("해당 멤버가 클럽 멤버가 아님");
+
+	//이메일로 멤버 추가
+	public boolean addClubMemberByEmail(JoinClubByEmailRequest request,long clubId){
+		validateMember(request.adminId(), clubId);
+
+		//추가할 이메일이 멤버로 존재하는지 체크
+		Member newMember = memberRepository.findByEmail(request.email())
+			.orElseThrow(() -> new IllegalArgumentException("요청 email의 멤버 데이터 X"));
+
+
+		//추가할 멤버가 이미 클럽멤버인지 체크
+		if (clubMemberRepository.existsByMemberIdAndClubId(newMember.getId(), clubId)) {
+			throw new IllegalArgumentException("추가할 멤버가 이미 클럽 멤버");
+		}
+
+		//참여하려는 id의 클럽이 존재하는지 체크 (반환 값 때문에 분리 메서드 못 씀)
+		Club club = clubRepository.findById(clubId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 클럽 존재 X"));
+
+		ClubMember clubMember = ClubMember.createClubMember(newMember, club,1);
+		clubMemberRepository.save(clubMember);
+		return true;
+	}
+
+	//코드로 멤버 추가
+	@Transactional
+	public boolean addClubMemberByCode(JoinClubByCodeRequest request, Long clubId){
+		Member newMember = memberRepository.findById(request.memberId())
+			.orElseThrow(()-> new IllegalArgumentException("해당 id의 member없음"));
+
+
+		//참여하려는 id의 클럽이 존재하는지 체크
+		Club club = validateClub(clubId);
+
+
+		if (!club.getTeamCode().equals(request.teamCode())) {
+			throw new IllegalArgumentException("팀 코드 일치X");
+		}
+
+		ClubMember clubMember = ClubMember.createClubMember(newMember, club,1);
+		clubMemberRepository.save(clubMember);
+		return true;
+
+	}
+
+	//그룹의 특정 멤버 데이터 조회
+	@Transactional(readOnly = true)
+	public ClubMemberInfoResponse getClubMember(Long clubId,Long clubMemberId){
+		Member member = memberService.findMyMemberInfo();
+		validateClubAndMember(clubId, member.getId());
+
+
+		//반환값 때문에 validate 메서드 사용X
+		ClubMember clubMember = clubMemberRepository.findById(clubMemberId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 클럽 멤버가 존재X"));
+
+
+		return ClubMemberInfoResponse.from(clubMember);
+	}
+
+	//클럽 멤버 정보 수정
+	public boolean updateClubMember(Long clubId, UpdateClubMemberRequest request) {
+		Member member = memberService.findMyMemberInfo();
+		//해당 클럽 존재하고 그 클럽의 멤버 체크
+		validateClubAndMember(clubId, member.getId());
+
+		ClubMember clubMember = clubMemberRepository.findById(request.clubMemberId())
+			.orElseThrow(() -> new IllegalArgumentException("클라이언트가 그룹멤버아님"));
+
+		if (!clubMember.getMember().getId().equals(member.getId())) {
+			throw new IllegalArgumentException("본인 정보 아님");
+		}
+		request.nickname().ifPresent(clubMember::setNickname);
+		request.clubName().ifPresent(clubMember::setClubName);
+		return true;
+
+	}
+
+	//탈퇴
+	public boolean leaveClub(Long clubId, Long clubMemberId){
+		Member member = memberService.findMyMemberInfo();
+		validateClubAndMember(clubId, member.getId());
+		ClubMember clubMember = clubMemberRepository.findById(clubMemberId)
+			.orElseThrow(() -> new IllegalArgumentException("클라이언트가 그룹멤버아님"));
+
+		if (!clubMember.getMember().getId().equals(member.getId())) {
+			throw new IllegalArgumentException("본인 정보 아님");
+
+		}
+		clubMemberRepository.delete(clubMember);
+		return true;
+
+	}
+
+	//(클럽장이)강퇴
+	public boolean banClubMember(Long clubId, BanClubMemberRequest request){
+		//클라이언트
+		Member admin = memberService.findMyMemberInfo();
+
+		//클럽장 체크
+		validateAdmin(admin.getId(),clubId);
+
+		//탈퇴시킬 멤버 유효성 체크
+		ClubMember out = clubMemberRepository.findByMemberIdAndClubId(request.memberId(),clubId)
+			.orElseThrow(() -> new IllegalArgumentException("탈퇴시킬 멤버 id에 해당하는 멤버 없음"));
+
+
+		clubMemberRepository.delete(out);
+		return true;
+
+	}
+
+
+
+
+
+
+	////////////////메서드 분리//////////////////////////
+
+	//클럽 id에 해당하는 클럽 존재 체크
+	private Club validateClub(Long clubId) {
+		return clubRepository.findById(clubId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 id의 클럽 존재 X"));
+	}
+
+	//클럽 존재 체크 + 클라이언트가 클럽 멤버인지
+	private Club validateClubAndMember(Long clubId, Long memberId) {
+		//클럽 존재 체크 후
+		Club club = validateClub(clubId);
+		//클라이언트가 클럽 멤버인지 체크
+		if (!clubMemberRepository.existsByMemberIdAndClubId(memberId, clubId)) {
+			throw new IllegalArgumentException("해당 클럽의 멤버 아님");
+		}
+		return club;
+	}
+
+	//멤버가 클럽 멤버인지 체크
+	private ClubMember validateMember(Long memberId, Long clubId) {
+		return clubMemberRepository.findByMemberIdAndClubId(memberId, clubId)
+			.orElseThrow(() -> new IllegalArgumentException("클라이언트가 클럽 멤버 아님"));
+	}
+
+
+	//클럽장인지 체크
+	private ClubMember validateAdmin(Long memberId, Long clubId){
+
+		ClubMember clubMember = validateMember(memberId, clubId);
+		if (clubMember.getCreatedBy() != 0) {
+			throw new IllegalArgumentException("클라이언트가 클럽장 아님");
+		}
+		return clubMember;
+	}
+
+	//이미 클럽 속한 멤버인지 체크
+	private void validateUniqueMember(Long memberId, Long clubId) {
+		if (clubMemberRepository.existsByMemberIdAndClubId(memberId, clubId)) {
+			throw new IllegalArgumentException("클라이언트는 이미 클럽 속해있음");
 		}
 	}
 
-	private void validateAdmin(Long memberId, Long clubId){
-		Optional<ClubMember> checkClubMember = clubMemberRepository.findByMemberIdAndClubId(memberId,clubId);
-		if (checkClubMember.isEmpty()){
-			throw new IllegalArgumentException("해당 멤버가 클럽 멤버가 아님");
-		}
 
-		if (checkClubMember.get().getCreatedBy()!=0){
-			throw new IllegalArgumentException("해당 멤버가 클럽장이 아님");
-		}
-	}
-
-	//팀코드 생성
+			//팀코드 생성
 	private String generateTeamCode() {
 		return TeamCodeGenerator.generateTeamCode();
 	}
