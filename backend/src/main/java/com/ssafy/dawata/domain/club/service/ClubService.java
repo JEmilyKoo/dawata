@@ -68,8 +68,7 @@ public class ClubService {
 	@Transactional(readOnly = true)
 	public List<ClubInfoResponse> getAllClubsByMemberId(){
 		Member member = memberService.findMyMemberInfo();
-		List<ClubMember> clubMembers = clubMemberRepository.findAllById(Collections.singleton(member.getId()));
-		// 이 부분에서 왜 .. Repository에서 적은 Long 타입을 파라미터로 보냈는데 에러가 날까요 .. (일단 추천 수정 방식으로 수정했음다 ..)
+		List<ClubMember> clubMembers = clubMemberRepository.findAllByMemberId(member.getId());
 
 		return clubMembers.stream()
 			.map(clubMember -> ClubInfoResponse.from(clubMember.getClub()))
@@ -79,15 +78,18 @@ public class ClubService {
 
 	//클럽 데이터 수정
 	public void updateClub(UpdateClubRequest request, Long clubId){
-		Member member = memberService.findMyMemberInfo();
-		validateMember(member.getId(),clubId);
-
+		//요청 클럽id의 존재 여부 체크
 		Club club = clubRepository.findById(clubId).
 			orElseThrow(()-> new IllegalArgumentException("해당 id의 클럽 없음"));
 
-		//클럽명 전달 값 존재 시 반영
+		//요청자 정보 가져와서 요청 클럽 아이디의 멤버인지 체크
+		Member member = memberService.findMyMemberInfo();
+		validateMember(member.getId(),clubId);
+
+
+		//클럽명 요청 값 존재 시 반영
 		request.name().ifPresent(club::updateName);
-		//카테고리 전달 값 존재 시 반영
+		//카테고리 요청 값 존재 시 반영
 		request.category().ifPresent(club::updateCategory);
 	}
 
@@ -110,6 +112,7 @@ public class ClubService {
 
 		currentAdmin.setCreatedBy(1);
 		newAdmin.setCreatedBy(0);
+
 
 		return true;
 	}
