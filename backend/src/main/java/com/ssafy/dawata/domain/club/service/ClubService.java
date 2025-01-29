@@ -42,15 +42,18 @@ public class ClubService {
 	public ClubInfoResponse createClub(CreateClubRequest request){
 		//추후에 SecurityContextHolder에서 가져오도록 하겠습니다.
 		Member member = memberService.findMyMemberInfo();
+		List<ClubMember> clubMembers = clubMemberRepository.findAllByMemberId(member.getId());
 		String teamCode = generateTeamCode();
 		Club club = Club.createClub(request.name(), request.category(),teamCode);
+
 
 		clubRepository.save(club);
 
 		ClubMember clubMember = ClubMember.createClubMember(member,club,0);
 		clubMemberRepository.save(clubMember);
+		List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
 
-		return ClubInfoResponse.from(club);
+		return ClubInfoResponse.from(club,members);
 
 	}
 
@@ -60,8 +63,9 @@ public class ClubService {
 	public ClubInfoResponse getClubById(Long clubId){
 		Member member = memberService.findMyMemberInfo();
 		Club club = validateClubAndMember(clubId, member.getId());
+		List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
 
-		return ClubInfoResponse.from(club);
+		return ClubInfoResponse.from(club,members);
 	}
 
 	//클라이언트의 멤버 정보 가져와서 -> 해당 유저가 속한 모든 그룹의 정보 가져오기
@@ -72,7 +76,11 @@ public class ClubService {
 		Member member = memberService.findMyMemberInfo();
 		List<ClubMember> clubMembers = clubMemberRepository.findAllByMemberId(member.getId());
 		return clubMembers.stream()
-			.map(clubMember -> ClubInfoResponse.from(clubMember.getClub()))
+			.map(clubMember -> {
+				Club club = clubMember.getClub();
+				List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
+				return ClubInfoResponse.from(club, members);
+			})
 			.collect(Collectors.toList());
 
 	}
@@ -297,6 +305,13 @@ public class ClubService {
 			//팀코드 생성
 	private String generateTeamCode() {
 		return TeamCodeGenerator.generateTeamCode();
+	}
+
+	//클럽 데이터 + 클럽 멤버 데이터 유틸 메서드
+	private List<ClubMemberInfoResponse> getMembersForResponse(Long clubId) {
+		return clubMemberRepository.findAllByClubId(clubId).stream()
+			.map(ClubMemberInfoResponse::from)
+			.toList();
 	}
 
 }
