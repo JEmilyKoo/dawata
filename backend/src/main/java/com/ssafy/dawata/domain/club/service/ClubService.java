@@ -111,8 +111,6 @@ public class ClubService {
 		//클럽장 여부 체크
 		Member member = memberService.findMyMemberInfo();
 		Club club = validateAdmin(member.getId(), clubId).getClub();
-		//클럽 삭제 전 클럽 내 멤버를 먼저 삭제해서 FK 무결성 지키기
-		clubMemberRepository.deleteAllByClubId(clubId);
 		clubRepository.delete(club);
 		return true;
 	}

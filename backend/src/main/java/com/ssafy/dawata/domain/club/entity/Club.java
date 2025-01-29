@@ -1,13 +1,15 @@
 package com.ssafy.dawata.domain.club.entity;
 
-import com.ssafy.dawata.domain.common.BaseTimeEntity;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,6 +40,9 @@ public class Club {
 	//img도 일단 만들어둘게요.
 	@Column
 	private String img;
+
+	@OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ClubMember> members;
 
 	@Builder(access = AccessLevel.PRIVATE)
 	public Club(String name, ClubCategory category, String teamCode) {
