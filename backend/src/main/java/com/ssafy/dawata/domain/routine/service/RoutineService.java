@@ -65,4 +65,34 @@ public class RoutineService {
 
 		return true;
 	}
+
+	public boolean updateRoutine(Long routineId, RoutineRequest routineRequest) {
+		RoutineTemplate routineTemplate =
+			routineTemplateRepository.findById(routineId)
+				.orElseThrow(IllegalArgumentException::new);
+
+		routineElementRepository.deleteAllByRoutineTemplate(routineTemplate);
+
+		for (int i = 0; i < routineRequest.elementRequestList().size(); i++) {
+			routineElementRepository.save(
+				createRoutineElement(
+					routineRequest.elementRequestList().get(i).play(),
+					routineRequest.elementRequestList().get(i).spendTime(),
+					i + 1,
+					routineTemplate));
+		}
+
+		return true;
+	}
+
+	public boolean deleteRoutine(Long routineId) {
+		RoutineTemplate routineTemplate =
+			routineTemplateRepository.findById(routineId)
+				.orElseThrow(IllegalArgumentException::new);
+
+		routineElementRepository.deleteAllByRoutineTemplate(routineTemplate);
+		routineTemplateRepository.deleteById(routineId);
+
+		return true;
+	}
 }

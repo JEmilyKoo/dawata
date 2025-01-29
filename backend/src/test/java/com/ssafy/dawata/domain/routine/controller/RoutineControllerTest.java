@@ -146,4 +146,49 @@ class RoutineControllerTest {
 			})
 			.andDo(print());
 	}
+
+	@Test
+	@DisplayName("내 루틴 수정 - 성공")
+	void success_updateRoutine() throws Exception {
+		// given
+		RoutineRequest request =
+			new RoutineRequest("test", List.of());
+		// when
+		when(routineService.updateRoutine(1L, request)).thenReturn(true);
+		// then
+		mockMvc.perform(put("/routines/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(result -> {
+				boolean resultBol = objectMapper.readValue(
+					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
+					new TypeReference<Boolean>() {
+					});
+
+				assertTrue(resultBol);
+			})
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("내 루틴 삭제 - 성공")
+	void success_deleteRoutine() throws Exception {
+		// given
+		// when
+		when(routineService.deleteRoutine(1L)).thenReturn(true);
+		// then
+		mockMvc.perform(delete("/routines/1")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(result -> {
+				boolean resultBol = objectMapper.readValue(
+					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
+					new TypeReference<Boolean>() {
+					});
+
+				assertTrue(resultBol);
+			})
+			.andDo(print());
+	}
 }
