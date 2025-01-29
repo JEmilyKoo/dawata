@@ -136,4 +136,59 @@ class RoutineServiceTest {
 
 		assertTrue(resultBol);
 	}
+
+	@Test
+	@DisplayName("루틴 수정 - 성공")
+	void success_updateRoutine() {
+		// given
+		Member member =
+			new Member("test@email.com", "tester", false);
+
+		RoutineTemplate routineTemplate =
+			createRoutineTemplate(
+				"test", member);
+		RoutineElementRequest element1 =
+			new RoutineElementRequest(PlayType.EAT, 10L);
+		RoutineElementRequest element2 =
+			new RoutineElementRequest(PlayType.WAKE, 20L);
+		List<RoutineElementRequest> routineElementList = List.of(element1, element2);
+
+		RoutineRequest request
+			= new RoutineRequest("tester", routineElementList);
+
+		// when
+		when(memberRepository.getReferenceById(1L)).thenReturn(member);
+		when(routineElementRepository.save(any(RoutineElement.class)))
+			.thenAnswer(invocation -> invocation.getArgument(0));
+
+		// then
+		boolean resultBol = routineService.saveRoutine(request);
+
+		assertTrue(resultBol);
+	}
+
+	@Test
+	@DisplayName("루틴 삭제 - 성공")
+	void success_deleteRoutine() {
+		// given
+		Member member =
+			new Member("test@email.com", "tester", false);
+		
+		RoutineElementRequest element1 =
+			new RoutineElementRequest(PlayType.EAT, 10L);
+		RoutineElementRequest element2 =
+			new RoutineElementRequest(PlayType.WAKE, 20L);
+		List<RoutineElementRequest> routineElementList = List.of(element1, element2);
+
+		RoutineRequest request
+			= new RoutineRequest("tester", routineElementList);
+
+		// when
+		when(memberRepository.getReferenceById(1L)).thenReturn(member);
+
+		// then
+		boolean resultBol = routineService.saveRoutine(request);
+
+		assertTrue(resultBol);
+	}
 }

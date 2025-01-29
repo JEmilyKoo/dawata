@@ -1,9 +1,11 @@
 package com.ssafy.dawata.domain.routine.controller;
 
 import org.springframework.data.domain.Slice;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +36,18 @@ public class RoutineController {
 	@PostMapping()
 	public boolean createRoutine(@RequestBody RoutineRequest routineRequest) {
 		return routineService.saveRoutine(routineRequest);
+	}
+
+	@PutMapping("/{routineId}")
+	public boolean updateRoutine(
+		@RequestBody RoutineRequest routineRequest,
+		@PathVariable("routineId") Long routineId) {
+		return routineService.updateRoutine(routineId, routineRequest);
+	}
+
+	@DeleteMapping("/{routineId}")
+	public boolean deleteRoutine(
+		@PathVariable("routineId") Long routineId) {
+		return routineService.deleteRoutine(routineId);
 	}
 }
