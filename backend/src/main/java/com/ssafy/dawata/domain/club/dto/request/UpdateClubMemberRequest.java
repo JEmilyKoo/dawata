@@ -1,8 +1,10 @@
 package com.ssafy.dawata.domain.club.dto.request;
 
+import java.util.Optional;
 public record UpdateClubMemberRequest(
-	Long memberId,
-	String nickname,
-	String clubName
+	Optional<String> nickname,
+	Optional<String> clubName,
+
+	Long clubMemberId
 ) {
 }

@@ -54,7 +54,7 @@ public class ClubMember {
 		this.createdBy = createdBy;
 	}
 
-	public static ClubMember createClubMember(Member member, Club club,int createdBy){
+	public static ClubMember createClubMember(Member member, Club club, int createdBy){
 		return ClubMember.builder()
 			.member(member)
 			.club(club)

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "club")
-public class Club extends BaseTimeEntity {
+public class Club {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +46,7 @@ public class Club extends BaseTimeEntity {
 		this.teamCode = teamCode;
 	}
 
-	public static Club createGroup(String name, ClubCategory category, String teamCode) {
+	public static Club createClub(String name, ClubCategory category, String teamCode) {
 		return Club.builder()
 			.name(name)
 			.category(category)

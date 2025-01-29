@@ -111,6 +111,7 @@ public class ClubService {
 		//클럽장 여부 체크
 		Member member = memberService.findMyMemberInfo();
 		Club club = validateAdmin(member.getId(), clubId).getClub();
+		//클럽 삭제 전 클럽 내 멤버를 먼저 삭제해서 FK 무결성 지키기
 		clubMemberRepository.deleteAllByClubId(clubId);
 		clubRepository.delete(club);
 		return true;
@@ -143,15 +144,9 @@ public class ClubService {
 		Member newMember = memberRepository.findByEmail(request.email())
 			.orElseThrow(() -> new IllegalArgumentException("요청 email의 멤버 데이터 X"));
 
-		//추가할 멤버가 이미 클럽멤버인지 체크
-		if (clubMemberRepository.existsByMemberIdAndClubId(newMember.getId(), clubId)) {
-			throw new IllegalArgumentException("추가할 멤버가 이미 클럽 멤버");
-		}
+		validateUniqueMember(newMember.getId(), clubId);
 
-		//참여하려는 id의 클럽이 존재하는지 체크 (반환 값 때문에 분리 메서드 못 씀)
-		Club club = clubRepository.findById(clubId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 클럽 존재 X"));
-
+		Club club = validateClub(clubId);
 		ClubMember clubMember = ClubMember.createClubMember(newMember, club, 1);
 		clubMemberRepository.save(clubMember);
 		return true;
@@ -203,6 +198,7 @@ public class ClubService {
 		}
 		request.nickname().ifPresent(clubMember::setNickname);
 		request.clubName().ifPresent(clubMember::setClubName);
+		clubMemberRepository.save(clubMember);
 		return true;
 
 	}
