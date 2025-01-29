@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.routine.service;
 
+import static com.ssafy.dawata.domain.routine.entity.RoutineTemplate.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -17,17 +18,27 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 
+import com.ssafy.dawata.domain.member.entity.Member;
+import com.ssafy.dawata.domain.member.repository.MemberRepository;
+import com.ssafy.dawata.domain.routine.dto.request.RoutineElementRequest;
+import com.ssafy.dawata.domain.routine.dto.request.RoutineRequest;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineDetailResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
+import com.ssafy.dawata.domain.routine.entity.RoutineElement;
 import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
 import com.ssafy.dawata.domain.routine.enums.PlayType;
-import com.ssafy.dawata.domain.routine.repository.RoutineRepository;
+import com.ssafy.dawata.domain.routine.repository.RoutineElementRepository;
+import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
 
 @ExtendWith(MockitoExtension.class)
 class RoutineServiceTest {
 	@Mock
-	private RoutineRepository routineRepository;
+	private RoutineTemplateRepository routineTemplateRepository;
+	@Mock
+	private RoutineElementRepository routineElementRepository;
+	@Mock
+	private MemberRepository memberRepository;
 
 	@InjectMocks
 	private RoutineService routineService;
@@ -37,9 +48,9 @@ class RoutineServiceTest {
 	void success_findAllRoutines() {
 		// given
 		RoutineTemplateResponse response1 =
-			new RoutineTemplateResponse("response1", 10L);
+			new RoutineTemplateResponse(1L, "response1", 10L);
 		RoutineTemplateResponse response2 =
-			new RoutineTemplateResponse("response1", 100L);
+			new RoutineTemplateResponse(2L, "response1", 100L);
 
 		List<RoutineTemplateResponse> noticeResponses = List.of(response1, response2);
 
@@ -47,7 +58,7 @@ class RoutineServiceTest {
 
 		Slice<RoutineTemplateResponse> routineTemplateResponseSlice = new SliceImpl<>(noticeResponses, pageable, true);
 		// when
-		when(routineRepository.customFindAllByMemberId(1L)).thenReturn(routineTemplateResponseSlice);
+		when(routineTemplateRepository.customFindAllByMemberId(1L)).thenReturn(routineTemplateResponseSlice);
 
 		// then
 		Slice<RoutineTemplateResponse> routineElementResponses =
@@ -67,18 +78,18 @@ class RoutineServiceTest {
 		Long routineId = 1L;
 		Long userId = 1L;
 		RoutineTemplate routineTemplate =
-			new RoutineTemplate("test");
+			new RoutineTemplate("test", null);
 		RoutineElementResponse response1 =
-			new RoutineElementResponse(PlayType.EAT, 10L, true);
+			new RoutineElementResponse(1L, PlayType.EAT, 10L, true);
 		RoutineElementResponse response2 =
-			new RoutineElementResponse(PlayType.WAKE, 110L, true);
+			new RoutineElementResponse(2L, PlayType.WAKE, 110L, true);
 		List<RoutineElementResponse> responseList =
 			List.of(response1, response2);
 
 		// when
-		when(routineRepository.findById(userId))
+		when(routineTemplateRepository.findById(userId))
 			.thenReturn(Optional.of(routineTemplate));
-		when(routineRepository.customFindByRoutineId(routineId))
+		when(routineTemplateRepository.customFindByRoutineId(routineId))
 			.thenReturn(responseList);
 
 		// then
@@ -92,5 +103,37 @@ class RoutineServiceTest {
 			responseList.get(0).spendTime());
 		assertEquals(routineResponse.routineTemplateList().get(0).state(),
 			responseList.get(0).state());
+	}
+
+	@Test
+	@DisplayName("루틴 생성 - 성공")
+	void success_saveRoutine() {
+		// given
+		Member member =
+			new Member("test@email.com", "tester", false);
+
+		RoutineTemplate routineTemplate =
+			createRoutineTemplate(
+				"test", member);
+		RoutineElementRequest element1 =
+			new RoutineElementRequest(PlayType.EAT, 10L);
+		RoutineElementRequest element2 =
+			new RoutineElementRequest(PlayType.WAKE, 20L);
+		List<RoutineElementRequest> routineElementList = List.of(element1, element2);
+
+		RoutineRequest request
+			= new RoutineRequest("tester", routineElementList);
+
+		// when
+		when(memberRepository.getReferenceById(1L)).thenReturn(member);
+		when(routineTemplateRepository.save(any(RoutineTemplate.class)))
+			.thenReturn(routineTemplate);
+		when(routineElementRepository.save(any(RoutineElement.class)))
+			.thenAnswer(invocation -> invocation.getArgument(0));
+
+		// then
+		boolean resultBol = routineService.saveRoutine(request);
+
+		assertTrue(resultBol);
 	}
 }

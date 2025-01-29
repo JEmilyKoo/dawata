@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.notice.dto.response.NoticeResponse;
+import com.ssafy.dawata.domain.routine.dto.request.RoutineRequest;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineDetailResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
@@ -60,9 +61,9 @@ class RoutineControllerTest {
 	void success_getRoutineList() throws Exception {
 		// given
 		RoutineTemplateResponse response1 =
-			new RoutineTemplateResponse("response1", 10L);
+			new RoutineTemplateResponse(1L, "response1", 10L);
 		RoutineTemplateResponse response2 =
-			new RoutineTemplateResponse("response1", 100L);
+			new RoutineTemplateResponse(2L, "response1", 100L);
 
 		List<RoutineTemplateResponse> noticeResponses = List.of(response1, response2);
 
@@ -94,9 +95,9 @@ class RoutineControllerTest {
 	void success_getRoutine() throws Exception {
 		// given
 		RoutineElementResponse response1 =
-			new RoutineElementResponse(PlayType.EAT, 10L, true);
+			new RoutineElementResponse(1L, PlayType.EAT, 10L, true);
 		RoutineElementResponse response2 =
-			new RoutineElementResponse(PlayType.WAKE, 30L, true);
+			new RoutineElementResponse(2L, PlayType.WAKE, 30L, true);
 
 		RoutineDetailResponse detailResponse =
 			new RoutineDetailResponse("test", List.of(response1, response2));
@@ -118,6 +119,30 @@ class RoutineControllerTest {
 				assertEquals(
 					resultResponse.routineTemplateList().size(),
 					detailResponse.routineTemplateList().size());
+			})
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("내 루틴 생성 - 성공")
+	void success_createRoutine() throws Exception {
+		// given
+		RoutineRequest request =
+			new RoutineRequest("test", List.of());
+		// when
+		when(routineService.saveRoutine(request)).thenReturn(true);
+		// then
+		mockMvc.perform(post("/routines")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(result -> {
+				boolean resultBol = objectMapper.readValue(
+					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
+					new TypeReference<Boolean>() {
+					});
+
+				assertTrue(resultBol);
 			})
 			.andDo(print());
 	}

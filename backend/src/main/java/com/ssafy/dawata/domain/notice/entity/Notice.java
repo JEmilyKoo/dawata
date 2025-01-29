@@ -3,12 +3,12 @@ package com.ssafy.dawata.domain.notice.entity;
 import java.time.LocalDateTime;
 
 import com.ssafy.dawata.domain.member.entity.Member;
-import com.ssafy.dawata.domain.notice.enums.NoticeConverter;
 import com.ssafy.dawata.domain.notice.enums.NoticeType;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,7 +29,7 @@ public class Notice {
 	private Long id;
 
 	@Column(name = "type")
-	@Convert(converter = NoticeConverter.class)
+	@Enumerated(EnumType.ORDINAL)
 	private NoticeType noticeType;
 
 	@Column

@@ -34,8 +34,16 @@ public class RoutineTemplate {
 	private Member member;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public RoutineTemplate(String name) {
+	public RoutineTemplate(String name, Member member) {
 		this.name = name;
+		this.member = member;
+	}
+
+	public static RoutineTemplate createRoutineTemplate(String name, Member member) {
+		return RoutineTemplate.builder()
+			.name(name)
+			.member(member)
+			.build();
 	}
 
 	public void updateName(String name) {
