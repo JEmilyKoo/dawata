@@ -161,10 +161,9 @@ public class ClubService {
 		}
 	}
 
-	//수정 예정 ..
+	//팀코드 생성
 	private String generateTeamCode() {
-		String teamCode="123456";
-		return teamCode;
+		return TeamCodeGenerator.generateTeamCode();
 	}
 
 }
