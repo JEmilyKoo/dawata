@@ -111,6 +111,7 @@ public class ClubService {
 		//클럽장 여부 체크
 		Member member = memberService.findMyMemberInfo();
 		Club club = validateAdmin(member.getId(), clubId).getClub();
+		clubMemberRepository.deleteAllByClubId(clubId);
 		clubRepository.delete(club);
 		return true;
 	}
