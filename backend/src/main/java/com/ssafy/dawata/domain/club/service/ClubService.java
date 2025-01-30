@@ -183,12 +183,12 @@ public class ClubService {
 	}
 
 	//클럽 멤버 정보 수정
-	public boolean updateClubMember(Long clubId, UpdateClubMemberRequest request) {
+	public boolean updateClubMember(Long clubId, Long clubMemberId, UpdateClubMemberRequest request) {
 		Member member = memberService.findMyMemberInfo();
 		//해당 클럽 존재하고 그 클럽의 멤버 체크
 		validateClubAndMember(clubId, member.getId());
 
-		ClubMember clubMember = clubMemberRepository.findById(request.clubMemberId())
+		ClubMember clubMember = clubMemberRepository.findById(clubMemberId)
 			.orElseThrow(() -> new IllegalArgumentException("클라이언트가 그룹멤버아님"));
 
 		if (!clubMember.getMember().getId().equals(member.getId())) {

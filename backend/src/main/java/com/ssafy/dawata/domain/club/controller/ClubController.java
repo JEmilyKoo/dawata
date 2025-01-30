@@ -39,7 +39,7 @@ public class ClubController {
 
 	//특정 클럽 조회
 	@GetMapping("/{clubId}")
-	public ResponseEntity<ClubInfoResponse>getClubById(@PathVariable Long clubId){
+	public ResponseEntity<ClubInfoResponse> getClubById(@PathVariable Long clubId) {
 		ClubInfoResponse response = clubService.getClubById(clubId);
 		return ResponseEntity.ok(response);
 	}
@@ -55,7 +55,7 @@ public class ClubController {
 	@PatchMapping("/{clubId}")
 	public ResponseEntity<Boolean> updateClub(@PathVariable Long clubId, @RequestBody UpdateClubRequest request) {
 		try {
-			clubService.updateClub(request,clubId);
+			clubService.updateClub(request, clubId);
 			return ResponseEntity.ok(true);
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(false);
@@ -89,14 +89,16 @@ public class ClubController {
 
 	// 클럽 내 특정 멤버 조회
 	@GetMapping("/{clubId}/members/{clubMemberId}")
-	public ResponseEntity<ClubMemberInfoResponse> getClubMember(@PathVariable Long clubId, @PathVariable Long clubMemberId) {
+	public ResponseEntity<ClubMemberInfoResponse> getClubMember(@PathVariable Long clubId,
+		@PathVariable Long clubMemberId) {
 		ClubMemberInfoResponse response = clubService.getClubMember(clubId, clubMemberId);
 		return ResponseEntity.ok(response);
 	}
 
 	// 이메일로 클럽 멤버 추가
 	@PostMapping("/{clubId}/members/email")
-	public ResponseEntity<Boolean> addClubMemberByEmail(@PathVariable Long clubId, @RequestBody JoinClubByEmailRequest request) {
+	public ResponseEntity<Boolean> addClubMemberByEmail(@PathVariable Long clubId,
+		@RequestBody JoinClubByEmailRequest request) {
 		try {
 			clubService.addClubMemberByEmail(request, clubId);
 			return ResponseEntity.ok(true);
@@ -107,7 +109,8 @@ public class ClubController {
 
 	// 코드로 클럽 멤버 추가
 	@PostMapping("/{clubId}/members/code")
-	public ResponseEntity<Boolean> addClubMemberByCode(@PathVariable Long clubId, @RequestBody JoinClubByCodeRequest request) {
+	public ResponseEntity<Boolean> addClubMemberByCode(@PathVariable Long clubId,
+		@RequestBody JoinClubByCodeRequest request) {
 		try {
 			clubService.addClubMemberByCode(request, clubId);
 			return ResponseEntity.ok(true);
@@ -118,9 +121,10 @@ public class ClubController {
 
 	// 클럽 멤버 정보 수정
 	@PatchMapping("/{clubId}/members/{clubMemberId}")
-	public ResponseEntity<Boolean> updateClubMember(@PathVariable Long clubId, @RequestBody UpdateClubMemberRequest request) {
+	public ResponseEntity<Boolean> updateClubMember(@PathVariable Long clubId, @PathVariable Long clubMemberId,
+		@RequestBody UpdateClubMemberRequest request) {
 		try {
-			clubService.updateClubMember(clubId, request);
+			clubService.updateClubMember(clubId, clubMemberId, request);
 			return ResponseEntity.ok(true);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest().body(false);
@@ -148,7 +152,5 @@ public class ClubController {
 			return ResponseEntity.badRequest().body(false);
 		}
 	}
-
-
 
 }
