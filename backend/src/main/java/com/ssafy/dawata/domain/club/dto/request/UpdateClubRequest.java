@@ -1,10 +1,11 @@
 package com.ssafy.dawata.domain.club.dto.request;
 
+import com.ssafy.dawata.domain.common.enums.Category;
+
 import java.util.Optional;
 
-import com.ssafy.dawata.domain.club.entity.ClubCategory;
 public record UpdateClubRequest(
 	Optional<String> name,
-	Optional<ClubCategory> category
-){
+	Optional<Category> category
+) {
 }

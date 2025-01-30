@@ -1,5 +1,9 @@
 package com.ssafy.dawata.domain.club.entity;
 
+import com.ssafy.dawata.domain.common.entity.BaseTimeEntity;
+import com.ssafy.dawata.domain.common.enums.Category;
+import com.ssafy.dawata.domain.common.enums.CategoryConverter;
+
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -29,9 +33,9 @@ public class Club {
 	@Column(nullable = false)
 	private String name;
 
-	@Convert(converter = ClubCategoryConverter.class)
+	@Convert(converter = CategoryConverter.class)
 	@Column(nullable = false)
-	private ClubCategory category;
+	private Category category;
 
 	//일단은 업데이트 가능하게.
 	@Column(nullable = false, length = 6)
@@ -45,13 +49,13 @@ public class Club {
 	private List<ClubMember> members;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public Club(String name, ClubCategory category, String teamCode) {
+	public Club(String name, Category category, String teamCode) {
 		this.name = name;
 		this.category = category;
 		this.teamCode = teamCode;
 	}
 
-	public static Club createClub(String name, ClubCategory category, String teamCode) {
+	public static Club createClub(String name, Category category, String teamCode) {
 		return Club.builder()
 			.name(name)
 			.category(category)
@@ -63,7 +67,7 @@ public class Club {
 		this.name = name;
 	}
 
-	public void updateCategory(ClubCategory category) {
+	public void updateCategory(Category category) {
 		this.category = category;
 	}
 

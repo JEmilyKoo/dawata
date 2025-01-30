@@ -1,4 +1,4 @@
-package com.ssafy.dawata.domain.common;
+package com.ssafy.dawata.domain.common.entity;
 
 import java.time.LocalDateTime;
 

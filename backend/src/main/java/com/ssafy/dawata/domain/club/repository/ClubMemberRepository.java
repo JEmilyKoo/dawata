@@ -28,5 +28,4 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 	List<ClubMember> findByTeamCode(@Param("teamCode") String teamCode);
 
 	void deleteAllByClubId(Long clubId);
-
 }
