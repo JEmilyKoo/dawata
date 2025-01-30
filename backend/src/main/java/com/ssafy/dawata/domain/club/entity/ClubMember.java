@@ -84,7 +84,7 @@ public class ClubMember extends BaseTimeEntity {
 	}
 
 	public void setClubName(String clubName) {
-		this.clubName = clubName;
+		this.nickname = nickname;
 	}
 
 	public void setCreatedBy(int createdBy) {

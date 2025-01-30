@@ -1,6 +1,5 @@
 package com.ssafy.dawata.domain.club.entity;
 
-import com.ssafy.dawata.domain.common.entity.BaseTimeEntity;
 import com.ssafy.dawata.domain.common.enums.Category;
 import com.ssafy.dawata.domain.common.enums.CategoryConverter;
 
