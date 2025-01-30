@@ -54,6 +54,9 @@ public class KakaoOAuth2Response extends OAuth2Response {
 						String.valueOf(attributes.get("name_needs_agreement"))
 					)
 				)
+				.name(
+					String.valueOf(attributes.get("name"))
+				)
 				.build();
 		}
 	}

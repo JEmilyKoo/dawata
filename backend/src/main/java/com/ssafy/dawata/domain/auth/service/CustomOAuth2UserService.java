@@ -40,7 +40,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		String email = extractAttributes.email();
 
 		return MemberPrincipal.from(
-			memberRepository.findByEmail(email).orElse(Member.createMember("test@email.com", "tester")),
+			memberRepository
+				.findByEmail(email)
+				.orElse(
+					memberRepository.save(
+						Member.createMember(extractAttributes.email(), extractAttributes.name())
+					)
+				),
 			oauth2Attributes
 		);
 	}

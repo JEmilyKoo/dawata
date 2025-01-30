@@ -1,6 +1,6 @@
 package com.ssafy.dawata.domain.member.entity;
 
-import com.ssafy.dawata.domain.common.BaseTimeEntity;
+import com.ssafy.dawata.domain.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
