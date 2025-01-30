@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 
@@ -28,7 +27,6 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 	@Query("SELECT clubMember FROM ClubMember clubMember WHERE clubMember.club.teamCode = :teamCode")
 	List<ClubMember> findByTeamCode(@Param("teamCode") String teamCode);
 
-	@Transactional
 	void deleteAllByClubId(Long clubId);
 
 }
