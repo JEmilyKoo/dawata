@@ -1,0 +1,12 @@
+{
+  "main": "메인",
+  "appointment": "약속",
+  "live": "라이브",
+  "notice": "알림",
+  "profile": "프로필",
+  "index": {
+    "catchphrase": "만남은 중간에서, 추억은 제 시간에",
+    "title": "다와따",
+    "lookArround": "둘러볼래요"
+  }
+}
