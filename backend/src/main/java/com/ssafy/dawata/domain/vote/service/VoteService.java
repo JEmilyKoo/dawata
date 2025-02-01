@@ -19,7 +19,7 @@ import com.ssafy.dawata.domain.vote.repository.VoterRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class VoteService {
 
@@ -29,6 +29,7 @@ public class VoteService {
 	private final ParticipantRepository participantRepository;
 	private final AppointmentRepository appointmentRepository;
 
+	@Transactional
 	public void createVoteItem(VoteItemRequest requestDto, Long appointmentId) {
 		Address address = Address.of(requestDto.roadAddress(), requestDto.longitude(), requestDto.latitude());
 		Address addressEntity = addressRepository.save(address);
@@ -43,6 +44,7 @@ public class VoteService {
 		voteItemRepository.save(voteItem);
 	}
 
+	@Transactional
 	public void voting(VotesRequest requestDto, Long appointmentId) {
 		Participant participant = participantRepository.findById(requestDto.participantId())
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 ID의 참가자가 존재하지 않습니다."));
