@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
 import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
@@ -60,15 +61,15 @@ class MemberControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				Member resultMember = objectMapper.readValue(
+				ApiResponse<Member> resultMember = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Member>() {
+					new TypeReference<ApiResponse<Member>>() {
 					}
 				);
 
-				assertEquals(member.getEmail(), resultMember.getEmail());
-				assertEquals(member.getName(), resultMember.getName());
-				assertFalse(resultMember.isWithdrawn());
+				assertEquals(member.getEmail(), resultMember.data().getEmail());
+				assertEquals(member.getName(), resultMember.data().getName());
+				assertFalse(resultMember.data().isWithdrawn());
 			})
 			.andDo(print());
 	}
@@ -101,13 +102,17 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				MemberInfoResponse resultMember = objectMapper.readValue(
+				ApiResponse<MemberInfoResponse> resultMember = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<MemberInfoResponse>() {
+					new TypeReference<ApiResponse<MemberInfoResponse>>() {
 					}
 				);
 
-				assertEquals(resultMember.name(), request.name());
+				assertEquals(resultMember.status(), "success");
+				assertEquals(resultMember.data().email(), changeMember.email());
+				assertEquals(resultMember.data().name(), changeMember.name());
+				assertEquals(resultMember.data().img(), changeMember.img());
+				assertEquals(resultMember.data().createdAt(), changeMember.createdAt());
 			})
 			.andDo(print());
 	}
@@ -131,20 +136,18 @@ class MemberControllerTest {
 	@DisplayName("회원 정보 탈퇴 - 성공")
 	void success_a() throws Exception {
 		// given
-		//when
-		when(memberService.withdraw()).thenReturn(true);
-
+		// when
 		// then
 		mockMvc.perform(delete("/members"))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				boolean resultBol = objectMapper.readValue(
+				ApiResponse<Void> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Boolean>() {
+					new TypeReference<ApiResponse<Void>>() {
 					}
 				);
 
-				assertTrue(resultBol);
+				assertEquals(resultResponse.status(), "success");
 			})
 			.andDo(print());
 	}

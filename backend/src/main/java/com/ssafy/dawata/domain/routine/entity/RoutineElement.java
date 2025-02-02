@@ -21,16 +21,16 @@ public class RoutineElement {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
+	@Column(nullable = false)
 	private String play;
 
-	@Column
+	@Column(nullable = false)
 	private Long spendTime;
 
-	@Column
+	@Column(nullable = false)
 	private Integer sequence;
 
-	@Column
+	@Column(nullable = false)
 	private boolean state = true;
 
 	@ManyToOne(fetch = FetchType.LAZY)

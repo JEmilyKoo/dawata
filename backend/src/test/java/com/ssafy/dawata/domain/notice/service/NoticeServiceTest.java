@@ -1,6 +1,8 @@
 package com.ssafy.dawata.domain.notice.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +38,7 @@ class NoticeServiceTest {
 	void success_findNoticeList() {
 		// given
 		NoticeResponse noticeResponse1 =
-			new NoticeResponse(1L, "11", null, false, false, LocalDateTime.now());
+			new NoticeResponse(1L, "11", null, false, LocalDateTime.now());
 
 		List<NoticeResponse> noticeResponses = List.of(noticeResponse1);
 
@@ -57,8 +59,6 @@ class NoticeServiceTest {
 			noticeSlice.getContent().get(0).type());
 		assertEquals(responseSlice.getContent().get(0).read(),
 			noticeSlice.getContent().get(0).read());
-		assertEquals(responseSlice.getContent().get(0).deleted(),
-			noticeSlice.getContent().get(0).deleted());
 		assertEquals(responseSlice.getContent().get(0).createdAt(),
 			noticeSlice.getContent().get(0).createdAt());
 	}
@@ -71,13 +71,18 @@ class NoticeServiceTest {
 			new Notice(NoticeType.GROUP, 1, 1, false, false);
 
 		// when
-		Mockito.when(noticeRepository.findById(1L))
+		Mockito.when(noticeRepository.findById(anyLong()))
 			.thenReturn(Optional.of(notice));
 
-		// then
-		boolean resultBol = noticeService.updateNoticeReadState(1L);
+		noticeService.updateNoticeReadState(anyLong());
 
-		assertTrue(resultBol);
+		// then
+		verify(noticeRepository, times(1))
+			.findById(anyLong());
+
+		verify(noticeRepository, never()).save(any(Notice.class));
+
+		assertTrue(notice.isRead());
 	}
 
 	@Test
@@ -88,12 +93,17 @@ class NoticeServiceTest {
 			new Notice(NoticeType.GROUP, 1, 1, false, false);
 
 		// when
-		Mockito.when(noticeRepository.findById(1L))
+		Mockito.when(noticeRepository.findById(anyLong()))
 			.thenReturn(Optional.of(notice));
 
-		// then
-		boolean resultBol = noticeService.deleteNotice(1L);
+		noticeService.deleteNotice(anyLong());
 
-		assertTrue(resultBol);
+		// then
+		verify(noticeRepository, times(1))
+			.findById(anyLong());
+
+		verify(noticeRepository, never()).save(any(Notice.class));
+
+		assertTrue(notice.isDeleted());
 	}
 }

@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,13 +28,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ssafy.dawata.domain.member.entity.Member;
-import com.ssafy.dawata.domain.notice.dto.response.NoticeResponse;
+import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.routine.dto.request.RoutineRequest;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineDetailResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
-import com.ssafy.dawata.domain.routine.enums.PlayType;
 import com.ssafy.dawata.domain.routine.service.RoutineService;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +46,6 @@ class RoutineControllerTest {
 	private MockMvc mockMvc;
 	private final ObjectMapper objectMapper =
 		new ObjectMapper().registerModule(new JavaTimeModule());
-	;
 
 	@BeforeEach
 	void setUp() {
@@ -80,7 +76,7 @@ class RoutineControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(result -> {
 				JsonNode jsonNode = objectMapper.readTree(result.getResponse().getContentAsString());
-				JsonNode contentNode = jsonNode.get("content");
+				JsonNode contentNode = jsonNode.get("data").get("content");
 
 				assertEquals(response1.name(),
 					contentNode.get(0).get("name").asText());
@@ -95,9 +91,9 @@ class RoutineControllerTest {
 	void success_getRoutine() throws Exception {
 		// given
 		RoutineElementResponse response1 =
-			new RoutineElementResponse(1L, PlayType.EAT, 10L, true);
+			new RoutineElementResponse(1L, "eat", 10L, true);
 		RoutineElementResponse response2 =
-			new RoutineElementResponse(2L, PlayType.WAKE, 30L, true);
+			new RoutineElementResponse(2L, "wake", 30L, true);
 
 		RoutineDetailResponse detailResponse =
 			new RoutineDetailResponse("test", List.of(response1, response2));
@@ -110,14 +106,14 @@ class RoutineControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				RoutineDetailResponse resultResponse = objectMapper.readValue(
+				ApiResponse<RoutineDetailResponse> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString()
-					, new TypeReference<RoutineDetailResponse>() {
+					, new TypeReference<ApiResponse<RoutineDetailResponse>>() {
 					});
 
-				assertEquals(resultResponse.name(), detailResponse.name());
+				assertEquals(resultResponse.status(), "success");
 				assertEquals(
-					resultResponse.routineTemplateList().size(),
+					resultResponse.data().routineTemplateList().size(),
 					detailResponse.routineTemplateList().size());
 			})
 			.andDo(print());
@@ -130,19 +126,18 @@ class RoutineControllerTest {
 		RoutineRequest request =
 			new RoutineRequest("test", List.of());
 		// when
-		when(routineService.saveRoutine(request)).thenReturn(true);
 		// then
 		mockMvc.perform(post("/routines")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				boolean resultBol = objectMapper.readValue(
+				ApiResponse<Void> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Boolean>() {
+					new TypeReference<ApiResponse<Void>>() {
 					});
 
-				assertTrue(resultBol);
+				assertEquals(resultResponse.status(), "success");
 			})
 			.andDo(print());
 	}
@@ -154,19 +149,18 @@ class RoutineControllerTest {
 		RoutineRequest request =
 			new RoutineRequest("test", List.of());
 		// when
-		when(routineService.updateRoutine(1L, request)).thenReturn(true);
 		// then
 		mockMvc.perform(put("/routines/1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				boolean resultBol = objectMapper.readValue(
+				ApiResponse<Void> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Boolean>() {
+					new TypeReference<ApiResponse<Void>>() {
 					});
 
-				assertTrue(resultBol);
+				assertEquals(resultResponse.status(), "success");
 			})
 			.andDo(print());
 	}
@@ -176,18 +170,17 @@ class RoutineControllerTest {
 	void success_deleteRoutine() throws Exception {
 		// given
 		// when
-		when(routineService.deleteRoutine(1L)).thenReturn(true);
 		// then
 		mockMvc.perform(delete("/routines/1")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				boolean resultBol = objectMapper.readValue(
+				ApiResponse<Void> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Boolean>() {
+					new TypeReference<ApiResponse<Void>>() {
 					});
 
-				assertTrue(resultBol);
+				assertEquals(resultResponse.status(), "success");
 			})
 			.andDo(print());
 	}

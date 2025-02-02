@@ -28,23 +28,23 @@ public class Notice {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "type")
+	@Column(name = "type", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private NoticeType noticeType;
 
-	@Column
+	@Column(nullable = false)
 	private int messageType;
 
-	@Column
+	@Column(nullable = false)
 	private int referenceId;
 
-	@Column(name = "is_read")
+	@Column(name = "is_read", nullable = false)
 	private boolean read = false;
 
-	@Column(name = "is_deleted")
+	@Column(name = "is_deleted", nullable = false)
 	private boolean deleted = false;
 
-	@Column
+	@Column(nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@ManyToOne(fetch = FetchType.LAZY)

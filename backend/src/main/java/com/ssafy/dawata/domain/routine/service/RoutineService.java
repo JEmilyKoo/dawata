@@ -19,20 +19,18 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class RoutineService {
 	private final MemberRepository memberRepository;
 	private final RoutineTemplateRepository routineTemplateRepository;
 	private final RoutineElementRepository routineElementRepository;
 
-	@Transactional(readOnly = true)
 	public Slice<RoutineTemplateResponse> findAllRoutines() {
 		Long id = 1L;
 
 		return routineTemplateRepository.customFindAllByMemberId(id);
 	}
 
-	@Transactional(readOnly = true)
 	public RoutineDetailResponse findRoutine(Long routineId) {
 		Long id = 1L;
 
@@ -44,7 +42,8 @@ public class RoutineService {
 			.build();
 	}
 
-	public boolean saveRoutine(RoutineRequest routineRequest) {
+	@Transactional
+	public void saveRoutine(RoutineRequest routineRequest) {
 		Long userId = 1L;
 
 		RoutineTemplate routineTemplate =
@@ -62,11 +61,10 @@ public class RoutineService {
 					i + 1,
 					rt));
 		}
-
-		return true;
 	}
 
-	public boolean updateRoutine(Long routineId, RoutineRequest routineRequest) {
+	@Transactional
+	public void updateRoutine(Long routineId, RoutineRequest routineRequest) {
 		RoutineTemplate routineTemplate =
 			routineTemplateRepository.findById(routineId)
 				.orElseThrow(IllegalArgumentException::new);
@@ -81,18 +79,15 @@ public class RoutineService {
 					i + 1,
 					routineTemplate));
 		}
-
-		return true;
 	}
 
-	public boolean deleteRoutine(Long routineId) {
+	@Transactional
+	public void deleteRoutine(Long routineId) {
 		RoutineTemplate routineTemplate =
 			routineTemplateRepository.findById(routineId)
 				.orElseThrow(IllegalArgumentException::new);
 
 		routineElementRepository.deleteAllByRoutineTemplate(routineTemplate);
 		routineTemplateRepository.deleteById(routineId);
-
-		return true;
 	}
 }

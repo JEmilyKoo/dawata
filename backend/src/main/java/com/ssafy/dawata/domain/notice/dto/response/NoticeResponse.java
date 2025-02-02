@@ -12,7 +12,6 @@ public record NoticeResponse(
 	String type,
 	MemberInfoResponse memberInfoResponse,
 	boolean read,
-	boolean deleted,
 	LocalDateTime createdAt
 ) {
 }

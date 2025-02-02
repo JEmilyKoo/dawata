@@ -13,12 +13,11 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MemberService {
 
 	private final MemberRepository memberRepository;
 
-	@Transactional(readOnly = true)
 	public Member findMyMemberInfo() {
 		// TODO: Test를 위한 코드 추후에 SecurityContextHolder 에서 정보 가져오기
 		Long id = 1L;
@@ -27,11 +26,12 @@ public class MemberService {
 			.orElseThrow(IllegalArgumentException::new);
 	}
 
-	@Transactional(readOnly = true)
-	public Member findMemberInfo(Long memberId) {
-		return memberRepository
-			.findById(memberId)
-			.orElseThrow(IllegalArgumentException::new);
+	public MemberInfoResponse findMemberInfo(Long memberId) {
+		// TODO : 내 정보 처리 로직 (SecurityContextHolder 구현 후 위 findMemberInfo 메소드에 적용 예정)
+		return toMemberInfo(
+			memberRepository
+				.findById(memberId)
+				.orElseThrow(IllegalArgumentException::new));
 	}
 
 	@Transactional
@@ -48,12 +48,13 @@ public class MemberService {
 		return toMemberInfo(member);
 	}
 
-	public boolean updateMyImg(String url) {
+	@Transactional
+	public void updateMyImg(String url) {
 		// TODO : 이미지 관련 사항 확정 시 작업 예정
-		return false;
 	}
 
-	public boolean withdraw() {
+	@Transactional
+	public void withdraw() {
 		Long id = 1L;
 
 		Member member = memberRepository
@@ -62,11 +63,8 @@ public class MemberService {
 
 		//더티 체킹 사용
 		member.updateIsWithdrawn(true);
-
-		return member.isWithdrawn();
 	}
 
-	@Transactional(readOnly = true)
 	public AppointmentInfoResponse findAllMyAppointmentInfo() {
 		// TODO : 약속 관련 기능 구현 시 작업 예정
 		return null;

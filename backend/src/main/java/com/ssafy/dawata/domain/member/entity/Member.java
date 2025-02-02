@@ -24,10 +24,10 @@ public class Member extends BaseTimeEntity {
 	@Column(unique = true, nullable = false)
 	private String email;
 
-	@Column
+	@Column(nullable = false)
 	private String name;
 
-	@Column(name = "is_withdrawn")
+	@Column(name = "is_withdrawn", nullable = false)
 	private boolean withdrawn = false;
 
 	@Builder(access = AccessLevel.PRIVATE)
