@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.member.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,16 +33,17 @@ class MemberServiceTest {
 		// given
 		Member member =
 			new Member("test@test.com", "tester", false);
+		MemberInfoResponse response
+			= new MemberInfoResponse("test@test.com", "tester", null, LocalDateTime.now());
 		// when
-		Mockito.when(memberRepository.findById(1L))
+		Mockito.when(memberRepository.findById(anyLong()))
 			.thenReturn(Optional.of(member));
-		// then
-		Member result = memberService.findMemberInfo(1L);
 
-		assertEquals(result.getId(), member.getId());
-		assertEquals(result.getName(), member.getName());
-		assertEquals(result.getEmail(), member.getEmail());
-		assertEquals(result.isWithdrawn(), member.isWithdrawn());
+		// then
+		MemberInfoResponse result = memberService.findMemberInfo(1L);
+
+		assertEquals(result.name(), member.getName());
+		assertEquals(result.email(), member.getEmail());
 	}
 
 	@Test
@@ -129,9 +131,9 @@ class MemberServiceTest {
 		// when
 		Mockito.when(memberRepository.findById(1L))
 			.thenReturn(Optional.of(memberSpy));
+
+		memberService.withdraw();
 		// then
-		assertFalse(memberSpy.isWithdrawn());
-		assertTrue(memberService.withdraw());
 		assertTrue(memberSpy.isWithdrawn());
 	}
 

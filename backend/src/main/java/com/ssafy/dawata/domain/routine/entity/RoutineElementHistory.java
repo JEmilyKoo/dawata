@@ -22,7 +22,7 @@ public class RoutineElementHistory {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "is_checked")
+	@Column(name = "is_checked", nullable = false)
 	private boolean checked;
 
 	@ManyToOne(fetch = FetchType.LAZY)

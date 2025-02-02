@@ -24,7 +24,6 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 		            m.createdAt
 		        ), 
 		        n.read, 
-		        n.deleted, 
 		        n.createdAt)
 		    FROM Notice n
 		    JOIN Member m ON n.referenceId = m.id

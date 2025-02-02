@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -29,6 +30,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ssafy.dawata.domain.common.dto.ApiResponse;
+import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.notice.dto.response.NoticeResponse;
 import com.ssafy.dawata.domain.notice.service.NoticeService;
 
@@ -54,10 +57,11 @@ class NoticeControllerTest {
 	@DisplayName("알림 조회 - 성공")
 	void success_getMyInfo() throws Exception {
 		// given
+		MemberInfoResponse mockMemberInfo = Mockito.mock(MemberInfoResponse.class);
 		NoticeResponse noticeResponse1 =
-			new NoticeResponse(1L, "11", null, false, false, LocalDateTime.now());
+			new NoticeResponse(1L, "11", mockMemberInfo, false, LocalDateTime.now());
 		NoticeResponse noticeResponse2 =
-			new NoticeResponse(2L, "21", null, false, false, LocalDateTime.now());
+			new NoticeResponse(2L, "21", mockMemberInfo, false, LocalDateTime.now());
 
 		List<NoticeResponse> noticeResponses = List.of(noticeResponse1, noticeResponse2);
 
@@ -73,7 +77,7 @@ class NoticeControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(result -> {
 				JsonNode jsonNode = objectMapper.readTree(result.getResponse().getContentAsString());
-				JsonNode contentNode = jsonNode.get("content");
+				JsonNode contentNode = jsonNode.get("data").get("content");
 
 				assertEquals(noticeResponse1.id(),
 					contentNode.get(0).get("id").asLong());
@@ -81,8 +85,6 @@ class NoticeControllerTest {
 					contentNode.get(0).get("type").asText());
 				assertEquals(noticeResponse1.read(),
 					contentNode.get(0).get("read").asBoolean());
-				assertEquals(noticeResponse1.deleted(),
-					contentNode.get(0).get("deleted").asBoolean());
 			})
 			.andDo(print());
 	}
@@ -91,20 +93,18 @@ class NoticeControllerTest {
 	@DisplayName("알림 읽기 - 성공")
 	void success_updateNoticeRead() throws Exception {
 		// given
-		//when
-		when(noticeService.updateNoticeReadState(1L)).thenReturn(true);
-
+		// when
 		// then
 		mockMvc.perform(post("/notices/1")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				Boolean resultBol = objectMapper.readValue(
+				ApiResponse<Void> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Boolean>() {
+					new TypeReference<ApiResponse<Void>>() {
 					});
 
-				assertTrue(resultBol);
+				assertEquals(resultResponse.status(), "success");
 			})
 			.andDo(print());
 	}
@@ -113,20 +113,18 @@ class NoticeControllerTest {
 	@DisplayName("알림 삭제 - 성공")
 	void success_deleteNotice() throws Exception {
 		// given
-		//when
-		when(noticeService.deleteNotice(1L)).thenReturn(true);
-
+		// when
 		// then
 		mockMvc.perform(delete("/notices/1")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				Boolean resultBol = objectMapper.readValue(
+				ApiResponse<Void> resultResponse = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<Boolean>() {
+					new TypeReference<ApiResponse<Void>>() {
 					});
 
-				assertTrue(resultBol);
+				assertEquals(resultResponse.status(), "success");
 			})
 			.andDo(print());
 	}

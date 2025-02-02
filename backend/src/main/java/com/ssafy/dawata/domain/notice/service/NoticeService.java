@@ -12,32 +12,29 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class NoticeService {
 	private final NoticeRepository noticeRepository;
 
-	@Transactional(readOnly = true)
 	public Slice<NoticeResponse> findNoticeList() {
 		Long id = 1L;
 
 		return noticeRepository.customFindAllByMemberId(id);
 	}
 
-	public boolean updateNoticeReadState(Long noticeId) {
+	@Transactional
+	public void updateNoticeReadState(Long noticeId) {
 		Notice notice = noticeRepository.findById(noticeId)
 			.orElseThrow(IllegalArgumentException::new);
 
 		notice.updateRead(true);
-
-		return notice.isRead();
 	}
 
-	public boolean deleteNotice(Long noticeId) {
+	@Transactional
+	public void deleteNotice(Long noticeId) {
 		Notice notice = noticeRepository.findById(noticeId)
 			.orElseThrow(IllegalArgumentException::new);
 
 		notice.updateDeleted(true);
-
-		return notice.isDeleted();
 	}
 }

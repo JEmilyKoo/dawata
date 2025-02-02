@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +28,6 @@ import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
 import com.ssafy.dawata.domain.routine.entity.RoutineElement;
 import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
-import com.ssafy.dawata.domain.routine.enums.PlayType;
 import com.ssafy.dawata.domain.routine.repository.RoutineElementRepository;
 import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
 
@@ -80,9 +80,9 @@ class RoutineServiceTest {
 		RoutineTemplate routineTemplate =
 			new RoutineTemplate("test", null);
 		RoutineElementResponse response1 =
-			new RoutineElementResponse(1L, PlayType.EAT, 10L, true);
+			new RoutineElementResponse(1L, "eat", 10L, true);
 		RoutineElementResponse response2 =
-			new RoutineElementResponse(2L, PlayType.WAKE, 110L, true);
+			new RoutineElementResponse(2L, "wake", 110L, true);
 		List<RoutineElementResponse> responseList =
 			List.of(response1, response2);
 
@@ -116,25 +116,36 @@ class RoutineServiceTest {
 			createRoutineTemplate(
 				"test", member);
 		RoutineElementRequest element1 =
-			new RoutineElementRequest(PlayType.EAT, 10L);
+			new RoutineElementRequest("eat", 10L);
 		RoutineElementRequest element2 =
-			new RoutineElementRequest(PlayType.WAKE, 20L);
+			new RoutineElementRequest("wake", 20L);
 		List<RoutineElementRequest> routineElementList = List.of(element1, element2);
 
 		RoutineRequest request
 			= new RoutineRequest("tester", routineElementList);
 
 		// when
-		when(memberRepository.getReferenceById(1L)).thenReturn(member);
+		when(memberRepository.getReferenceById(anyLong())).thenReturn(member);
 		when(routineTemplateRepository.save(any(RoutineTemplate.class)))
 			.thenReturn(routineTemplate);
 		when(routineElementRepository.save(any(RoutineElement.class)))
 			.thenAnswer(invocation -> invocation.getArgument(0));
 
-		// then
-		boolean resultBol = routineService.saveRoutine(request);
+		routineService.saveRoutine(request);
 
-		assertTrue(resultBol);
+		// then
+		verify(memberRepository, times(1)).getReferenceById(anyLong());
+		verify(routineTemplateRepository, times(1)).save(any(RoutineTemplate.class));
+		verify(routineElementRepository, times(2)).save(any(RoutineElement.class));
+
+		ArgumentCaptor<RoutineElement> captor = ArgumentCaptor.forClass(RoutineElement.class);
+		verify(routineElementRepository, times(2)).save(captor.capture());
+
+		List<RoutineElement> savedElements = captor.getAllValues();
+		assertEquals("eat", savedElements.get(0).getPlay());
+		assertEquals(10L, savedElements.get(0).getSpendTime());
+		assertEquals("wake", savedElements.get(1).getPlay());
+		assertEquals(20L, savedElements.get(1).getSpendTime());
 	}
 
 	@Test
@@ -148,23 +159,39 @@ class RoutineServiceTest {
 			createRoutineTemplate(
 				"test", member);
 		RoutineElementRequest element1 =
-			new RoutineElementRequest(PlayType.EAT, 10L);
+			new RoutineElementRequest("eat", 10L);
 		RoutineElementRequest element2 =
-			new RoutineElementRequest(PlayType.WAKE, 20L);
+			new RoutineElementRequest("wake", 20L);
 		List<RoutineElementRequest> routineElementList = List.of(element1, element2);
 
 		RoutineRequest request
 			= new RoutineRequest("tester", routineElementList);
 
 		// when
-		when(memberRepository.getReferenceById(1L)).thenReturn(member);
+		when(routineTemplateRepository.findById(anyLong()))
+			.thenReturn(Optional.of(routineTemplate));
+		doNothing().when(routineElementRepository).deleteAllByRoutineTemplate(any(RoutineTemplate.class));
 		when(routineElementRepository.save(any(RoutineElement.class)))
 			.thenAnswer(invocation -> invocation.getArgument(0));
 
-		// then
-		boolean resultBol = routineService.saveRoutine(request);
+		routineService.updateRoutine(1L, request);
 
-		assertTrue(resultBol);
+		// then
+		verify(routineTemplateRepository, times(1))
+			.findById(anyLong());
+		verify(routineElementRepository, times(1))
+			.deleteAllByRoutineTemplate(any(RoutineTemplate.class));
+		verify(routineElementRepository, times(2))
+			.save(any(RoutineElement.class));
+
+		ArgumentCaptor<RoutineElement> captor = ArgumentCaptor.forClass(RoutineElement.class);
+		verify(routineElementRepository, times(2)).save(captor.capture());
+
+		List<RoutineElement> updatedElements = captor.getAllValues();
+		assertEquals("eat", updatedElements.get(0).getPlay());
+		assertEquals(10L, updatedElements.get(0).getSpendTime());
+		assertEquals("wake", updatedElements.get(1).getPlay());
+		assertEquals(20L, updatedElements.get(1).getSpendTime());
 	}
 
 	@Test
@@ -173,22 +200,45 @@ class RoutineServiceTest {
 		// given
 		Member member =
 			new Member("test@email.com", "tester", false);
-		
+		RoutineTemplate routineTemplate =
+			createRoutineTemplate("test", member);
+
 		RoutineElementRequest element1 =
-			new RoutineElementRequest(PlayType.EAT, 10L);
+			new RoutineElementRequest("eat", 10L);
 		RoutineElementRequest element2 =
-			new RoutineElementRequest(PlayType.WAKE, 20L);
+			new RoutineElementRequest("wake", 20L);
 		List<RoutineElementRequest> routineElementList = List.of(element1, element2);
 
 		RoutineRequest request
 			= new RoutineRequest("tester", routineElementList);
 
 		// when
-		when(memberRepository.getReferenceById(1L)).thenReturn(member);
+		when(routineTemplateRepository.findById(anyLong()))
+			.thenReturn(Optional.of(routineTemplate));
+		doNothing().when(routineElementRepository)
+			.deleteAllByRoutineTemplate(routineTemplate);
+		doNothing().when(routineTemplateRepository)
+			.deleteById(anyLong());
+
+		routineService.deleteRoutine(anyLong());
 
 		// then
-		boolean resultBol = routineService.saveRoutine(request);
+		verify(routineTemplateRepository, times(1))
+			.findById(anyLong());
+		verify(routineElementRepository, times(1))
+			.deleteAllByRoutineTemplate(any(RoutineTemplate.class));
+		verify(routineTemplateRepository, times(1))
+			.deleteById(anyLong());
 
-		assertTrue(resultBol);
+		ArgumentCaptor<RoutineTemplate> captor =
+			ArgumentCaptor.forClass(RoutineTemplate.class);
+		verify(routineElementRepository, times(1))
+			.deleteAllByRoutineTemplate(captor.capture());
+
+		List<RoutineTemplate> deletedElements = captor.getAllValues();
+		assertEquals(deletedElements.get(0).getName(), routineTemplate.getName());
+		assertEquals(deletedElements.get(0).getMember().getName(), routineTemplate.getMember().getName());
+		assertEquals(deletedElements.get(0).getMember().getEmail(), routineTemplate.getMember().getEmail());
+		assertEquals(deletedElements.get(0).getMember().isWithdrawn(), routineTemplate.getMember().isWithdrawn());
 	}
 }
