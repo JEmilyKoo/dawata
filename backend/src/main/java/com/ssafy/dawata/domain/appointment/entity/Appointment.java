@@ -3,6 +3,8 @@ package com.ssafy.dawata.domain.appointment.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import com.ssafy.dawata.domain.common.entity.BaseEntity;
 import com.ssafy.dawata.domain.common.enums.Category;
 import com.ssafy.dawata.domain.common.enums.CategoryConverter;
@@ -22,6 +24,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Appointment extends BaseEntity {
 
@@ -56,5 +59,21 @@ public class Appointment extends BaseEntity {
 	public static Appointment createAppointment(String name, Category category, LocalDateTime scheduledAt,
 		LocalDateTime voteEndTime) {
 		return new Appointment(name, category, scheduledAt, voteEndTime);
+	}
+
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateCategory(Category category) {
+		this.category = category;
+	}
+
+	public void updateScheduledAt(LocalDateTime scheduledAt) {
+		this.scheduledAt = scheduledAt;
+	}
+
+	public void updateVoteEndTime(LocalDateTime voteEndTime) {
+		this.voteEndTime = voteEndTime;
 	}
 }
