@@ -38,5 +38,18 @@ public class Address {
 	public static Address of(String roadAddress, Double longitude, Double latitude) {
 		return new Address(roadAddress, longitude, latitude);
 	}
+
+	public void updateRoadAddress(String roadAddress) {
+		this.roadAddress = roadAddress;
+	}
+
+	public void updateLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public void updateLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
 }
 

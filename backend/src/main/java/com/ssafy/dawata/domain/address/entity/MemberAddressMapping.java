@@ -54,4 +54,12 @@ public class MemberAddressMapping {
 			.address(address).member(member).name(name).isPrimary(isPrimary).build();
 	}
 
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateIsPrimary(boolean isPrimary) {
+		this.isPrimary = isPrimary;
+	}
+
 }
