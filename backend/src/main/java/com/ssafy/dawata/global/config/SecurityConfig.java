@@ -20,6 +20,7 @@ import com.ssafy.dawata.domain.auth.handler.CustomOAuth2AuthenticationFailureHan
 import com.ssafy.dawata.domain.auth.handler.CustomOAuth2AuthenticationSuccessHandler;
 import com.ssafy.dawata.domain.auth.service.CustomOAuth2UserService;
 import com.ssafy.dawata.global.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.ssafy.dawata.global.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,8 @@ public class SecurityConfig {
 	private final CustomOAuth2AuthenticationSuccessHandler oauth2SuccessHandler;
 	private final CustomOAuth2AuthenticationFailureHandler oauth2FailureHandler;
 
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		defaultFilterChain(http);
@@ -46,18 +49,23 @@ public class SecurityConfig {
 					.anyRequest()
 					.permitAll()
 			)
-			.oauth2Login(oauth2 -> oauth2.authorizationEndpoint(authorization -> authorization
-						.baseUri("/auth/social")
-						.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-					)
-					.redirectionEndpoint(redirect -> redirect
-						.baseUri("/oauth2/callback/*")
-					)
-					.userInfoEndpoint(userInfo -> userInfo
-						.userService(customOAuth2UserService)
-					)
-					.failureHandler(oauth2FailureHandler)
-					.successHandler(oauth2SuccessHandler)
+			.addFilterBefore(
+				jwtAuthenticationFilter,
+				UsernamePasswordAuthenticationFilter.class
+			)
+			.oauth2Login(oauth2 -> oauth2
+				.authorizationEndpoint(authorization -> authorization
+					.baseUri("/auth/social")
+					.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+				)
+				.redirectionEndpoint(redirect -> redirect
+					.baseUri("/oauth2/callback/*")
+				)
+				.userInfoEndpoint(userInfo -> userInfo
+					.userService(customOAuth2UserService)
+				)
+				.failureHandler(oauth2FailureHandler)
+				.successHandler(oauth2SuccessHandler)
 			)
 			.build();
 	}

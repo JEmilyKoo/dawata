@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +20,13 @@ import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
 import com.ssafy.dawata.domain.appointment.service.AppointmentService;
+import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/appointments")
@@ -31,7 +35,8 @@ public class AppointmentController {
 	private final AppointmentService appointmentService;
 
 	@PostMapping
-	public void createAppointment(@RequestBody AppointmentWithParticipantsRequest requestDto) {
+	public void createAppointment(@AuthenticationPrincipal SecurityMemberDetails memberDetails,
+		@RequestBody AppointmentWithParticipantsRequest requestDto) {
 		// TODO: principal에서 가져오기
 		appointmentService.createAppointment(requestDto, 1L);
 	}
@@ -67,7 +72,7 @@ public class AppointmentController {
 		);
 	}
 
-	@DeleteMapping("/{appiontmentId}")
+	@DeleteMapping("/{appointmentId}")
 	public ResponseEntity<ApiResponse<?>> deleteAppointment(@PathVariable Long appointmentId) {
 		appointmentService.deleteAppointment(1L, appointmentId);
 		return ResponseEntity.ok(

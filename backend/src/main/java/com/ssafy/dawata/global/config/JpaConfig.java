@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.ssafy.dawata.domain.auth.entity.MemberPrincipal;
+import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 
 @Configuration
 @EnableJpaAuditing
@@ -22,7 +22,7 @@ public class JpaConfig {
 			.map(SecurityContext::getAuthentication)
 			.filter(Authentication::isAuthenticated)
 			.map(Authentication::getPrincipal)
-			.map(MemberPrincipal.class::cast)
-			.map(MemberPrincipal::getUsername);
+			.map(SecurityMemberDetails.class::cast)
+			.map(SecurityMemberDetails::getUserEmail);
 	}
 }

@@ -2,6 +2,9 @@ package com.ssafy.dawata.domain.auth.service;
 
 import java.util.Map;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -11,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.dawata.domain.auth.dto.response.KakaoOAuth2Response;
 import com.ssafy.dawata.domain.auth.dto.response.OAuth2Response;
-import com.ssafy.dawata.domain.auth.entity.MemberPrincipal;
+import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 
@@ -30,24 +33,22 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 		OAuth2Response extractAttributes = KakaoOAuth2Response.from(oAuth2User.getAttributes());
 
-		return createMemberPrincipal(extractAttributes, oAuth2User.getAttributes());
+		return (OAuth2User)createMemberDetails(extractAttributes);
 	}
 
-	private MemberPrincipal createMemberPrincipal(
-		OAuth2Response extractAttributes,
-		Map<String, Object> oauth2Attributes
+	private UsernamePasswordAuthenticationToken createMemberDetails(
+		OAuth2Response extractAttributes
 	) {
 		String email = extractAttributes.email();
 
-		return MemberPrincipal.from(
-			memberRepository
-				.findByEmail(email)
-				.orElse(
-					memberRepository.save(
-						Member.createMember(extractAttributes.email(), extractAttributes.name())
-					)
-				),
-			oauth2Attributes
+		Member member = memberRepository.findByEmail(email)
+			.orElse(memberRepository.save(
+				Member.createMember(extractAttributes.email(), extractAttributes.name())
+			));
+
+		UserDetails userDetails = new SecurityMemberDetails(member);
+		return new UsernamePasswordAuthenticationToken(
+			userDetails, null, null
 		);
 	}
 }
