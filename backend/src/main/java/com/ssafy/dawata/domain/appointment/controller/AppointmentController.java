@@ -33,7 +33,7 @@ public class AppointmentController {
 	@PostMapping
 	public void createAppointment(@RequestBody AppointmentWithParticipantsRequest requestDto) {
 		// TODO: principal에서 가져오기
-		appointmentService.createAppointment(requestDto, "host@email.com");
+		appointmentService.createAppointment(requestDto, 1L);
 	}
 
 	@GetMapping

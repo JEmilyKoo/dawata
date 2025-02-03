@@ -1,18 +1,14 @@
 package com.ssafy.dawata.domain.appointment.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.dawata.domain.appointment.dto.request.AppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipantsRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
-import com.ssafy.dawata.domain.appointment.dto.response.AppointmentResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
@@ -44,19 +40,19 @@ public class AppointmentService {
 	private final VoterRepository voterRepository;
 
 	@Transactional
-	public void createAppointment(AppointmentWithParticipantsRequest requestDto, String hostEmail) {
+	public void createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
 		Appointment appointment = requestDto.toDto().toEntity();
 		final Appointment appointmentEntity = appointmentRepository.save(appointment);
 
-		final Member hostMemberEntity = memberRepository.findByEmail(hostEmail)
+		final Member hostMemberEntity = memberRepository.findById(memberId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 member 입니다."));
 
-		requestDto.memberIds().forEach(memberId -> {
+		requestDto.memberIds().forEach(mId -> {
 			ClubMember clubMemberEntity = clubMemberRepository
-				.findByMemberIdAndClubId(memberId, requestDto.clubId())
+				.findByMemberIdAndClubId(mId, requestDto.clubId())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 club member 입니다."));
 
-			boolean isHostMember = memberId.equals(hostMemberEntity.getId());
+			boolean isHostMember = mId.equals(hostMemberEntity.getId());
 
 			Participant participant = Participant.of(
 				appointmentEntity, clubMemberEntity, isHostMember, DailyStatus.LATE,
