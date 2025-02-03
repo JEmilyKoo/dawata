@@ -11,7 +11,7 @@ import {
 } from "react-native"
 import { WebView } from "react-native-webview"
 
-import BottomSheet from "@gorhom/bottom-sheet"
+import BottomSheet from "@/components/BottomSheet"
 import * as Location from "expo-location"
 
 interface LocationRecord {
@@ -31,6 +31,7 @@ interface User {
   }
 }
 
+
 export default function LiveScreen() {
   const { t } = useTranslation()
   const [locationRecords, setLocationRecords] = useState<LocationRecord[]>([])
@@ -39,7 +40,12 @@ export default function LiveScreen() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const TMAP_API_KEY = "YBRKLWh8yp2cxRr7ZrktOariTykJhXPBaIQFLJiV"
+  const [index, setIndex] = useState(0);
 
+  const handleChange = (newIndex: number) => {
+    console.log('새로운 index:', newIndex);
+    setIndex(newIndex); // 상태 업데이트 등 외부 로직 처리
+  };
   // 샘플 사용자 데이터
   const users: User[] = [
     {
@@ -151,13 +157,6 @@ export default function LiveScreen() {
     </html>
   `
 
-  const bottomSheetRef = React.useRef<BottomSheet>(null)
-  const snapPoints = useMemo(() => ["10%", "50%", "90%"], [])
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index)
-  }, [])
-
   const renderBottomSheetContent = () => (
     <View className="flex-1 p-4">
       <View className="mb-5">
@@ -243,21 +242,11 @@ export default function LiveScreen() {
         />
       </View>
       <View className="absolute bottom-0 left-0 right-0 z-20 border-2 border-blue-500">
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={0} // 기본적으로 10%에서 시작
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-          enablePanDownToClose={false}
-          style={{
-            position: "absolute", // 화면 하단에 고정
-            bottom: 0, // 하단에 고정
-            left: 0,
-            right: 0,
-            zIndex: 1000, // WebView보다 위로 올라오도록 설정
-          }}>
-          {renderBottomSheetContent()}
-        </BottomSheet>
+      <View style={{ flex: 1 }}>
+      <BottomSheet handleChange={handleChange}>
+        <Text>dfddfd</Text>
+      </BottomSheet>
+    </View>
       </View>
     </View>
   ) : (
@@ -274,16 +263,9 @@ export default function LiveScreen() {
             console.warn("WebView error: ", nativeEvent)
           }}
         />
-
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={0}
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-          enablePanDownToClose={false}
-          style={{ zIndex: 1000 }}>
-          {renderBottomSheetContent()}
-        </BottomSheet>
+      <BottomSheet handleChange={handleChange}>
+        <Text>dfddfd</Text>
+      </BottomSheet>
       </View>
     </View>
   )
