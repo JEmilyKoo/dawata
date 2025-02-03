@@ -30,7 +30,9 @@ public class VoteService {
 	private final AppointmentRepository appointmentRepository;
 
 	@Transactional
-	public void createVoteItem(VoteItemRequest requestDto, Long appointmentId) {
+	public void createVoteItem(VoteItemRequest requestDto, Long memberId, Long appointmentId) {
+		validateAndGetParticipant(memberId, appointmentId);
+
 		Address address = Address.of(requestDto.roadAddress(), requestDto.longitude(), requestDto.latitude());
 		Address addressEntity = addressRepository.save(address);
 
@@ -45,14 +47,13 @@ public class VoteService {
 	}
 
 	@Transactional
-	public void voting(VotesRequest requestDto, Long appointmentId) {
-		Participant participant = participantRepository.findById(requestDto.participantId())
-			.orElseThrow(() -> new IllegalArgumentException("해당하는 ID의 참가자가 존재하지 않습니다."));
+	public void voting(VotesRequest requestDto, Long memberId, Long appointmentId) {
+		Participant participant = validateAndGetParticipant(memberId, appointmentId);
 
 		requestDto.voteInfos()
 			.forEach(voteInfo -> {
 				boolean isExist = voterRepository.existsByParticipantIdAndVoteItemId(
-					requestDto.participantId(), voteInfo.voteItemId()
+					participant.getId(), voteInfo.voteItemId()
 				);
 
 				VoteItem voteItem = voteItemRepository.findById(voteInfo.voteItemId())
@@ -65,9 +66,20 @@ public class VoteService {
 
 				if (!voteInfo.isSelected() && isExist) {
 					voterRepository.deleteByParticipantIdAndVoteItemId(
-						requestDto.participantId(), voteInfo.voteItemId()
+						participant.getId(), voteInfo.voteItemId()
 					);
 				}
 			});
+	}
+
+	private Participant validateAndGetParticipant(Long memberId, Long appointmentId) {
+		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
+
+		if (!participant.getIsAttending()) {
+			throw new IllegalArgumentException("약속에 불참인 참가자는 변경할 수 없습니다.");
+		}
+
+		return participant;
 	}
 }

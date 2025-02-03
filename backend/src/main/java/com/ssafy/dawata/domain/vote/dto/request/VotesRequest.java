@@ -9,7 +9,6 @@ import lombok.Builder;
  */
 @Builder
 public record VotesRequest(
-	Long participantId,
 	List<VoteInfo> voteInfos
 ) {
 

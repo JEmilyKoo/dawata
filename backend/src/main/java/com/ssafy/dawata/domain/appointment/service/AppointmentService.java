@@ -8,7 +8,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dawata.domain.appointment.dto.request.AppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipantsRequest;
+import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
@@ -109,6 +111,37 @@ public class AppointmentService {
 			appointment.getParticipants(),
 			makeVoteResponses(voteItems, voters, participant.getId())
 		);
+	}
+
+	@Transactional
+	public void updateAppointment(UpdateAppointmentRequest requestDto, Long memberId, Long appointmentId) {
+		validateParticipant(memberId, appointmentId);
+
+		Appointment appointment = appointmentRepository.findById(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
+
+		requestDto.name().ifPresent(appointment::updateName);
+		requestDto.category().ifPresent(appointment::updateCategory);
+		requestDto.scheduledAt().ifPresent(appointment::updateScheduledAt);
+		requestDto.voteEndTime().ifPresent(appointment::updateVoteEndTime);
+	}
+
+	@Transactional
+	public void deleteAppointment(Long memberId, Long appointmentId) {
+		validateParticipant(memberId, appointmentId);
+
+		Appointment appointment = appointmentRepository.findById(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
+		appointmentRepository.delete(appointment);
+	}
+
+	private void validateParticipant(Long memberId, Long appointmentId) {
+		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
+
+		if (!participant.getIsAttending()) {
+			throw new IllegalArgumentException("약속에 불참인 참가자는 변경할 수 없습니다.");
+		}
 	}
 
 	private List<AppointmentWithExtraInfoResponse> makeAppointmentWithExtraInfoResponses(Long memberId,
