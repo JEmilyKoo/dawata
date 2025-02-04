@@ -41,7 +41,6 @@ public class Member extends BaseTimeEntity {
 		return Member.builder()
 			.email(email)
 			.name(name)
-			.withdrawn(false)
 			.build();
 	}
 
