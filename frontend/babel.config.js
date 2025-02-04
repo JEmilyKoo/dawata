@@ -8,14 +8,14 @@ module.exports = function (api) {
     plugins: [
       "react-native-reanimated/plugin",
       [
-        "module:react-native-dotenv",
+        "babel-plugin-module-resolver",
         {
-          moduleName: "@env",
-          path: ".env",
-          safe: false,
-          aloowUndefined: true,
+          root: ["./src"],
+          alias: {
+            app: "./src/app",
+          },
         },
-      ],
+      ]
     ],
   }
 }

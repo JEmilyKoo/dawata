@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { BASE_URL } from '@env';
+import axios from 'axios'
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: process.env.EXPO_PUBLIC_BASE_URL,
   timeout: 5000,
 
   headers: {
