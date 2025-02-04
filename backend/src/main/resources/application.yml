@@ -3,6 +3,7 @@ spring:
     import:
       - application-db.yml
       - application-auth.yml
+      - application-aws.yml
 springdoc:
   swagger-ui:
     path: /api-docs.html
