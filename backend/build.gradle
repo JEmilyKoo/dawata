@@ -60,6 +60,9 @@ dependencies {
     implementation 'software.amazon.awssdk:auth'
     implementation 'software.amazon.awssdk:sts:2.30.11'
     implementation 'software.amazon.awssdk:sqs:2.30.11'
+
+    // dot env
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 }
 
 tasks.named('test') {

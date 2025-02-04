@@ -1,9 +1,40 @@
 spring:
   config:
-    import:
-      - application-db.yml
-      - application-auth.yml
-      - application-aws.yml
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:mysql://${DB_URL}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource.hikari:
+    connection-init-sql: SET NAMES utf8mb4
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: ${REDIRECT_URI}
+            client-authentication-method: client_secret_post
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
 springdoc:
   swagger-ui:
     path: /api-docs.html
@@ -11,3 +42,19 @@ springdoc:
     path: /api-docs
   show-actuator: true
   default-produces-media-type: application/json
+
+aws:
+  credentials:
+    region:
+      static: ap-northeast-2
+    access-key: ${ACCESS_KEY}
+    secret-key: ${SECRET_KEY}
+  s3:
+    bucket: ${BUCKET_NAME}
+    presigned-url-expiration: 10
+  sqs:
+    queue-url: ${QUEUE_URL}
+
+logging.level:
+  org.hibernate.SQL: debug
+  org.hibernate.type: trace
