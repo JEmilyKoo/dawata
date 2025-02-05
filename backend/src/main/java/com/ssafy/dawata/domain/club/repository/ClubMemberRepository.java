@@ -20,12 +20,18 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 	//특정 유저가 속한 모든 클럽의 멤버아이디 조회
 	List<ClubMember> findAllByMemberId(Long memberId);
 
-	//멤버 아이디와 클럽 아이디로 해당 클럽에 속하는 클럽 멤버 아이디 존재 시 클럽 멤버 아이디 반환
+	void deleteAllByClubId(Long clubId);
+
+	//멤버 아이디, 클럽 아이디로 해당 클럽에 속하는 클럽 멤버 아이디 존재 시 클럽 멤버 아이디 반환
+	@Query("SELECT clubMember FROM ClubMember clubMember WHERE clubMember.member.id = :memberId AND clubMember.club.id = :clubId")
 	Optional<ClubMember> findByMemberIdAndClubId(Long memberId, Long clubId);
 
 	//코드로 클럽 찾기
 	@Query("SELECT clubMember FROM ClubMember clubMember WHERE clubMember.club.teamCode = :teamCode")
 	List<ClubMember> findByTeamCode(@Param("teamCode") String teamCode);
 
-	void deleteAllByClubId(Long clubId);
+	//memberId 유저가 참여하는 클럽의 모든 멤버 조회 (그룹 info 조회 시 그룹 멤버 함께 반환)
+	@Query("SELECT clubMember FROM ClubMember clubMember JOIN FETCH clubMember.club WHERE clubMember.member.id = :memberId")
+	List<ClubMember> findAllWithClubByMemberId(@Param("memberId") Long memberId);
+
 }
