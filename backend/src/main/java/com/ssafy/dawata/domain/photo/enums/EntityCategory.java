@@ -1,9 +1,6 @@
 package com.ssafy.dawata.domain.photo.enums;
 
-import java.util.Arrays;
 import java.util.Objects;
-
-import com.ssafy.dawata.domain.participant.enums.DailyStatus;
 
 import lombok.Getter;
 

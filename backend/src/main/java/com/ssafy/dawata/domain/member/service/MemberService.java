@@ -26,6 +26,14 @@ public class MemberService {
 			.orElseThrow(IllegalArgumentException::new);
 	}
 
+	public MemberInfoResponse findMemberInfo() {
+		// TODO : 내 정보 처리 로직 (SecurityContextHolder 구현 후 위 findMemberInfo 메소드에 적용 예정)
+		return toMemberInfo(
+			memberRepository
+				.findById(1L)
+				.orElseThrow(IllegalArgumentException::new));
+	}
+
 	public MemberInfoResponse findMemberInfo(Long memberId) {
 		// TODO : 내 정보 처리 로직 (SecurityContextHolder 구현 후 위 findMemberInfo 메소드에 적용 예정)
 		return toMemberInfo(
