@@ -45,34 +45,37 @@ public class SqsService {
 	private void pollMessages() {
 		ReceiveMessageRequest request = ReceiveMessageRequest.builder()
 			.queueUrl(queueUrl)
-			.waitTimeSeconds(20)            // 20초 마다 GET
-			.maxNumberOfMessages(5)        // 한 번에 최대 5개 메시지 수신
+			.waitTimeSeconds(20)          // Long Polling 활성화
+			.maxNumberOfMessages(5)       // 한 번에 최대 5개 메시지 수신
 			.build();
 
 		CompletableFuture<ReceiveMessageResponse> future = sqsAsyncClient.receiveMessage(request);
 
 		// 성공 처리
 		future.thenAccept(response -> {
-			List<Message> messages = response.messages();
-			if (!messages.isEmpty()) {
-				messages.forEach(this::processMessage);
-			}
+				List<Message> messages = response.messages();
+				if (!messages.isEmpty()) {
+					messages.forEach(this::processMessage);
+				}
 
-			pollMessages();  // 계속 폴링 유지
-		}).exceptionally(ex -> {
-			System.err.println("❌ 메시지 수신 실패: " + ex.getMessage());
-			ex.printStackTrace();
-			try {
-				Thread.sleep(5000);  // 실패 시 5초 대기 후 재시도
-			} catch (InterruptedException ignored) {
-			}
-			pollMessages();  // 실패 후에도 재시도
-			return null;
-		});
+				pollMessages();  // 계속 폴링 유지
+			})
+
+			// 실패 처리
+			.exceptionally(ex -> {
+				System.err.println("❌ 메시지 수신 실패: " + ex.getMessage());
+				ex.printStackTrace();
+				try {
+					Thread.sleep(5000);  // 실패 시 5초 대기 후 재시도
+				} catch (InterruptedException ignored) {
+				}
+				pollMessages();  // 실패 후에도 재시도
+				return null;
+			});
 	}
 
 	private void processMessage(Message message) {
-		if (running.get()) {
+		if (!running.get()) {
 			return;
 		}
 
