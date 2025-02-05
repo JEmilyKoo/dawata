@@ -2,6 +2,7 @@ package com.ssafy.dawata.domain.member.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,11 +37,11 @@ class MemberServiceTest {
 		MemberInfoResponse response
 			= new MemberInfoResponse("test@test.com", "tester", null, LocalDateTime.now());
 		// when
-		Mockito.when(memberRepository.findById(anyLong()))
-			.thenReturn(Optional.of(member));
+		Mockito.when(memberRepository.customFindById(anyLong()))
+			.thenReturn(Optional.of(response));
 
 		// then
-		MemberInfoResponse result = memberService.findMemberInfo(1L);
+		MemberInfoResponse result = memberService.findMemberInfo();
 
 		assertEquals(result.name(), member.getName());
 		assertEquals(result.email(), member.getEmail());
@@ -51,12 +52,12 @@ class MemberServiceTest {
 	void fail_findMemberInfo_notFoundMember() {
 		// given
 		// when
-		Mockito.when(memberRepository.findById(1L))
+		Mockito.when(memberRepository.customFindById(anyLong()))
 			.thenReturn(Optional.empty());
 		// then
 		assertThrows(
 			IllegalArgumentException.class, () -> {
-				memberService.findMemberInfo(1L);
+				memberService.findMemberInfo();
 			}
 		);
 	}
@@ -77,15 +78,14 @@ class MemberServiceTest {
 		Member memberSpy =
 			Mockito.spy(new Member("test@test.com", "tester", false));
 		// when
-		Mockito.when(memberRepository.findById(1L))
+		Mockito.when(memberRepository.findById(anyLong()))
 			.thenReturn(Optional.of(memberSpy));
-		// then
-		MemberInfoResponse result =
-			memberService.updateMyInfo(request);
 
-		assertNotEquals(result.name(), member.name());
-		assertEquals(result.email(), member.email());
-		assertEquals(result.img(), member.img());
+		memberService.updateMyInfo(request);
+
+		// then
+		verify(memberRepository, times(1)).findById(anyLong());
+		assertNotEquals(memberSpy.getName(), member.name());
 	}
 
 	@Test
@@ -93,32 +93,14 @@ class MemberServiceTest {
 	void fail_updateMemberName_notFoundMember() {
 		// given
 		// when
-		Mockito.when(memberRepository.findById(1L))
+		Mockito.when(memberRepository.findById(anyLong()))
 			.thenReturn(Optional.empty());
 		// then
 		assertThrows(
 			IllegalArgumentException.class, () -> {
-				memberService.findMemberInfo(1L);
+				memberService.updateMyInfo(any(MemberInfoUpdateRequest.class));
 			}
 		);
-	}
-
-	@Test
-	@DisplayName("회원 이름 수정 - 실패 (이름 변경 X)")
-	void fail_updateMemberName_notUpdateName() {
-		// given
-		Member member =
-			new Member("test@test.com", "tester", false);
-		MemberInfoUpdateRequest request =
-			new MemberInfoUpdateRequest("update");
-		// when
-		Mockito.when(memberRepository.findById(1L))
-			.thenReturn(Optional.of(member));
-		// then
-		MemberInfoResponse result =
-			memberService.updateMyInfo(request);
-
-		assertEquals(result.name(), member.getName());
 	}
 
 	@Test
@@ -142,12 +124,12 @@ class MemberServiceTest {
 	void fail_withdraw() {
 		// given
 		// when
-		Mockito.when(memberRepository.findById(1L))
+		Mockito.when(memberRepository.customFindById(anyLong()))
 			.thenReturn(Optional.empty());
 		// then
 		assertThrows(
 			IllegalArgumentException.class, () -> {
-				memberService.findMemberInfo(1L);
+				memberService.findMemberInfo();
 			}
 		);
 	}
