@@ -51,25 +51,27 @@ class MemberControllerTest {
 	@DisplayName("회원 정보 조회 - 성공")
 	void success_getMyInfo() throws Exception {
 		// given
-		Member member = new Member("tester@email.com", "tester", false);
+		Member member =
+			new Member("tester@email.com", "tester", false);
+		MemberInfoResponse response =
+			new MemberInfoResponse("tester@email.com", "tester", null, LocalDateTime.now());
 
 		//when
-		when(memberService.findMyMemberInfo()).thenReturn(member);
+		when(memberService.findMemberInfo()).thenReturn(response);
 
 		// then
 		mockMvc.perform(get("/members")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				ApiResponse<Member> resultMember = objectMapper.readValue(
+				ApiResponse<MemberInfoResponse> resultMember = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<ApiResponse<Member>>() {
+					new TypeReference<ApiResponse<MemberInfoResponse>>() {
 					}
 				);
 
-				assertEquals(member.getEmail(), resultMember.data().getEmail());
-				assertEquals(member.getName(), resultMember.data().getName());
-				assertFalse(resultMember.data().isWithdrawn());
+				assertEquals(member.getEmail(), resultMember.data().email());
+				assertEquals(member.getName(), resultMember.data().name());
 			})
 			.andDo(print());
 	}
@@ -93,26 +95,20 @@ class MemberControllerTest {
 			new MemberInfoResponse("tester@email.com", "update", null, LocalDateTime.now());
 
 		//when
-		when(memberService.updateMyInfo(request))
-			.thenReturn(changeMember);
-
 		// then
 		mockMvc.perform(patch("/members")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(result -> {
-				ApiResponse<MemberInfoResponse> resultMember = objectMapper.readValue(
+				ApiResponse<Void> resultMember = objectMapper.readValue(
 					result.getResponse().getContentAsString(StandardCharsets.UTF_8),
-					new TypeReference<ApiResponse<MemberInfoResponse>>() {
+					new TypeReference<ApiResponse<Void>>() {
 					}
 				);
 
-				assertEquals(resultMember.status(), "success");
-				assertEquals(resultMember.data().email(), changeMember.email());
-				assertEquals(resultMember.data().name(), changeMember.name());
-				assertEquals(resultMember.data().img(), changeMember.img());
-				assertEquals(resultMember.data().createdAt(), changeMember.createdAt());
+				assertEquals("success", resultMember.status());
+				assertNull(resultMember.data());
 			})
 			.andDo(print());
 	}
