@@ -89,4 +89,8 @@ public class Participant {
 	public void updateIsAttending(Boolean isAttending) {
 		this.isAttending = isAttending;
 	}
+
+	public void updateDailyStatus(DailyStatus dailyStatus) {
+		this.dailyStatus = dailyStatus;
+	}
 }
