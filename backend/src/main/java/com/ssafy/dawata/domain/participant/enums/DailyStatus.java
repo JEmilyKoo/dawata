@@ -9,7 +9,8 @@ import lombok.Getter;
 public enum DailyStatus {
 	PRESENT("정상", "P"),
 	LATE("지각", "L"),
-	NO_SHOW("노쇼", "NS");
+	NO_SHOW("노쇼", "NS"),
+	UNKNOWN("알수 없음", "U");
 
 	private final String description;
 

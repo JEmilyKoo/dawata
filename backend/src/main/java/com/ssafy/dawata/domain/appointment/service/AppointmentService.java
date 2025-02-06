@@ -58,7 +58,7 @@ public class AppointmentService {
 			boolean isHostMember = mId.equals(hostMemberEntity.getId());
 
 			Participant participant = Participant.of(
-				appointmentEntity, clubMemberEntity, isHostMember, DailyStatus.LATE,
+				appointmentEntity, clubMemberEntity, isHostMember, DailyStatus.UNKNOWN,
 				isHostMember ? Role.HOST : Role.GUEST
 			);
 
@@ -149,6 +149,14 @@ public class AppointmentService {
 			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
 
 		participant.updateIsAttending(isAttending);
+	}
+
+	@Transactional
+	public void updateParticipantDailyStatus(Long memberId, Long appointmentId, DailyStatus dailyStatus) {
+		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
+
+		participant.updateDailyStatus(dailyStatus);
 	}
 
 	private List<AppointmentWithExtraInfoResponse> makeAppointmentWithExtraInfoResponses(Long memberId,

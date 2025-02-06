@@ -24,6 +24,7 @@ import com.ssafy.dawata.domain.appointment.service.AppointmentService;
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantAttendingRequest;
+import com.ssafy.dawata.domain.participant.dto.request.ParticipantDailyStatusRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +89,17 @@ public class AppointmentController {
 		@RequestBody ParticipantAttendingRequest requestDto
 	) {
 		appointmentService.updateParticipantAttending(1L, appointmentId, requestDto.isAttending());
+		return ResponseEntity.ok(
+			ApiResponse.success()
+		);
+	}
+
+	@PatchMapping("/{appointmentId}/participants/daily-status")
+	public ResponseEntity<ApiResponse<?>> updateDailyStatus(
+		@PathVariable Long appointmentId,
+		@RequestBody ParticipantDailyStatusRequest requestDto
+	) {
+		appointmentService.updateParticipantDailyStatus(1L, appointmentId, requestDto.dailyStatus());
 		return ResponseEntity.ok(
 			ApiResponse.success()
 		);
