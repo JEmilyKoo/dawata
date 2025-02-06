@@ -22,6 +22,8 @@ import com.ssafy.dawata.domain.member.repository.MemberRepository;
 import com.ssafy.dawata.domain.participant.entity.Participant;
 import com.ssafy.dawata.domain.participant.enums.DailyStatus;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
+import com.ssafy.dawata.domain.photo.entity.Photo;
+import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
 import com.ssafy.dawata.domain.vote.entity.VoteItem;
 import com.ssafy.dawata.domain.vote.entity.Voter;
 import com.ssafy.dawata.domain.vote.enums.VoteStatus;
@@ -41,6 +43,7 @@ public class AppointmentService {
 	private final ParticipantRepository participantRepository;
 	private final VoteItemRepository voteItemRepository;
 	private final VoterRepository voterRepository;
+	private final PhotoRepository photoRepository;
 
 	@Transactional
 	public void createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
@@ -103,11 +106,20 @@ public class AppointmentService {
 				.toList()
 		);
 
+		List<AppointmentDetailResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
+			.stream()
+			.map(p -> {
+				Photo photo = photoRepository.findByEntityId(p.getClubMember().getMember().getId())
+					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+				return AppointmentDetailResponse.ParticipantResponse.of(p, photo.getPhotoName());
+			})
+			.toList();
+
 		return AppointmentDetailResponse.of(
 			clubMember.getClub().getId(),
 			clubMember.getClubName(),
 			appointment,
-			appointment.getParticipants(),
+			participantResponses,
 			makeVoteResponses(voteItems, voters, participant.getId())
 		);
 	}
