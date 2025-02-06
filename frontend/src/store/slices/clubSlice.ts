@@ -1,20 +1,20 @@
 // /src/store/slices/appointmentSlice.ts
-import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
-import type { RootState } from "../store"
+import type { RootState } from '../store'
 
 const initialState = {
   clubs: [
     {
       clubId: 1,
-      name: "테스트 클럽",
-      img: "",
-      category: "",
+      name: '테스트 클럽',
+      img: '',
+      category: '',
       appointment: [
         {
           appointmentId: 1,
-          name: "테스트 약속",
-          category: "STUDY",
+          name: '테스트 약속',
+          category: 'STUDY',
         },
       ],
     },
@@ -22,7 +22,7 @@ const initialState = {
 }
 
 const clubSlice = createSlice({
-  name: "appointment",
+  name: 'appointment',
   initialState,
   reducers: {
     setAppointments(state, action) {
