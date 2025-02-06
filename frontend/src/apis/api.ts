@@ -24,7 +24,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     console.log('✅ 응답 성공:', response.data)
-    return response
+    return response.data
   },
   (error) => {
     console.error('❌ 응답 실패:', error.response?.data || error.message)

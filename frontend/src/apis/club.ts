@@ -1,28 +1,21 @@
-import handleApiError from "@/utils/errorHandler"
 import { Club } from "@/types/club"
+import handleApiError from "@/utils/errorHandler"
+
 import api from "./api"
 
 //그룹 생성
 interface CreateClubParams {
-  clubId: number
-  nextRange?: number
-  prevRange?: number
+  name: string
+  category: string
 }
 
-export const createClub = async ({
-  clubId,
-  nextRange = 4,
-  prevRange = 4,
-}: CreateClubParams) => {
+export const createClub = async ({ name, category }: CreateClubParams) => {
   try {
-    const response = await api.get(`/appointments`, {
-      params: { clubId, nextRange, prevRange },
+    const response = await api.post(`/clubs`, {
+      name,
+      category,
     })
-    console.log("결과가 나옴에 의의를 둠" + response)
-    return [
-      { id: 1, title: "약속1" },
-      { id: 2, title: "약속2" },
-    ]
+    return response.data
   } catch (error) {
     console.error("⛔ 그룹 생성 실패:", handleApiError(error))
     return null
@@ -36,15 +29,9 @@ interface GetClubParams {
   prevRange?: number
 }
 
-export const getClub = async ({
-  clubId,
-  nextRange = 4,
-  prevRange = 4,
-}: GetClubParams) => {
+export const getClub = async ({ clubId }: GetClubParams) => {
   try {
-    const response = await api.get(`/appointments`, {
-      params: { clubId, nextRange, prevRange },
-    })
+    const response = await api.get(`/clubs/${clubId}`)
     console.log("결과가 나옴에 의의를 둠" + response)
     return [
       { id: 1, title: "약속1" },
@@ -58,14 +45,14 @@ export const getClub = async ({
 
 // 전체 그룹 데이터 조회
 export const getClubs = async () => {
-    try {
-      const response = await api.get<Club[]>('/clubs')
-      return response;
-    } catch (error) {
-      console.error("⛔ 전체 그룹 데이터 조회 실패:", handleApiError(error))
-      return null
-    }
+  try {
+    const response = await api.get<Club[]>("/clubs")
+    return response
+  } catch (error) {
+    console.error("⛔ 전체 그룹 데이터 조회 실패:", handleApiError(error))
+    return null
   }
+}
 
 // 그룹 데이터 수정
 interface UpdateClubParams {
@@ -125,9 +112,7 @@ interface ClubIdParams {
   clubId: number
 }
 
-export const getClubCode = async ({
-  clubId,
-}: ClubIdParams) => {
+export const getClubCode = async ({ clubId }: ClubIdParams) => {
   try {
     const response = await api.get(`/clubs/${clubId}/code`);
     return response;
@@ -138,9 +123,7 @@ export const getClubCode = async ({
 }
 
 // 클럽 멤버 전체 조회
-export const getClubMembers = async ({
-  clubId,
-}: ClubIdParams) => {
+export const getClubMembers = async ({ clubId }: ClubIdParams) => {
   try {
     const response = await api.get(`/clubs/${clubId}/members`)
     return response;
