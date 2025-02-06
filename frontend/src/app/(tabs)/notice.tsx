@@ -1,8 +1,8 @@
-import { useTranslation } from "react-i18next"
-import { ScrollView, Text, TouchableOpacity, View } from "react-native"
+import { useTranslation } from 'react-i18next'
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
-import BackButton from "@/components/BackButton"
-import NoticeItem from "@/components/NoticeItem"
+import BackButton from '@/components/BackButton'
+import NoticeItem from '@/components/NoticeItem'
 
 interface NoticeInfo {
   id: number // 알림의 고유 ID
@@ -15,99 +15,99 @@ interface NoticeInfo {
 const noticeInfo: NoticeInfo[] = [
   {
     id: 1,
-    noticeType: "알림",
+    noticeType: '알림',
     read: false,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 3,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 4,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 4,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 4,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
   {
     id: 2,
-    noticeType: "알림",
+    noticeType: '알림',
     read: true,
     deleted: false,
-    createdAt: "2025-01-01T00:00:00",
+    createdAt: '2025-01-01T00:00:00',
   },
 ]
 export default function TabOneScreen() {
   const { t } = useTranslation()
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row p-4 border-b border-border">
+      <View className="flex-row p-4 border-b border-bord">
         <TouchableOpacity className="mr-4">
           <BackButton />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="text-xl font-bold mt-2">{t("notice")}</Text>
+          <Text className="text-xl font-bold mt-2">{t('notice')}</Text>
         </View>
       </View>
       <ScrollView>
