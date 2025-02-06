@@ -1,25 +1,45 @@
+import { afterEach, describe, expect, jest, test } from "@jest/globals"
 import React from "react"
 
 import { fireEvent, render } from "@testing-library/react-native"
 
 import MemberList from "../components/MemberList"
+import { ClubMember } from "../../../types/club"
 
-const members = [
+const members: ClubMember[] = [
   {
     id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    profilePicUrl: "https://example.com/profiles/john",
-    isAdmin: false,
+    memberId: 1,
+    clubId: 1,
+    nickname: "John Doe",
+    clubName: "Club A",
+    createdBy: 0,  // 관리자
   },
   {
     id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    profilePicUrl: "https://example.com/profiles/jane",
-    isAdmin: true,
+    memberId: 2,
+    clubId: 1,
+    nickname: "Jane Smith",
+    clubName: "Club A",
+    createdBy: 1,  // 일반 멤버
   },
 ]
+
+describe("멤버 권한 처리 테스트", () => {
+  test("createdBy 값에 따라 관리자와 일반 멤버가 구분된다", () => {
+    const { getByText, queryByText } = render(<MemberList members={members} />)
+    
+    // John Doe는 관리자(createdBy: 0)
+    expect(getByText("John Doe")).toBeTruthy()
+    expect(getByText("관리자").closest('View')).toHaveTextContent("John Doe")
+    
+    // Jane Smith는 일반 멤버(createdBy: 1)
+    expect(getByText("Jane Smith")).toBeTruthy()
+    expect(queryByText("관리자").closest('View')).not.toHaveTextContent("Jane Smith")
+  })
+})
+
+
 
 describe("Member List Interactions", () => {
   test("멤버 리스트 아이템을 클릭하면, 해당 멤버의 프로필 정보가 담긴 팝업이 뜬다", () => {

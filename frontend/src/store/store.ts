@@ -2,10 +2,12 @@
 import { configureStore } from "@reduxjs/toolkit"
 
 import appointmentReducer from "./slices/appointmentSlice"
+import clubReducer from "./slices/clubSlice"
 
 export const store = configureStore({
   reducer: {
     appointment: appointmentReducer,
+    club: clubReducer,
   },
 })
 
