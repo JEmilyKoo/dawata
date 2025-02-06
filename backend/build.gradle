@@ -61,6 +61,10 @@ dependencies {
     implementation 'software.amazon.awssdk:sts:2.30.11'
     implementation 'software.amazon.awssdk:sqs:2.30.11'
 
+    // Firebase
+    implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+
     // dot env
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 }
