@@ -17,11 +17,6 @@ import {
 
 jest.mock("../api") // api.ts를 목킹
 
-interface RequestData {
-  status: string
-  data: any
-}
-
 describe("Club API 테스트", () => {
   afterEach(() => {
     jest.clearAllMocks() // 매 테스트 후 Mock 초기화
@@ -29,10 +24,10 @@ describe("Club API 테스트", () => {
 
   // 약속 리스트 조회
   test("getAppointments - 약속 리스트 조회 요청 성공", async () => {
-    const mockResponse: RequestData = { status: "success", data: [] }
-    ;(
-      api.get as jest.MockedFunction<() => Promise<RequestData>>
-    ).mockResolvedValue(mockResponse)
+    const mockResponse = { data: [] }
+    ;(api.get as jest.MockedFunction<typeof api.get>).mockResolvedValue(
+      mockResponse,
+    )
     const result = await getAppointments({
       clubId: 1,
       nextRange: 4,
@@ -52,24 +47,33 @@ describe("Club API 테스트", () => {
   //     expect(result).toEqual(mockResponse.data)
   //   })
 
-  // //약속 생성
+  //약속 생성
   // test("createAppointment - 약속 생성 요청 성공", async () => {
   //   // BE 단 미완성
   // })
 
-  /*   test('createClub - 클럽 생성 요청 성공', async () => {
-    (api.get as jest.Mock).mockResolvedValue({ data: { id: 1, title: '새 클럽' } });
-    const result = await createClub({ clubId: 1 });
-    expect(api.get).toHaveBeenCalledWith('/appointments', { params: { clubId: 1, nextRange: 4, prevRange: 4 } });
-    expect(result).toEqual([{ id: 1, title: '약속1' }, { id: 2, title: '약속2' }]);
-  }); */
+  // test("createClub - 클럽 생성 요청 성공", async () => {
+  //   ;(api.get as jest.Mock).mockResolvedValue({
+  //     data: { id: 1, title: "새 클럽" },
+  //   })
+  //   const result = await createClub({ clubId: 1 })
+  //   expect(api.get).toHaveBeenCalledWith("/appointments", {
+  //     params: { clubId: 1, nextRange: 4, prevRange: 4 },
+  //   })
+  //   expect(result).toEqual([
+  //     { id: 1, title: "약속1" },
+  //     { id: 2, title: "약속2" },
+  //   ])
+  // })
 
-  //   test('getClub - 특정 클럽 데이터 요청 실패', async () => {
-  //     (api.get as jest.Mock).mockRejectedValue(new Error('API 오류'));
-  //     const result = await getClub({ clubId: 2 });
-  //     expect(api.get).toHaveBeenCalledWith('/appointments', { params: { clubId: 2, nextRange: 4, prevRange: 4 } });
-  //     expect(result).toBeNull();
-  //   });
+  // test("getClub - 특정 클럽 데이터 요청 실패", async () => {
+  //   ;(api.get as jest.Mock).mockRejectedValue(new Error("API 오류"))
+  //   const result = await getClub({ clubId: 2 })
+  //   expect(api.get).toHaveBeenCalledWith("/appointments", {
+  //     params: { clubId: 2, nextRange: 4, prevRange: 4 },
+  //   })
+  //   expect(result).toBeNull()
+  // })
 
   // 전체 그룹 데이터 조회
   //   test("getClubs - 전체 그룹 데이터 요청 성공", async () => {
