@@ -1,7 +1,9 @@
 package com.ssafy.dawata.domain.appointment.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ import com.ssafy.dawata.domain.participant.enums.DailyStatus;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 import com.ssafy.dawata.domain.vote.entity.VoteItem;
 import com.ssafy.dawata.domain.vote.entity.Voter;
+import com.ssafy.dawata.domain.vote.enums.VoteStatus;
 import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 import com.ssafy.dawata.domain.vote.repository.VoterRepository;
 
@@ -77,7 +80,7 @@ public class AppointmentService {
 		Integer prevRange) {
 		// TODO: nextRange와 prevRange로 where 조건 추가하기
 		// TODO: participantInfos 에 participant_id -> email 로 변경하기 + profile_url 추가
-		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberIdAndClubId(memberId, clubId);
+		List<Appointment> appointments = appointmentRepository.findAppointmentsByClubId(clubId);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
 	}
@@ -144,18 +147,37 @@ public class AppointmentService {
 		List<Appointment> appointments) {
 		return appointments.stream()
 			.map(appointment -> {
-				ClubMember clubMember = appointment.getParticipants()
+				Optional<Participant> participant = appointment.getParticipants()
 					.stream()
-					.map(Participant::getClubMember)
-					.filter(cm -> Objects.equals(cm.getMember().getId(), memberId))
-					.findFirst()
-					.orElseThrow(() -> new IllegalArgumentException("문제 상황 발생"));
+					.filter(p -> p.getClubMember().getMember().getId().equals(memberId))
+					.findAny();
+
+				ClubMember targetClubMember = participant.orElseGet(() -> appointment.getParticipants()
+						.stream()
+						.findAny()
+						.orElseThrow(() -> new IllegalArgumentException("약속에 참여하는 참가자가 없습니다.")))
+					.getClubMember();
+
+				String clubName =
+					participant.isPresent() ? targetClubMember.getClubName() : targetClubMember.getClub().getName();
+
+				// Vote Status 로직 추가하기
+				VoteStatus voteStatus = VoteStatus.NOT_SELECTED;
+
+				if (participant.isEmpty()) {
+					voteStatus = VoteStatus.NOT_PARTICIPANT;
+				} else if (appointment.getVoteEndTime().isBefore(LocalDateTime.now())) {
+					voteStatus = VoteStatus.EXPIRED;
+				} else if (participantRepository.hasVoted(participant.get().getId())) {
+					voteStatus = VoteStatus.SELECTED;
+				}
 
 				return AppointmentWithExtraInfoResponse.of(
-					clubMember.getClub().getId(),
-					clubMember.getClubName(),
+					targetClubMember.getClub().getId(),
+					clubName,
 					appointment,
-					appointment.getParticipants()
+					appointment.getParticipants(),
+					voteStatus
 				);
 			})
 			.toList();
