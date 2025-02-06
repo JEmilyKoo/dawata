@@ -1,7 +1,6 @@
 package com.ssafy.dawata.global.config;
 
 import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.security.config.Customizer.*;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
