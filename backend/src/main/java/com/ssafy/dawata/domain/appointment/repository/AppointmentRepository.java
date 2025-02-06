@@ -11,22 +11,22 @@ import com.ssafy.dawata.domain.appointment.entity.Appointment;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-	@EntityGraph(attributePaths = {"participants", "participants.clubMember"})
+	@EntityGraph(attributePaths = {"participants", "participants.clubMember",
+		"participants.clubMember.club"}, type = EntityGraph.EntityGraphType.FETCH)
 	@Query("SELECT a FROM Appointment a " +
-		"JOIN Participant p ON a.id = p.appointment.id " +
-		"JOIN ClubMember cm ON p.clubMember.id = cm.id " +
-		"WHERE cm.member.id = :memberId")
+		"JOIN a.participants p " +
+		"WHERE p.clubMember.member.id = :memberId")
 	List<Appointment> findAppointmentsByMemberId(@Param("memberId") Long memberId);
 
-	@EntityGraph(attributePaths = {"participants", "participants.clubMember"})
-	@Query("SELECT a FROM Appointment a " +
+	@EntityGraph(attributePaths = {"participants", "participants.clubMember",
+		"participants.clubMember.club"}, type = EntityGraph.EntityGraphType.FETCH)
+	@Query("SELECT distinct a FROM Appointment a " +
 		"JOIN Participant p ON a.id = p.appointment.id " +
 		"JOIN ClubMember cm ON p.clubMember.id = cm.id " +
-		"WHERE cm.member.id = :memberId " +
-		"AND cm.club.id = :clubId"
+		"JOIN Club c ON cm.club.id = c.id " +
+		"WHERE cm.club.id = :clubId"
 	)
-	List<Appointment> findAppointmentsByMemberIdAndClubId(
-		@Param("memberId") Long memberId,
+	List<Appointment> findAppointmentsByClubId(
 		@Param("clubId") Long clubId
 	);
 

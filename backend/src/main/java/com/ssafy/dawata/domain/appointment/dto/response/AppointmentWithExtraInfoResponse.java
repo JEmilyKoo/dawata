@@ -5,6 +5,7 @@ import java.util.List;
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.participant.entity.Participant;
 import com.ssafy.dawata.domain.participant.enums.DailyStatus;
+import com.ssafy.dawata.domain.vote.enums.VoteStatus;
 
 import lombok.Builder;
 
@@ -12,7 +13,8 @@ import lombok.Builder;
 public record AppointmentWithExtraInfoResponse(
 	ClubResponse clubInfo,
 	AppointmentResponse appointmentInfo,
-	List<ParticipantResponse> participantInfos
+	List<ParticipantResponse> participantInfos,
+	VoteStatus voteStatus
 ) {
 
 	@Builder
@@ -42,12 +44,14 @@ public record AppointmentWithExtraInfoResponse(
 		Long clubId,
 		String clubName,
 		Appointment appointment,
-		List<Participant> participants
+		List<Participant> participants,
+		VoteStatus voteStatus
 	) {
 		return AppointmentWithExtraInfoResponse.builder()
 			.clubInfo(ClubResponse.of(clubId, clubName))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participants.stream().map(ParticipantResponse::of).toList())
+			.voteStatus(voteStatus)
 			.build();
 	}
 }

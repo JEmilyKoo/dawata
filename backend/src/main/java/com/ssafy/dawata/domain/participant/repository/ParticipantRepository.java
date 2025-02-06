@@ -20,4 +20,12 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 		@Param("memberId") Long memberId,
 		@Param("appointmentId") Long appointmentId
 	);
+
+	@Query("""
+			SELECT CASE 
+				WHEN EXISTS (SELECT 1 FROM Voter vt WHERE vt.participant.id = :participantId) THEN true 
+				ELSE false END 
+			FROM Participant p WHERE p.id = :participantId
+		""")
+	boolean hasVoted(@Param("participantId") Long participantId);
 }

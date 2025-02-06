@@ -11,9 +11,9 @@ import com.ssafy.dawata.domain.vote.entity.Voter;
 public interface VoterRepository extends JpaRepository<Voter, Long> {
 
 	// TODO: 쿼리 최적화 (불필요한 left join 줄이기)
-	boolean existsByParticipantIdAndVoteItemId(Long participantId, Long voterId);
+	boolean existsByParticipantIdAndVoteItemId(Long participantId, Long voteItemId);
 
-	void deleteByParticipantIdAndVoteItemId(Long participantId, Long voterId);
+	void deleteByParticipantIdAndVoteItemId(Long participantId, Long voteItemId);
 
 	@Query("SELECT v " +
 		"FROM Voter v " +
