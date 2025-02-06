@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +23,7 @@ import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfo
 import com.ssafy.dawata.domain.appointment.service.AppointmentService;
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
+import com.ssafy.dawata.domain.participant.dto.request.ParticipantAttendingRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +77,17 @@ public class AppointmentController {
 	@DeleteMapping("/{appointmentId}")
 	public ResponseEntity<ApiResponse<?>> deleteAppointment(@PathVariable Long appointmentId) {
 		appointmentService.deleteAppointment(1L, appointmentId);
+		return ResponseEntity.ok(
+			ApiResponse.success()
+		);
+	}
+
+	@PatchMapping("/{appointmentId}/participants/attending")
+	public ResponseEntity<ApiResponse<?>> attendAppointment(
+		@PathVariable Long appointmentId,
+		@RequestBody ParticipantAttendingRequest requestDto
+	) {
+		appointmentService.updateParticipantAttending(1L, appointmentId, requestDto.isAttending());
 		return ResponseEntity.ok(
 			ApiResponse.success()
 		);

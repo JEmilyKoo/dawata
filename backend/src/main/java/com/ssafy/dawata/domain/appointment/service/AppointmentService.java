@@ -143,6 +143,14 @@ public class AppointmentService {
 		}
 	}
 
+	@Transactional
+	public void updateParticipantAttending(Long memberId, Long appointmentId, boolean isAttending) {
+		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
+
+		participant.updateIsAttending(isAttending);
+	}
+
 	private List<AppointmentWithExtraInfoResponse> makeAppointmentWithExtraInfoResponses(Long memberId,
 		List<Appointment> appointments) {
 		return appointments.stream()
