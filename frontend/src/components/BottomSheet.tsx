@@ -1,57 +1,45 @@
-import { useCallback, useMemo, useRef, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { BottomSheetHandleProps, BottomSheetModal } from '@gorhom/bottom-sheet';
-import { withModalProvider } from '@/components/withModalProvider';
-import { HeaderHandle } from '@/components/HeaderHandle';
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
+
+import { BottomSheetHandleProps, BottomSheetModal } from '@gorhom/bottom-sheet'
+
+import { HeaderHandle } from '@/components/HeaderHandle'
+import { withModalProvider } from '@/components/withModalProvider'
 
 interface BottomSheetProps {
-  handleChange: (index: number) => void; 
-  children: React.ReactNode; 
+  handleChange: (index: number) => void
+  children: React.ReactNode
 }
 
 const BottomSheet = ({ handleChange, children }: BottomSheetProps) => {
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['10%', '25%', '50%', '90%'], []);
+  const bottomSheetRef = useRef<BottomSheetModal>(null)
+  const snapPoints = useMemo(() => ['10%', '25%', '50%', '90%'], [])
 
-  useEffect(() => {
-    bottomSheetRef.current!.present();
-  }, []);
+  useLayoutEffect(() => {
+    bottomSheetRef.current?.present()
+  }, [])
 
   const renderHeaderHandle = useCallback(
-    (props: BottomSheetHandleProps) => (
-      <HeaderHandle {...props} />
-    ),
-    []
-  );
+    (props: BottomSheetHandleProps) => <HeaderHandle {...props} />,
+    [],
+  )
 
   return (
-    <View style={styles.container}>
-      <BottomSheetModal
-        index={0}
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enablePanDownToClose={false}
-        enableDismissOnClose={false}
-        enableDynamicSizing={false}
-        onChange={handleChange}
-        handleComponent={renderHeaderHandle}
-      >
-        {children}
-      </BottomSheetModal>
-    </View>
-  );
-};
+    <BottomSheetModal
+      index={0}
+      ref={bottomSheetRef}
+      snapPoints={snapPoints}
+      enablePanDownToClose={false}
+      enableDismissOnClose={false}
+      enableDynamicSizing={false}
+      onChange={handleChange}
+      handleComponent={renderHeaderHandle}>
+      {children}
+    </BottomSheetModal>
+  )
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-});
+const BottomSheetWithModalProvider = withModalProvider(
+  (props: BottomSheetProps) => <BottomSheet {...props} />,
+)
 
-// withModalProvider 타입 확장: BottomSheet에 props 전달
-const BottomSheetWithModalProvider = withModalProvider((props: BottomSheetProps) => (
-  <BottomSheet {...props} />
-));
-
-export default BottomSheetWithModalProvider;
+export default BottomSheetWithModalProvider
