@@ -1,41 +1,43 @@
 import { describe, expect, test } from '@jest/globals'
 
-interface AppointmentInfo {
-  appointmentId: number
-  scheduledAt: Date
-  name: string
-  category: string
-  voteEndTime: Date
-  createdBy: string
-}
+import { AppointmentInfo } from '@/types/appointment'
 
-const formatDate = (date: Date) => date.toISOString().split('T')[0] // YYYY-MM-DD 형식 변환
+const formatDate = (dateString: string) => dateString.split('T')[0] // YYYY-MM-DD 형식 변환
 
-export function getSelectedDate(appointments: AppointmentInfo[]): Date | null {
+export function getSelectedDate(
+  appointments: AppointmentInfo[],
+): string | null {
   if (appointments.length === 0) return null
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
+  const todayStr = today.toISOString()
 
-  const futureAppointments = appointments.filter((a) => a.scheduledAt >= today)
-  const pastAppointments = appointments.filter((a) => a.scheduledAt < today)
+  const futureAppointments = appointments.filter(
+    (a) => new Date(a.scheduledAt) >= today,
+  )
+  const pastAppointments = appointments.filter(
+    (a) => new Date(a.scheduledAt) < today,
+  )
 
   if (
     futureAppointments.some(
-      (a) => formatDate(a.scheduledAt) === formatDate(today),
+      (a) => formatDate(a.scheduledAt) === formatDate(todayStr),
     )
   ) {
-    return today
+    return todayStr
   }
 
   if (futureAppointments.length > 0) {
     return futureAppointments.sort(
-      (a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime(),
+      (a, b) =>
+        new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime(),
     )[0].scheduledAt
   }
 
   return pastAppointments.sort(
-    (a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime(),
+    (a, b) =>
+      new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime(),
   )[0].scheduledAt
 }
 
@@ -45,25 +47,23 @@ describe('getSelectedDate function', () => {
     const appointments: AppointmentInfo[] = [
       {
         appointmentId: 1,
-        scheduledAt: today,
+        scheduledAt: today.toISOString(),
         name: '오늘 약속',
         category: '미팅',
-        voteEndTime: new Date(),
-        createdBy: 'user1',
+        voteEndTime: new Date().toISOString(),
       },
       {
         appointmentId: 2,
-        scheduledAt: new Date(today.getTime() + 86400000),
+        scheduledAt: new Date(today.getTime() + 86400000).toISOString(),
         name: '내일 약속',
         category: '회의',
-        voteEndTime: new Date(),
-        createdBy: 'user2',
+        voteEndTime: new Date().toISOString(),
       },
     ]
 
     const selectedDate = getSelectedDate(appointments)
 
-    expect(formatDate(selectedDate!)).toEqual(formatDate(today))
+    expect(formatDate(selectedDate!)).toEqual(formatDate(today.toISOString()))
   })
 
   test('오늘 약속이 없고, 미래의 약속이 있는 경우 가장 가까운 미래의 날짜가 selectedDate여야 한다', () => {
@@ -72,17 +72,18 @@ describe('getSelectedDate function', () => {
     const appointments: AppointmentInfo[] = [
       {
         appointmentId: 1,
-        scheduledAt: futureDate,
+        scheduledAt: futureDate.toISOString(),
         name: '미래 약속',
         category: '워크샵',
-        voteEndTime: new Date(),
-        createdBy: 'user3',
+        voteEndTime: new Date().toISOString(),
       },
     ]
 
     const selectedDate = getSelectedDate(appointments)
 
-    expect(formatDate(selectedDate!)).toEqual(formatDate(futureDate))
+    expect(formatDate(selectedDate!)).toEqual(
+      formatDate(futureDate.toISOString()),
+    )
   })
 
   test('오늘과 미래의 약속이 없고, 과거의 약속만 있는 경우 가장 가까운 과거의 날짜가 selectedDate여야 한다', () => {
@@ -91,17 +92,18 @@ describe('getSelectedDate function', () => {
     const appointments: AppointmentInfo[] = [
       {
         appointmentId: 1,
-        scheduledAt: pastDate,
+        scheduledAt: pastDate.toISOString(),
         name: '과거 약속',
         category: '이벤트',
-        voteEndTime: new Date(),
-        createdBy: 'user4',
+        voteEndTime: new Date().toISOString(),
       },
     ]
 
     const selectedDate = getSelectedDate(appointments)
 
-    expect(formatDate(selectedDate!)).toEqual(formatDate(pastDate))
+    expect(formatDate(selectedDate!)).toEqual(
+      formatDate(pastDate.toISOString()),
+    )
   })
 
   test('약속이 없는 경우 selectedDate는 null이어야 한다', () => {
