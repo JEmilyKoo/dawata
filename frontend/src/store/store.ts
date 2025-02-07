@@ -3,21 +3,15 @@ import { configureStore } from '@reduxjs/toolkit'
 
 import appointmentReducer from './slices/appointmentSlice'
 import clubReducer from './slices/clubSlice'
-<<<<<<< HEAD
-import memberReducer from './slices/memberSlice'
-=======
 import liveReducer from './slices/liveSlice'
->>>>>>> fcedd9eaa7ef291b462111c7fce95f1399fe3992
+import memberReducer from './slices/memberSlice'
 
 export const store = configureStore({
   reducer: {
     appointment: appointmentReducer,
     club: clubReducer,
-<<<<<<< HEAD
     member: memberReducer,
-=======
     live: liveReducer,
->>>>>>> fcedd9eaa7ef291b462111c7fce95f1399fe3992
   },
 })
 
