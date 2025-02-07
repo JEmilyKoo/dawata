@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.member.controller;
 
 import java.net.URL;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
 import com.ssafy.dawata.domain.member.dto.request.MemberPhotoRequest;
+import com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
 import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.service.MemberService;
@@ -40,11 +42,20 @@ public class MemberController {
 		return ResponseEntity.ok(ApiResponse.success(memberService.findMemberInfo()));
 	}
 
-	@Operation(summary = "내 전체 약속 정보 조회 (아직 구현 X)",
-		description = "내 전체 약속 정보를 조회하는 작업을 수행합니다.")
+	@Operation(summary = "내 전체 약속 출결정보 조회",
+		description = "내 전체 약속 출결정보를 조회하는 작업을 수행합니다.")
 	@GetMapping("/appointment-info")
-	public ResponseEntity<ApiResponse<AppointmentInfoResponse>> getAllMyAppointment() {
-		return ResponseEntity.ok(ApiResponse.success(memberService.findAllMyAppointmentInfo()));
+	public ResponseEntity<ApiResponse<List<AppointmentInfoResponse>>> getMyAppointmentConditions() {
+		return ResponseEntity.ok(ApiResponse.success(memberService.findAllMyAppointmentCondition()));
+	}
+
+	@Operation(summary = "이번 달 약속 조회",
+		description = "이번 달 약속을 조회하는 작업을 수행합니다.")
+	@GetMapping("/appointment-info/{date}")
+	public ResponseEntity<ApiResponse<List<AppointmentInMonthResponse>>> getMyAppointmentInMonth(
+		@PathVariable("date") String date
+	) {
+		return ResponseEntity.ok(ApiResponse.success(memberService.findMyAppointmentInfoInMonth(date)));
 	}
 
 	@Operation(summary = "멤버 이름 변경",

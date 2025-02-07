@@ -1,13 +1,18 @@
 package com.ssafy.dawata.domain.member.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
+import com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
 import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
+import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberService {
 	private final MemberRepository memberRepository;
+	private final AppointmentRepository appointmentRepository;
+	private final ParticipantRepository participantRepository;
 
 	public Member findMyMemberInfo() {
 		// TODO : SecurityContextHolder 구현되면 삭제 예정
@@ -57,8 +64,12 @@ public class MemberService {
 		member.updateIsWithdrawn(true);
 	}
 
-	public AppointmentInfoResponse findAllMyAppointmentInfo() {
-		// TODO : 약속 관련 기능 구현 시 작업 예정
-		return null;
+	public List<AppointmentInfoResponse> findAllMyAppointmentCondition() {
+		return participantRepository.countByMemberId(1L);
+	}
+
+	public List<AppointmentInMonthResponse> findMyAppointmentInfoInMonth(String date) {
+		String[] arr = date.split("-");
+		return appointmentRepository.findByScheduledAtInDate(1L, arr[0], arr[1]);
 	}
 }
