@@ -24,9 +24,16 @@ export interface VoteInfo {
   isSelected: boolean
 }
 
-export interface AppointmentsInfo {
-  clubInfo: { clubId: number; name: string; img: string; category: string }
-  appointmentInfo: AppointmentInfo[]
-  participantInfo: ParticipantInfo[]
-  voteInfo: VoteInfo[]
+export interface AppointmentDetailInfo {
+  clubInfo: ClubInfo
+  appointmentInfo: AppointmentInfo
+  participantInfos: ParticipantInfo[]
+  voteInfos: VoteInfo[]
+}
+
+export interface AppointmentListInfo {
+  clubInfo: ClubInfo
+  appointmentInfo: AppointmentInfo
+  participantInfos: ParticipantInfo[]
+  voteStatus: string
 }
