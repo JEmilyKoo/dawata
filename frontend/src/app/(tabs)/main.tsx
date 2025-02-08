@@ -52,18 +52,22 @@ interface AppointmentsInfo {
   voteInfo: VoteInfo[]
 }
 export default function MainScreen() {
-  const [appoList, setAppoList] = useState<AppointmentListInfo>()
+  const [appoList, setAppoList] = useState<AppointmentListInfo[]>()
+  // TODO: 추후 코드가 정돈되면 appoList를 appointmentList로 바꿀 것.
+  // TODO: 필요 없는 더미 데이터를 지울 것.
   const fetchAppointments = async () => {
     try {
       console.log('페이지 처음 마운트 될 때 실행')
-      const result = await getAppointments({
+      const result: AppointmentListInfo[] = await getAppointments({
         clubId: 1,
         nextRange: 4,
         prevRange: 4,
       })
 
       console.log('🔍 약속 리스트 조회 결과:', result)
-      setAppoList(result)
+      if (result) {
+        setAppoList(result)
+      }
     } catch (error) {
       console.error('약속 목록을 가져오는 중 오류 발생:', error)
     }
@@ -244,14 +248,14 @@ export default function MainScreen() {
               </Link>
             </TouchableOpacity>
           </View>
-          {AppointmentInfos.map((appointmentInfo) => (
-            <AppointmentItem
-              key={appointmentInfo.appointmentInfo.appointmentId}
-              appointmentInfo={appoList}
-              userImages={userImages}
-            />
-            // TODO: appointmentInfo 인터페이스 수정 필요
-          ))}
+          {appoList &&
+            appoList.map((appoListItem) => (
+              <AppointmentItem
+                key={appoListItem.appointmentInfo.appointmentId}
+                appointmentListInfo={appoListItem}
+                userImages={userImages}
+              />
+            ))}
         </View>
       </ScrollView>
     </SafeAreaView>
