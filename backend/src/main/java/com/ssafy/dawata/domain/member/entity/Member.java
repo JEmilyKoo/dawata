@@ -37,11 +37,21 @@ public class Member extends BaseTimeEntity {
 		this.withdrawn = withdrawn;
 	}
 
+	private Member(Long id, String email, String name) {
+		this.id = id;
+		this.email = email;
+		this.name = name;
+	}
+
 	public static Member createMember(String email, String name) {
 		return Member.builder()
 			.email(email)
 			.name(name)
 			.build();
+	}
+
+	public static Member createMember(Long id, String email, String name) {
+		return new Member(id, email, name);
 	}
 
 	public void updateName(String name) {
