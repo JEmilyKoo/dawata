@@ -1,53 +1,71 @@
-import { Controller, useForm } from "react-hook-form"
-import { Button, Text, TextInput, TouchableOpacity, View } from "react-native"
-import { useDispatch } from "react-redux"
+import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { Picker } from "@react-native-picker/picker"
-// 액션 import
-import { useRouter } from "expo-router"
+import { Picker } from '@react-native-picker/picker'
+import { useRouter } from 'expo-router'
 
-// dispatch 사용
+import Category from '@/constants/Category'
+import { RootState } from '@/store/store'
+import { AppointmentCreateInfo } from '@/types/appointment'
+
 import {
-  setCategory,
-  setPromiseName,
-} from "../../store/slices/appointmentSlice"
+  setCreateCategory,
+  setCreateName,
+} from '../../store/slices/appointmentSlice'
 
 const AppointmentCreate1 = () => {
+  const { t } = useTranslation()
+  const { create } = useSelector((state: RootState) => state.appointment)
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm<AppointmentCreateInfo>({
+    defaultValues: {
+      name: create.name,
+      category: create.category,
+    },
+  })
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const onSubmit = (data: any) => {
-    dispatch(setPromiseName(data.promiseName)) // Redux store에 약속 이름 저장
-    dispatch(setCategory(data.category)) // Redux store에 카테고리 저장
-    router.push("/appointment/create2") // Step2로 이동
+  const onSubmit = (data: AppointmentCreateInfo) => {
+    dispatch(setCreateName(data.name))
+    dispatch(setCreateCategory(data.category))
+    router.push('/appointment/create2')
   }
 
   return (
     <View className="flex-1 p-4">
-      <Text className="text-xl font-bold mb-2">약속 이름을 설정해주세요</Text>
+      <Text className="text-xl font-bold mb-2 text-text-primary">
+        {t('createAppointment.name.title')}
+      </Text>
+      <Text className="text-xs font-bold mb-2 text-text-secondary">
+        {t('createAppointment.name.subTitle')}
+      </Text>
       <Controller
         control={control}
-        name="promiseName"
-        rules={{ required: "약속 이름은 필수입니다." }}
-        render={({ field }) => (
+        name="name"
+        rules={{ required: t('createAppointment.name.error') }}
+        render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
-            placeholder="약속 이름을 입력하세요"
+            placeholder={t('createAppointment.name.title')}
+            onBlur={onBlur}
             className="border-b-2 mb-4"
-            {...field}
+            onChangeText={onChange}
+            value={value}
           />
         )}
       />
-      {errors.promiseName && (
-        <Text className="text-red-500">{errors.promiseName.message}</Text>
+      {errors.name && (
+        <Text className="text-light-red">{errors.name.message}</Text>
       )}
 
       <Text className="text-xl font-bold mb-2">
-        약속 카테고리를 설정해주세요
+        {t('createAppointment.category.title')}
       </Text>
       <Controller
         control={control}
@@ -57,37 +75,21 @@ const AppointmentCreate1 = () => {
             selectedValue={field.value}
             onValueChange={field.onChange}
             className="border-2 p-2 mb-4">
-            <Picker.Item
-              label="카테고리를 선택해주세요"
-              value=""
-            />
-            <Picker.Item
-              label="스터디"
-              value="study"
-            />
-            <Picker.Item
-              label="스포츠"
-              value="sports"
-            />
-            <Picker.Item
-              label="친목"
-              value="social"
-            />
-            <Picker.Item
-              label="동아리"
-              value="club"
-            />
-            <Picker.Item
-              label="기타"
-              value="other"
-            />
+            {
+              Category.map((item) => (
+                <Picker.Item
+                  key={item}
+                  label={t(`category.${item}`)}
+                  value={item}
+                />
+              ))}
           </Picker>
         )}
       />
       <TouchableOpacity
         className="bg-primary p-2 rounded"
         onPress={handleSubmit(onSubmit)}>
-        <Text className="text-white text-center">다음</Text>
+        <Text className="text-white text-center font-bold">{t('next')}</Text>
       </TouchableOpacity>
     </View>
   )

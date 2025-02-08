@@ -1,5 +1,6 @@
 import api from './api';
 import handleApiError from '@/utils/errorHandler';
+import { AppointmentCreateInfo } from '@/types/appointment';
 
 interface GetAppointmentsParams {
   clubId: number;
@@ -20,29 +21,11 @@ export const getAppointments = async ({ clubId, nextRange = 4, prevRange = 4 }: 
     return null;
   }
 };
-
-interface CreateAppointmentParams {
-  name: string;
-  category: string;
-  scheduledAt: string;
-  voteEndTime: string;
-  clubId: number;
-  memberIds: number[];
-}
-
 // 약속 생성
-export const createAppointment = async ({ name, category, scheduledAt, voteEndTime, clubId, memberIds }: CreateAppointmentParams) => {
+export const createAppointment = async (appointmentCreateInfo: AppointmentCreateInfo) => {
   try {
-    const response = await api.post(`/appointments`, {
-      name,
-      category,
-      scheduledAt,
-      voteEndTime,
-      clubId,
-      memberIds,
-    });
-    return response.data;
-
+    const response = await api.post(`/appointments`, appointmentCreateInfo);
+    return response.data
   } catch (error) {
     console.error('⛔ 약속 리스트 조회 실패:', handleApiError(error));
     return null;

@@ -37,3 +37,12 @@ export interface AppointmentListInfo {
   participantInfos: ParticipantInfo[]
   voteStatus: string
 }
+
+export interface AppointmentCreateInfo {
+  name: string
+  category: string
+  scheduledAt: string
+  voteEndTime: string
+  clubId: number
+  memberIds: number[]
+}

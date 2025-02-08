@@ -1,41 +1,46 @@
-import React, { useState } from "react"
-// React Native DatePicker
-import DatePicker from "react-datepicker"
-// 웹용 DatePicker
-import "react-datepicker/dist/react-datepicker.css"
-import { Button, Platform, Text, TouchableOpacity, View } from "react-native"
-import { DatePicker as ReactNativeDatePicker } from "react-native-date-picker"
-import { useDispatch, useSelector } from "react-redux"
-
-// 액션 import
-import { useRouter } from "expo-router"
-
-// Redux 상태 관리
-import { setDateTime } from "../../store/slices/appointmentSlice"
-
-// 스타일 임포트
+import { useState } from 'react'
+import { Platform, Text, TouchableOpacity, View } from 'react-native'
+import NativeDatePicker from 'react-native-date-picker'
+import { useDispatch, useSelector } from 'react-redux'
+import { useRouter } from 'expo-router'
+import WebDatePicker from '@/components/WebDatePicker'
+import { RootState } from '@/store/store'
+import {
+  setCreateScheduledAt,
+  setCreateVoteEndTime,
+} from '../../store/slices/appointmentSlice'
+import { format } from 'date-fns'
+import { ko } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
 
 const AppointmentCreate2 = () => {
+  const { t } = useTranslation()
   const dispatch = useDispatch()
   const router = useRouter()
-
-  const { promiseName, category } = useSelector((state) => state.appointment) // Redux에서 이전 데이터 가져오기
-
-  const [date, setDate] = useState(new Date()) // 선택된 날짜 상태
-  const [open, setOpen] = useState(false) // React Native DatePicker 열고 닫는 상태
+  const { create } = useSelector((state: RootState) => state.appointment)
+  const [date, setDate] = useState(
+    create.scheduledAt ? new Date(create.scheduledAt) : new Date(),
+  ) // 선택된 날짜 상태
+  const [open, setOpen] = useState(true) // React Native DatePicker 열고 닫는 상태
 
   const handleConfirm = (date: Date) => {
     setDate(date) // 선택한 날짜를 상태로 업데이트
   }
 
   const onSubmit = () => {
-    dispatch(
-      setDateTime({
-        date: date.toLocaleDateString(),
-        time: date.toLocaleTimeString(),
-      }),
-    ) // 선택한 날짜와 시간 Redux에 저장
-    router.push("/appointment/create3") // Step3으로 이동
+    dispatch(setCreateScheduledAt(date.toISOString()))
+    dispatch(setCreateVoteEndTime(
+      new Date(date.setDate(date.getDate() - 7)).toISOString(),
+    ))
+  }
+
+  const onPressNext = () => {
+    onSubmit()
+    router.push('/appointment/create3')
+  }
+  const onPressPrev = () => {
+    onSubmit()
+    router.push('/appointment/create1')
   }
 
   return (
@@ -44,23 +49,20 @@ const AppointmentCreate2 = () => {
         약속 날짜와 시간을 설정해주세요
       </Text>
 
-      {/* 날짜 선택 */}
       <TouchableOpacity
-        className="bg-primary p-2 rounded"
+        className="p-2"
         onPress={() => setOpen(true)}>
         <Text className="text-white text-center">날짜와 시간 선택</Text>
       </TouchableOpacity>
-
-      {/* 플랫폼에 따라 다른 DatePicker 사용 */}
-      {Platform.OS === "web" ? (
-        <DatePicker
-          selected={date}
-          onChange={handleConfirm}
-          showTimeSelect
-          dateFormat="Pp"
+      {Platform.OS === 'web' ? (
+        <View className="w-full h-1/2 items-center">
+        <WebDatePicker
+          date={date}
+          handleConfirm={handleConfirm}
         />
+        </View>
       ) : (
-        <ReactNativeDatePicker
+        <NativeDatePicker
           modal
           open={open}
           date={date}
@@ -68,14 +70,21 @@ const AppointmentCreate2 = () => {
           onCancel={() => setOpen(false)}
         />
       )}
-
-      {/* 선택된 날짜와 시간 출력 */}
-      <Text className="mb-4">선택된 날짜와 시간: {date.toLocaleString()}</Text>
-      <TouchableOpacity
-        className="bg-primary p-2 rounded"
-        onPress={onSubmit}>
-        <Text className="text-white text-center">다음</Text>
-      </TouchableOpacity>
+      <Text className="mb-4">
+        선택된 날짜와 시간: {format(date, 'PPP p', { locale: ko })}
+      </Text>
+      <View className="flex-row justify-between space-x-2">
+        <TouchableOpacity
+          className="bg-bord p-2 rounded w-1/4"
+          onPress={onPressPrev}>
+          <Text className="text-text-primary text-center font-bold">{t('prev')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="bg-primary p-2 rounded w-3/4"
+          onPress={onPressNext}>
+          <Text className="text-white text-center font-bold">{t('next')}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
