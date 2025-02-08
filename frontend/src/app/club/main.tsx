@@ -9,10 +9,7 @@ import {
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
-import {
-  ActionSheetProps,
-  useActionSheet,
-} from '@expo/react-native-action-sheet'
+import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams } from 'expo-router'
 
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
@@ -21,6 +18,8 @@ import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
 import ClubAddModal from '@/components/ClubAddModal'
+
+import { useClubAppointments } from './hooks/useClubAppointments'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -70,7 +69,9 @@ type RouteParams = {
 
 function ClubMain() {
   const params = useLocalSearchParams<RouteParams>()
-  console.log('clubId:', params)
+  const { appointments, loading } = useClubAppointments({
+    clubId: Number(params.clubId),
+  })
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
@@ -79,12 +80,14 @@ function ClubMain() {
     '2025-01-24': { marked: true, dotColor: '#ff8339' },
     '2025-01-25': { marked: true, dotColor: '#ff8339' },
   }
+
   interface Club {
     id: string
     name: string
     image: any
     tag: string
   }
+
   const myClubs: Club[] = [
     {
       id: '1',
@@ -96,7 +99,6 @@ function ClubMain() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* 헤더 */}
       <View className="flex-row p-4 border-b border-bord">
         <TouchableOpacity className="mr-4">
           <BackButton />
@@ -127,7 +129,6 @@ function ClubMain() {
       </View>
 
       <ScrollView>
-        {/* 멤버 리스트 */}
         <View className="p-4 border-b border-bord">
           <TouchableOpacity className="flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
             <Text className="text-base">멤버 리스트</Text>
@@ -145,7 +146,7 @@ function ClubMain() {
                   key={i}
                   className="flex-col mr-4">
                   {[...Array(3)].map((_, j) => {
-                    const index = i * 3 + j // 아이템 인덱스 계산
+                    const index = i * 3 + j
                     return (
                       <View
                         key={index}
@@ -161,7 +162,6 @@ function ClubMain() {
           </ScrollView>
         </View>
 
-        {/* 캘린더 섹션 */}
         <View className="p-4">
           <Text className="text-lg font-bold mb-4">No.1 캘린더</Text>
           <Calendar
@@ -190,35 +190,56 @@ function ClubMain() {
           />
         </View>
 
-        {/* 스터디 목록 */}
         <View className="p-4 space-y-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <TouchableOpacity
-              key={i}
-              className="flex-row p-4 border border-bord rounded-lg">
-              <Image
-                source={myClubs[0].image}
-                className="w-12 h-12 rounded-lg bg-gray-200 mr-4"
-              />
-              <View className="flex-1">
-                <Text className="font-bold">1월 {25 - i}일 스터디</Text>
-                <Text className="text-sm text-secondary mt-1">오후 7:00</Text>
-                <Text className="text-sm text-secondary">
-                  역삼 투썸플레이스 #스터디
-                </Text>
-              </View>
-              <View className="items-end">
-                <Text className="text-sm text-secondary mb-1">(6/6)</Text>
-                <View className="bg-gray-100 px-3 py-1 rounded">
-                  <Text className="text-xs text-secondary">투표 종료</Text>
+          {appointments.map((appointment, index) => {
+            const now = new Date()
+            const voteEndTime = new Date(
+              appointment.appointmentInfo.voteEndTime,
+            )
+            const isVoteEnded = voteEndTime < now
+
+            return (
+              <TouchableOpacity
+                key={index}
+                className="flex-row p-4 border border-bord rounded-lg">
+                <Image
+                  source={myClubs[0].image}
+                  className="w-12 h-12 rounded-lg bg-gray-200 mr-4"
+                />
+                <View className="flex-1">
+                  <Text className="font-bold">
+                    {appointment.appointmentInfo.name}
+                  </Text>
+                  <Text className="text-sm text-secondary mt-1">
+                    {new Date(
+                      appointment.appointmentInfo.scheduledAt,
+                    ).toLocaleString()}
+                  </Text>
+                  <Text className="text-sm text-secondary">
+                    역삼 투썸플레이스 #스터디
+                  </Text>
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+                <View className="items-end">
+                  <Text className="text-sm text-secondary mb-1">
+                    참석 인원:{' '}
+                    {
+                      appointment.participantInfos.filter((p) => p.isAttending)
+                        .length
+                    }
+                    /{appointment.participantInfos.length}
+                  </Text>
+                  <View className="bg-gray-100 px-3 py-1 rounded">
+                    <Text className="text-xs text-secondary">
+                      {isVoteEnded ? '투표 종료' : '투표 중'}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )
+          })}
         </View>
       </ScrollView>
 
-      {/* 플로팅 버튼 */}
       <View className="absolute right-4 bottom-8">
         <ClubAddModal />
       </View>
