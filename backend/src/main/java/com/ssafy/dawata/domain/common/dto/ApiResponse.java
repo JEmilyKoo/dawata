@@ -11,8 +11,4 @@ public record ApiResponse<T>(
 	public static <T> ApiResponse<T> success() {
 		return new ApiResponse<>("success", null);
 	}
-
-	public static <T> ApiResponse<T> fail(T data) {
-		return new ApiResponse<>("fail", data);
-	}
 }
