@@ -6,7 +6,7 @@ import { ClubMemberListProps } from '@/types/club'
 
 import { useClub } from '../hooks/useClubInfo'
 
-const ClubMemberList: React.FC<ClubMemberListProps> = ({ clubId, members }) => {
+const ClubMemberList: React.FC<ClubMemberListProps> = ({ clubId }) => {
   const { clubInfo, loading: clubInfoLoading } = useClub({ clubId })
   const clubMembers = clubInfo?.members || []
 

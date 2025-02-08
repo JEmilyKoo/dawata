@@ -113,10 +113,7 @@ function ClubMain() {
         teamCode={clubInfo?.teamCode}
       />
       <ScrollView>
-        <ClubMemberList
-          clubId={Number(params.clubId)}
-          members={[]}
-        />
+        <ClubMemberList clubId={Number(params.clubId)} />
 
         <View className="p-4">
           <Text className="text-lg font-bold mb-4">No.1 캘린더</Text>
