@@ -8,5 +8,25 @@
     "catchphrase": "만남은 중간에서, 추억은 제 시간에",
     "title": "다와따",
     "lookArround": "둘러볼래요"
+  },
+  "createAppointment": {
+    "name": {
+      "title": "약속 이름을 설정해주세요",
+      "subTitle": "약속과 관련된 한 줄 설명을 작성해주세요.",
+      "error": "약속 이름은 필수입니다."
+    },
+    "category": {
+      "title": "약속 카테고리를 설정해주세요"
+    }
+  },
+  "prev": "이전",
+  "next": "다음",
+  "category": {
+    "FRIEND": "친구",
+    "STUDY": "스터디",
+    "HOBBY": "취미",
+    "SOCIAL": "친목",
+    "EXERCISE": "운동",
+    "OTHER": "기타"
   }
 }

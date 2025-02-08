@@ -3,18 +3,13 @@ import { Button, Text, TouchableOpacity, View } from "react-native"
 import { useSelector } from "react-redux"
 
 import { useRouter } from "expo-router"
-
+import { RootState } from "@/store/store"
 const AppointmentCreate4 = () => {
   const router = useRouter()
-  const { promiseName, category, dateTime, participants } = useSelector(
-    (state) => state.appointment,
-  ) // Redux store에서 모든 데이터 가져오기
+  const { create } = useSelector((state: RootState) => state.appointment)
 
   const onSubmit = () => {
-    console.log("약속 이름:", promiseName)
-    console.log("카테고리:", category)
-    console.log("날짜와 시간:", dateTime.date, dateTime.time)
-    console.log("참여자들:", participants)
+    console.log("약속:", create)
     // 완료 후 홈 화면으로 이동하거나 다른 작업을 할 수 있습니다.
     router.push("/main")
   }

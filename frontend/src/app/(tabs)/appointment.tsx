@@ -16,10 +16,13 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { router } from 'expo-router'
 
+import { useDispatch } from 'react-redux'
+import { resetCreate } from '../../store/slices/appointmentSlice'
 import AppointmentCalendar from '@/app/appointment/AppointmentCalendar'
 import AppointmentList from '@/app/appointment/AppointmentList'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
+
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import AppointmentItem from '@/components/AppointmentItem'
@@ -219,6 +222,11 @@ function Appointment() {
     tag: string
   }
 
+  const dispatch = useDispatch()
+  const onPressCreateAppointment = () => {
+    dispatch(resetCreate())
+    router.push('/appointment/create1')
+  }
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 헤더 */}
@@ -254,7 +262,7 @@ function Appointment() {
       {/* 플로팅 버튼 */}
       <View className="absolute right-4 bottom-8">
         <TouchableOpacity
-          onPress={() => router.push('/appointment/create1')}
+          onPress={onPressCreateAppointment}
           className="absolute right-4 bottom-8 w-14 h-14 rounded-full bg-primary items-center justify-center shadow-lg">
           <PlusIcon
             height={30}
