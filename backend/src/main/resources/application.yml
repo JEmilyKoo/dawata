@@ -34,6 +34,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 springdoc:
   swagger-ui:
@@ -70,6 +74,11 @@ firebase:
   "client_x509_cert_url": ${CLIENT_X509_CERT_URL}
   "universe_domain": ${UNIVERSE_DOMAIN}
 
+
+jwt:
+  secret: ${SECRET}
+  access_expiration: 1000000
+  refresh_expiration: 1000000
 
 logging.level:
   org.hibernate.SQL: debug

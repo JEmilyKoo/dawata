@@ -11,18 +11,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ssafy.dawata.global.cookie.CookieUtils;
+import com.ssafy.dawata.global.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.ssafy.dawata.global.jwt.JwtTokenProvider;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CustomOAuth2AuthenticationSuccessHandler extends
 	SimpleUrlAuthenticationSuccessHandler {
 
 	// TODO: 로그인 성공 시 토큰 넘기도록 할 것
-	// private final TokenProvider tokenProvider;
-	// private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+	private final JwtTokenProvider tokenProvider;
+	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -35,14 +39,13 @@ public class CustomOAuth2AuthenticationSuccessHandler extends
 		}
 
 		this.clearAuthenticationAttributes(request);
-		// this.httpCookieOAuth2AuthorizationRequestRepository.clearCookies(request, response);
+		this.httpCookieOAuth2AuthorizationRequestRepository.clearCookies(request, response);
 		this.getRedirectStrategy().sendRedirect(request, response, targetUrl);
 	}
 
 	@Override
 	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) {
-		// TODO: cookie에 access_token, refresh_token 넣어 보내기
 
 		String targetUrl = CookieUtils
 			.resolveCookie(request, REDIRECT_URL_PARAM_COOKIE_NAME)
@@ -51,9 +54,9 @@ public class CustomOAuth2AuthenticationSuccessHandler extends
 
 		return UriComponentsBuilder
 			.fromUriString(targetUrl)
-			// .queryParam("access_token", tokenProvider.createAccessToken(authentication))
-			// .queryParam("refresh_token", tokenProvider.createRefreshToken(authentication))
-			// .queryParam("expires_in", tokenProvider.getExpiration())
+			.queryParam("access_token", tokenProvider.createAccessToken(authentication))
+			.queryParam("refresh_token", tokenProvider.createRefreshToken(authentication))
+			.queryParam("expires_in", tokenProvider.getExpiration())
 			.encode(StandardCharsets.UTF_8)
 			.build().toUriString();
 	}

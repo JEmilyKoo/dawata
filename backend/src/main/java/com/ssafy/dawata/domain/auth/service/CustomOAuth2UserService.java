@@ -33,22 +33,20 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 		OAuth2Response extractAttributes = KakaoOAuth2Response.from(oAuth2User.getAttributes());
 
-		return (OAuth2User)createMemberDetails(extractAttributes);
+		return createMemberDetails(extractAttributes);
 	}
 
-	private UsernamePasswordAuthenticationToken createMemberDetails(
+	private SecurityMemberDetails createMemberDetails(
 		OAuth2Response extractAttributes
 	) {
 		String email = extractAttributes.email();
 
 		Member member = memberRepository.findByEmail(email)
-			.orElse(memberRepository.save(
-				Member.createMember(extractAttributes.email(), extractAttributes.name())
-			));
+			.orElseGet(() -> memberRepository.save(
+					Member.createMember(extractAttributes.email(), extractAttributes.name())
+				)
+			);
 
-		UserDetails userDetails = new SecurityMemberDetails(member);
-		return new UsernamePasswordAuthenticationToken(
-			userDetails, null, null
-		);
+		return new SecurityMemberDetails(member);
 	}
 }
