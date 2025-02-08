@@ -14,3 +14,20 @@ export interface Club {
   teamCode: string
   members: ClubMember[]
 }
+
+export interface ClubHeaderProps {
+  name?: string
+  category?: string
+  createdAt?: string
+  teamCode?: string
+}
+
+export interface ClubMemberListProps {
+  clubId: number
+  members?: ClubMember[]
+}
+
+export interface ClubCalendarProps {
+  markedDates: { [key: string]: { marked: boolean; dotColor: string } }
+  currentDate: string
+}

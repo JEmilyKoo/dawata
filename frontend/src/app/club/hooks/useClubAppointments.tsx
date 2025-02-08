@@ -7,7 +7,7 @@ export const useClubAppointments = ({ clubId }: { clubId: number }) => {
   const [appointments, setAppointments] = useState<AppointmentListInfo[]>([])
   const [loading, setLoading] = useState(true)
   useEffect(() => {
-    const clubAppointmentsList = async () => {
+    const clubAppointmentsListWithRange = async () => {
       try {
         const data = await getAppointments({
           clubId,
@@ -23,7 +23,7 @@ export const useClubAppointments = ({ clubId }: { clubId: number }) => {
       }
     }
 
-    clubAppointmentsList()
+    clubAppointmentsListWithRange()
     // cleanup 함수가 필요하다면 여기서 반환
   }, [clubId])
   return {

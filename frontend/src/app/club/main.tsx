@@ -19,7 +19,11 @@ import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
 import ClubAddModal from '@/components/ClubAddModal'
 
+import AppointmentList from './components/ClubAppointmentList'
+import ClubHeader from './components/ClubHeader'
+import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
+import { useClub } from './hooks/useClubInfo'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -72,6 +76,9 @@ function ClubMain() {
   const { appointments, loading } = useClubAppointments({
     clubId: Number(params.clubId),
   })
+  const { clubInfo, loading: clubInfoLoading } = useClub({
+    clubId: Number(params.clubId),
+  })
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
@@ -99,68 +106,17 @@ function ClubMain() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-row p-4 border-b border-bord">
-        <TouchableOpacity className="mr-4">
-          <BackButton />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-xl font-bold">No.1</Text>
-          <View className="flex-row items-center mt-1">
-            <Text className="text-sm text-secondary">#스터디</Text>
-            <Text className="text-sm text-secondary ml-2">2025-01-07 생성</Text>
-          </View>
-          <View className="flex-row items-center mt-1">
-            <Text className="text-sm text-secondary">그룹 초대 코드</Text>
-            <Text className="text-sm text-secondary mx-2">H9UF6K</Text>
-            <TouchableOpacity>
-              <CopyIcon
-                height={20}
-                width={20}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <TouchableOpacity className="p-2">
-          <MoreIcon
-            height={24}
-            width={24}
-          />
-        </TouchableOpacity>
-      </View>
-
+      {/* 헤더 */}
+      <ClubHeader
+        name={clubInfo?.name}
+        category={clubInfo?.category}
+        teamCode={clubInfo?.teamCode}
+      />
       <ScrollView>
-        <View className="p-4 border-b border-bord">
-          <TouchableOpacity className="flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
-            <Text className="text-base">멤버 리스트</Text>
-            <MoreIcon
-              height={20}
-              width={20}
-            />
-          </TouchableOpacity>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}>
-            <View className="flex-row">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <View
-                  key={i}
-                  className="flex-col mr-4">
-                  {[...Array(3)].map((_, j) => {
-                    const index = i * 3 + j
-                    return (
-                      <View
-                        key={index}
-                        className="items-center mb-4">
-                        <View className="w-12 h-12 rounded-full bg-gray-200 mb-1" />
-                        <Text className="text-xs">멤버{index + 1}</Text>
-                      </View>
-                    )
-                  })}
-                </View>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
+        <ClubMemberList
+          clubId={Number(params.clubId)}
+          members={[]}
+        />
 
         <View className="p-4">
           <Text className="text-lg font-bold mb-4">No.1 캘린더</Text>
@@ -190,54 +146,10 @@ function ClubMain() {
           />
         </View>
 
-        <View className="p-4 space-y-4">
-          {appointments.map((appointment, index) => {
-            const now = new Date()
-            const voteEndTime = new Date(
-              appointment.appointmentInfo.voteEndTime,
-            )
-            const isVoteEnded = voteEndTime < now
-
-            return (
-              <TouchableOpacity
-                key={index}
-                className="flex-row p-4 border border-bord rounded-lg">
-                <Image
-                  source={myClubs[0].image}
-                  className="w-12 h-12 rounded-lg bg-gray-200 mr-4"
-                />
-                <View className="flex-1">
-                  <Text className="font-bold">
-                    {appointment.appointmentInfo.name}
-                  </Text>
-                  <Text className="text-sm text-secondary mt-1">
-                    {new Date(
-                      appointment.appointmentInfo.scheduledAt,
-                    ).toLocaleString()}
-                  </Text>
-                  <Text className="text-sm text-secondary">
-                    역삼 투썸플레이스 #스터디
-                  </Text>
-                </View>
-                <View className="items-end">
-                  <Text className="text-sm text-secondary mb-1">
-                    참석 인원:{' '}
-                    {
-                      appointment.participantInfos.filter((p) => p.isAttending)
-                        .length
-                    }
-                    /{appointment.participantInfos.length}
-                  </Text>
-                  <View className="bg-gray-100 px-3 py-1 rounded">
-                    <Text className="text-xs text-secondary">
-                      {isVoteEnded ? '투표 종료' : '투표 중'}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            )
-          })}
-        </View>
+        <AppointmentList
+          appointments={appointments}
+          myClubs={myClubs}
+        />
       </ScrollView>
 
       <View className="absolute right-4 bottom-8">
