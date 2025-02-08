@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Image,
@@ -15,6 +15,9 @@ import { getAppointments } from '@/apis/appointment'
 import { getClubs } from '@/apis/club'
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg'
 import AppointmentItem from '@/components/AppointmentItem'
+import { AppointmentListInfo } from '@/types/appointment'
+
+import AppointmentList from '../appointment/AppointmentList'
 
 interface ClubInfo {
   clubId: string
@@ -49,6 +52,7 @@ interface AppointmentsInfo {
   voteInfo: VoteInfo[]
 }
 export default function MainScreen() {
+  const [appoList, setAppoList] = useState<AppointmentListInfo>()
   const fetchAppointments = async () => {
     try {
       console.log('페이지 처음 마운트 될 때 실행')
@@ -57,7 +61,9 @@ export default function MainScreen() {
         nextRange: 4,
         prevRange: 4,
       })
+
       console.log('🔍 약속 리스트 조회 결과:', result)
+      setAppoList(result)
     } catch (error) {
       console.error('약속 목록을 가져오는 중 오류 발생:', error)
     }
@@ -225,7 +231,6 @@ export default function MainScreen() {
             ))}
           </ScrollView>
         </View>
-
         {/* 다가오는 약속 섹션 */}
         <View className="p-5">
           <View className="flex-row justify-between items-center mb-4">
@@ -242,9 +247,10 @@ export default function MainScreen() {
           {AppointmentInfos.map((appointmentInfo) => (
             <AppointmentItem
               key={appointmentInfo.appointmentInfo.appointmentId}
-              appointmentInfo={appointmentInfo}
+              appointmentInfo={appoList}
               userImages={userImages}
             />
+            // TODO: appointmentInfo 인터페이스 수정 필요
           ))}
         </View>
       </ScrollView>

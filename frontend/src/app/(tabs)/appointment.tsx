@@ -16,6 +16,8 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { router } from 'expo-router'
 
+import AppointmentCalendar from '@/app/appointment/AppointmentCalendar'
+import AppointmentList from '@/app/appointment/AppointmentList'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
@@ -220,7 +222,7 @@ function Appointment() {
 
       <ScrollView>
         {/* 캘린더 섹션 */}
-        <View className="p-4">
+        {/* <View className="p-4">
           <Calendar
             className="border border-bord rounded-lg p-2"
             theme={{
@@ -245,10 +247,13 @@ function Appointment() {
             enableSwipeMonths={true}
             current={'2025-01-21'}
           />
-        </View>
+        </View> */}
+        <AppointmentCalendar
+          appointments={AppointmentInfos.map((info) => info.appointmentInfo)}
+        />
 
         {/* 스터디 목록 */}
-        {AppointmentInfos.map((appointmentInfo) => (
+        {/* {AppointmentInfos.map((appointmentInfo) => (
           <View className="p-4">
             <AppointmentItem
               key={appointmentInfo.appointmentInfo.appointmentId}
@@ -256,7 +261,8 @@ function Appointment() {
               userImages={userImages}
             />{' '}
           </View>
-        ))}
+        ))} */}
+        <AppointmentList />
       </ScrollView>
 
       {/* 플로팅 버튼 */}
