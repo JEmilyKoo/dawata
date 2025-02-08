@@ -188,7 +188,10 @@ export default function LiveScreen() {
           }}
         />
         <BottomSheet handleChange={handleChange}>
-          <Text>dfddfd</Text>
+          <BottomSheetContent
+            liveMembers={liveData}
+            selectedMemberId={selectedMemberId}
+            setSelectedMemberId={setSelectedMemberId}></BottomSheetContent>
         </BottomSheet>
       </View>
     </View>
