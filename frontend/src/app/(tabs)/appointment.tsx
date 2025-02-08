@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Image,
   SafeAreaView,
@@ -16,6 +16,8 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { router } from 'expo-router'
 
+import AppointmentCalendar from '@/app/appointment/AppointmentCalendar'
+import AppointmentList from '@/app/appointment/AppointmentList'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
@@ -66,7 +68,7 @@ LocaleConfig.locales['kr'] = {
 }
 LocaleConfig.defaultLocale = 'kr'
 interface ClubInfo {
-  clubId: string
+  clubId: number
   name: string
   img: any
   category: string
@@ -105,19 +107,19 @@ function Appointment() {
   const params = useLocalSearchParams<RouteParams>()
   const myClubs: ClubInfo[] = [
     {
-      clubId: '1',
+      clubId: 1,
       name: 'No.1',
       img: require('@/assets/clubs/club1.png'),
       category: '#스터디',
     },
     {
-      clubId: '2',
+      clubId: 2,
       name: '역삼FC',
       img: require('@/assets/clubs/club2.png'),
       category: '#풋살',
     },
     {
-      clubId: '3',
+      clubId: 3,
       name: 'DogLover',
       img: require('@/assets/clubs/club3.png'),
       category: '#애견',
@@ -140,8 +142,8 @@ function Appointment() {
         appointmentId: 1,
         name: '1월 17일 스터디 • No.1',
         category: '스터디',
-        scheduledAt: '1월 24일',
-        voteEndTime: '1월 23일 오후 6:00',
+        scheduledAt: '2025-02-09T13:00:56',
+        voteEndTime: '2025-02-02T13:00:56',
       },
       participantInfo: [
         {
@@ -164,8 +166,8 @@ function Appointment() {
         appointmentId: 2,
         name: '애견모임 • DogLover',
         category: '애견',
-        scheduledAt: '1월 23일 오후 6:00',
-        voteEndTime: '1월 22일 오후 6:00',
+        scheduledAt: '2025-02-08T13:00:56',
+        voteEndTime: '2025-02-01T13:00:56',
       },
       participantInfo: [
         {
@@ -192,13 +194,24 @@ function Appointment() {
       ],
     },
   ]
-  const markedDates = {
-    '2025-01-21': { marked: true, dotColor: '#ff8339' },
-    '2025-01-22': { marked: true, dotColor: '#ff8339' },
-    '2025-01-23': { marked: true, dotColor: '#ff8339' },
-    '2025-01-24': { marked: true, dotColor: '#ff8339' },
-    '2025-01-25': { marked: true, dotColor: '#ff8339' },
-  }
+  const [markedDates, setMarkedDates] = useState<{ [key: string]: number[] }>(
+    {},
+  )
+
+  useEffect(() => {
+    let newMarkedDates: { [key: string]: number[] } = {}
+    AppointmentInfos.forEach((info) => {
+      const dateKey = info.appointmentInfo.scheduledAt.split('T')[0] // "YYYY-MM-DD" 형식
+      if (newMarkedDates[dateKey]) {
+        if (newMarkedDates[dateKey].length > 3) {
+          newMarkedDates[dateKey].push(info.clubInfo.clubId % 10)
+        }
+      } else {
+        newMarkedDates[dateKey] = [info.clubInfo.clubId % 10]
+      }
+    })
+    setMarkedDates(newMarkedDates)
+  }, [])
   interface Club {
     id: string
     name: string
@@ -220,35 +233,13 @@ function Appointment() {
 
       <ScrollView>
         {/* 캘린더 섹션 */}
-        <View className="p-4">
-          <Calendar
-            className="border border-bord rounded-lg p-2"
-            theme={{
-              backgroundColor: '#ffffff',
-              calendarBackground: '#ffffff',
-              textSectionTitleColor: '#9c9c9c',
-              selectedDayBackgroundColor: '#ff8339',
-              selectedDayTextColor: '#ffffff',
-              todayTextColor: '#ff8339',
-              dayTextColor: '#1f1f1f',
-              textDisabledColor: '#e6e6e6',
-              dotColor: '#ff8339',
-              selectedDotColor: '#ffffff',
-              arrowColor: '#ff8339',
-              monthTextColor: '#1f1f1f',
-              textDayFontSize: 16,
-              textMonthFontSize: 16,
-              textDayHeaderFontSize: 14,
-            }}
-            markedDates={markedDates}
-            markingType={'dot'}
-            enableSwipeMonths={true}
-            current={'2025-01-21'}
-          />
-        </View>
+        <AppointmentCalendar
+          markedDates={markedDates}
+          appointments={AppointmentInfos.map((info) => info.appointmentInfo)}
+        />
 
         {/* 스터디 목록 */}
-        {AppointmentInfos.map((appointmentInfo) => (
+        {/* {AppointmentInfos.map((appointmentInfo) => (
           <View className="p-4">
             <AppointmentItem
               key={appointmentInfo.appointmentInfo.appointmentId}
@@ -256,7 +247,8 @@ function Appointment() {
               userImages={userImages}
             />{' '}
           </View>
-        ))}
+        ))} */}
+        <AppointmentList />
       </ScrollView>
 
       {/* 플로팅 버튼 */}
