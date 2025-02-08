@@ -9,10 +9,7 @@ import {
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
-import {
-  ActionSheetProps,
-  useActionSheet,
-} from '@expo/react-native-action-sheet'
+import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams } from 'expo-router'
 
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
@@ -21,6 +18,12 @@ import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
 import ClubAddModal from '@/components/ClubAddModal'
+
+import AppointmentList from './components/ClubAppointmentList'
+import ClubHeader from './components/ClubHeader'
+import ClubMemberList from './components/ClubMemberList'
+import { useClubAppointments } from './hooks/useClubAppointments'
+import { useClub } from './hooks/useClubInfo'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -70,7 +73,12 @@ type RouteParams = {
 
 function ClubMain() {
   const params = useLocalSearchParams<RouteParams>()
-  console.log('clubId:', params)
+  const { appointments, loading } = useClubAppointments({
+    clubId: Number(params.clubId),
+  })
+  const { clubInfo, loading: clubInfoLoading } = useClub({
+    clubId: Number(params.clubId),
+  })
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
@@ -79,12 +87,14 @@ function ClubMain() {
     '2025-01-24': { marked: true, dotColor: '#ff8339' },
     '2025-01-25': { marked: true, dotColor: '#ff8339' },
   }
+
   interface Club {
     id: string
     name: string
     image: any
     tag: string
   }
+
   const myClubs: Club[] = [
     {
       id: '1',
@@ -97,71 +107,14 @@ function ClubMain() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 헤더 */}
-      <View className="flex-row p-4 border-b border-bord">
-        <TouchableOpacity className="mr-4">
-          <BackButton />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-xl font-bold">No.1</Text>
-          <View className="flex-row items-center mt-1">
-            <Text className="text-sm text-secondary">#스터디</Text>
-            <Text className="text-sm text-secondary ml-2">2025-01-07 생성</Text>
-          </View>
-          <View className="flex-row items-center mt-1">
-            <Text className="text-sm text-secondary">그룹 초대 코드</Text>
-            <Text className="text-sm text-secondary mx-2">H9UF6K</Text>
-            <TouchableOpacity>
-              <CopyIcon
-                height={20}
-                width={20}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <TouchableOpacity className="p-2">
-          <MoreIcon
-            height={24}
-            width={24}
-          />
-        </TouchableOpacity>
-      </View>
-
+      <ClubHeader
+        name={clubInfo?.name}
+        category={clubInfo?.category}
+        teamCode={clubInfo?.teamCode}
+      />
       <ScrollView>
-        {/* 멤버 리스트 */}
-        <View className="p-4 border-b border-bord">
-          <TouchableOpacity className="flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
-            <Text className="text-base">멤버 리스트</Text>
-            <MoreIcon
-              height={20}
-              width={20}
-            />
-          </TouchableOpacity>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}>
-            <View className="flex-row">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <View
-                  key={i}
-                  className="flex-col mr-4">
-                  {[...Array(3)].map((_, j) => {
-                    const index = i * 3 + j // 아이템 인덱스 계산
-                    return (
-                      <View
-                        key={index}
-                        className="items-center mb-4">
-                        <View className="w-12 h-12 rounded-full bg-gray-200 mb-1" />
-                        <Text className="text-xs">멤버{index + 1}</Text>
-                      </View>
-                    )
-                  })}
-                </View>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
+        <ClubMemberList clubId={Number(params.clubId)} />
 
-        {/* 캘린더 섹션 */}
         <View className="p-4">
           <Text className="text-lg font-bold mb-4">No.1 캘린더</Text>
           <Calendar
@@ -190,35 +143,12 @@ function ClubMain() {
           />
         </View>
 
-        {/* 스터디 목록 */}
-        <View className="p-4 space-y-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <TouchableOpacity
-              key={i}
-              className="flex-row p-4 border border-bord rounded-lg">
-              <Image
-                source={myClubs[0].image}
-                className="w-12 h-12 rounded-lg bg-gray-200 mr-4"
-              />
-              <View className="flex-1">
-                <Text className="font-bold">1월 {25 - i}일 스터디</Text>
-                <Text className="text-sm text-secondary mt-1">오후 7:00</Text>
-                <Text className="text-sm text-secondary">
-                  역삼 투썸플레이스 #스터디
-                </Text>
-              </View>
-              <View className="items-end">
-                <Text className="text-sm text-secondary mb-1">(6/6)</Text>
-                <View className="bg-gray-100 px-3 py-1 rounded">
-                  <Text className="text-xs text-secondary">투표 종료</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <AppointmentList
+          appointments={appointments}
+          myClubs={myClubs}
+        />
       </ScrollView>
 
-      {/* 플로팅 버튼 */}
       <View className="absolute right-4 bottom-8">
         <ClubAddModal />
       </View>
