@@ -16,53 +16,18 @@ import { getAppointments } from '@/apis/appointment'
 import { getClubs } from '@/apis/club'
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg'
 import AppointmentItem from '@/components/AppointmentItem'
+import ImageThumbnail from '@/components/ImageThumbnail'
 import Colors from '@/constants/Colors'
 import { setClubs } from '@/store/slices/clubSlice'
 import { RootState } from '@/store/store'
 import { AppointmentListInfo } from '@/types/appointment'
 import { Club } from '@/types/club'
 
-import AppointmentList from '../appointment/AppointmentList'
-import ImageThumbnail from '@/components/ImageThumbnail'
-
-interface ClubInfo {
-  clubId: string
-  name: string
-  img: any
-  category: string
-}
-
-interface AppointmentInfo {
-  appointmentId: number
-  name: string
-  category: string
-  scheduledAt: string
-  voteEndTime: string
-}
-
-interface ParticipantInfo {
-  email: string
-  isAttending: boolean
-  dailyStatus: string
-}
-
-interface VoteInfo {
-  content: string
-  isSelected: boolean
-}
-
-interface AppointmentsInfo {
-  clubInfo: ClubInfo
-  appointmentInfo: AppointmentInfo
-  participantInfo: ParticipantInfo[]
-  voteInfo: VoteInfo[]
-}
 export default function MainScreen() {
   const dispatch = useDispatch()
   const { clubs } = useSelector((state: RootState) => state.club)
   const [appoList, setAppoList] = useState<AppointmentListInfo[]>()
   // TODO: 추후 코드가 정돈되면 appoList를 appointmentList로 바꿀 것.
-  // TODO: 필요 없는 더미 데이터를 지울 것.
   const [showClubLoading, setShowClubLoading] = useState(false)
 
   const fetchAppointments = async () => {
@@ -87,9 +52,8 @@ export default function MainScreen() {
     try {
       setShowClubLoading(false)
       const result: Club[] | null = await getClubs()
-      console.log('🔍 클럽 리스트 조회 결과:', result)
       dispatch(setClubs(result))
-      setShowClubLoading(true);
+      setShowClubLoading(true)
     } catch (error) {
       console.error('클럽 목록을 가져오는 중 오류 발생:', error)
     }
@@ -103,26 +67,6 @@ export default function MainScreen() {
   const { t } = useTranslation()
   const router = useRouter()
 
-  const myClubs: ClubInfo[] = [
-    {
-      clubId: '1',
-      name: 'No.1',
-      img: require('@/assets/clubs/club1.png'),
-      category: '#스터디',
-    },
-    {
-      clubId: '2',
-      name: '역삼FC',
-      img: require('@/assets/clubs/club2.png'),
-      category: '#풋살',
-    },
-    {
-      clubId: '3',
-      name: 'DogLover',
-      img: require('@/assets/clubs/club3.png'),
-      category: '#애견',
-    },
-  ]
   const userImages = [
     require('@/assets/avatars/user1.png'),
     require('@/assets/avatars/user2.png'),
@@ -132,65 +76,6 @@ export default function MainScreen() {
     require('@/assets/avatars/user6.png'),
     require('@/assets/avatars/user7.png'),
     require('@/assets/avatars/user8.png'),
-  ]
-  const AppointmentInfos: AppointmentsInfo[] = [
-    {
-      clubInfo: myClubs[0],
-      appointmentInfo: {
-        appointmentId: 1,
-        name: '1월 17일 스터디 • No.1',
-        category: '스터디',
-        scheduledAt: '1월 24일',
-        voteEndTime: '1월 23일 오후 6:00',
-      },
-      participantInfo: [
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-      ],
-      voteInfo: [
-        {
-          content: '역삼 투썸플레이스',
-          isSelected: true,
-        },
-      ],
-    },
-
-    {
-      clubInfo: myClubs[2],
-      appointmentInfo: {
-        appointmentId: 2,
-        name: '애견모임 • DogLover',
-        category: '애견',
-        scheduledAt: '1월 23일 오후 6:00',
-        voteEndTime: '1월 22일 오후 6:00',
-      },
-      participantInfo: [
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-      ],
-      voteInfo: [
-        {
-          content: '역삼 투썸플레이스',
-          isSelected: true,
-        },
-      ],
-    },
   ]
 
   const handleClubPress = (clubId: number) => {
@@ -244,20 +129,24 @@ export default function MainScreen() {
             className="space-x-4">
             {showClubLoading &&
               clubs.map((club) => (
-                <View key={club.id} className="relative">
-                  <TouchableOpacity
-                    className="items-center p-2 w-[100px]"
-                    onPress={() => handleClubPress(club.id)}>
-                    <ImageThumbnail
-                      img={'https://picsum.photos/80'}
-                      defaultImg={require('@/assets/clubs/club1.png')}
-                      width={80}
-                      height={80}
-                    />
-                    <Text className="text-base font-medium  text-center truncate w-full">{club.name}</Text>
-                    <Text className="text-sm text-text-secondary text-center w-full">{t(`category.${club.category}`)}</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  key={club.id}
+                  className=" relativeitems-center p-2 w-[100px]"
+                  onPress={() => handleClubPress(club.id)}>
+                  <ImageThumbnail
+                    img={'https://picsum.photos/80'}
+                    defaultImg={require('@/assets/clubs/club1.png')}
+                    width={80}
+                    height={80}
+                    className="rounded-xl"
+                  />
+                  <Text className="px-2 text-base font-medium text-center line-clamp-2 w-full">
+                    {club.name}
+                  </Text>
+                  <Text className="text-sm text-text-secondary text-center w-full">
+                    {t(`category.${club.category}`)}
+                  </Text>
+                </TouchableOpacity>
               ))}
           </ScrollView>
         </View>
