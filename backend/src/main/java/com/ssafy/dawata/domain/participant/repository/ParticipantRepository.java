@@ -1,16 +1,16 @@
 package com.ssafy.dawata.domain.participant.repository;
 
+import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
+import com.ssafy.dawata.domain.participant.entity.Participant;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
-import com.ssafy.dawata.domain.participant.entity.Participant;
-
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
+
+    Optional<Object> findByClubMemberIdAndAppointmentId(Long id, Long appointmentId);
 
 	@Query(""" 
 			SELECT new com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse (
