@@ -3,6 +3,7 @@ package com.ssafy.dawata.domain.address.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +32,7 @@ public class AddressController {
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
-	//클라이언트 전체주소 반환
+	//클라이언트 전체주소 조회
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<AddressResponseInfo>>> getAllAddresses() {
 		List<AddressResponseInfo> response = addressService.getAllAddresses().data();
@@ -45,5 +46,20 @@ public class AddressController {
 		System.out.println("=====수정======");
 		AddressResponseInfo response = addressService.updateAddress(addressId, request).data();
 		return ResponseEntity.ok(ApiResponse.success(response));
+	}
+
+	//특정 주소 조회
+	@GetMapping("/{addressId}")
+	public ResponseEntity<ApiResponse<AddressResponseInfo>> getAddress(@PathVariable Long addressId) {
+		System.out.println("====특정 주소 조회=====");
+		AddressResponseInfo response = addressService.getAddress(addressId).data();
+		return ResponseEntity.ok(ApiResponse.success(response));
+	}
+
+	//특정 주소 삭제
+	@DeleteMapping("/{addressId}")
+	public ResponseEntity<ApiResponse<Void>> deleteAddress(@PathVariable Long addressId) {
+		addressService.deleteAddress(addressId);
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 }

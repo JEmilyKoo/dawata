@@ -49,7 +49,8 @@ public class AddressService {
 	//멤버 전체 주소 조회
 	public ApiResponse<List<AddressResponseInfo>> getAllAddresses() {
 		Member member = memberService.findMyMemberInfo();
-		List<MemberAddressMapping> mapping = memberAddressMappingRepository.findByMemberId(member.getId());
+		List<MemberAddressMapping> mapping = memberAddressMappingRepository.findAllWithAddressByMemberId(
+			member.getId());
 		List<AddressResponseInfo> response = mapping.stream()
 			.map(AddressResponseInfo::from)
 			.toList();
@@ -100,4 +101,28 @@ public class AddressService {
 
 	}
 
+	//주소 하나 조회
+	public ApiResponse<AddressResponseInfo> getAddress(Long addressId) {
+		MemberAddressMapping mapping = validateAddressIdAndMemberId(addressId);
+		return ApiResponse.success(AddressResponseInfo.from(mapping));
+	}
+
+	////////vaidate 메서드 분리///////
+	private MemberAddressMapping validateAddressIdAndMemberId(Long addressId) {
+		Member member = memberService.findMyMemberInfo();
+		MemberAddressMapping mapping = memberAddressMappingRepository.findById(addressId)
+			.orElseThrow(() -> new IllegalArgumentException("요청 주소 없음"));
+
+		if (!mapping.getMember().getId().equals(member.getId())) {
+			throw new IllegalArgumentException("클라이언트의 주소 정보 아님");
+		}
+		return mapping;
+	}
+
+	//주소 삭제
+	@Transactional
+	public void deleteAddress(Long addressId) {
+		MemberAddressMapping mapping = validateAddressIdAndMemberId(addressId);
+		memberAddressMappingRepository.delete(mapping);
+	}
 }
