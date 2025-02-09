@@ -114,12 +114,19 @@ export default function AppointmentDetail() {
 
       {/* 참여 인원 리스트 */}
       <View>
-        <Text>참여 인원 : {appointmentDetail?.participantInfos.length}</Text>
-        {appointmentDetail?.participantInfos.map((participant) => (
-          <Text key={participant.participantId}>
-            {participant.isAttending && participant.img}
-          </Text>
-        ))}
+        <Text>
+          참여 인원 :{' '}
+          {
+            appointmentDetail?.participantInfos.filter(
+              (participant) => participant.isAttending,
+            ).length
+          }
+        </Text>
+        {appointmentDetail?.participantInfos
+          .filter((participant) => participant.isAttending)
+          .map((participant) => (
+            <Text key={participant.participantId}>{participant.img}</Text>
+          ))}
       </View>
     </View>
 
