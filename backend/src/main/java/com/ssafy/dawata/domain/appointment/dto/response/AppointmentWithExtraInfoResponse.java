@@ -34,13 +34,17 @@ public record AppointmentWithExtraInfoResponse(
 		Long clubId,
 
 		@Schema(description = "클럽 이름", example = "스터디 클럽")
-		String name
+		String name,
+
+		@Schema(description = "클럽 이미지 파일명", example = "image.jpg")
+		String img
 	) {
 
-		public static ClubResponse of(Long clubId, String name) {
+		public static ClubResponse of(Long clubId, String name, String img) {
 			return ClubResponse.builder()
 				.clubId(clubId)
 				.name(name)
+				.img(img)
 				.build();
 		}
 	}
@@ -55,14 +59,18 @@ public record AppointmentWithExtraInfoResponse(
 		Boolean isAttending,
 
 		@Schema(description = "출결 상태", example = "PRESENT")
-		DailyStatus dailyStatus
+		DailyStatus dailyStatus,
+
+		@Schema(description = "이미지 파일명", example = "image.jpg")
+		String img
 	) {
 
-		public static ParticipantResponse of(Participant entity) {
+		public static ParticipantResponse of(Participant entity, String img) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
 				.isAttending(entity.getIsAttending())
 				.dailyStatus(entity.getDailyStatus())
+				.img(img)
 				.build();
 		}
 	}
@@ -70,14 +78,15 @@ public record AppointmentWithExtraInfoResponse(
 	public static AppointmentWithExtraInfoResponse of(
 		Long clubId,
 		String clubName,
+		String img,
 		Appointment appointment,
-		List<Participant> participants,
+		List<ParticipantResponse> participantResponses,
 		VoteStatus voteStatus
 	) {
 		return AppointmentWithExtraInfoResponse.builder()
-			.clubInfo(ClubResponse.of(clubId, clubName))
+			.clubInfo(ClubResponse.of(clubId, clubName, img))
 			.appointmentInfo(AppointmentResponse.of(appointment))
-			.participantInfos(participants.stream().map(ParticipantResponse::of).toList())
+			.participantInfos(participantResponses)
 			.voteStatus(voteStatus)
 			.build();
 	}
