@@ -13,6 +13,7 @@ import AppointmentItem from '@/components/AppointmentItem'
 import { AppointmentListInfo } from '@/types/appointment'
 
 import { getSelectedDate } from './SelectedDateInitial'
+import { dummyAppointmentList } from './dummyAppointmentList'
 
 const AppointmentList: React.FC = () => {
   const [appointments, setAppointments] = useState<AppointmentListInfo[]>([])
@@ -42,6 +43,8 @@ const AppointmentList: React.FC = () => {
 
     fetchAppointments()
   }, [])
+
+  // const testappointments = dummyAppointmentList
 
   // TODO: 스크롤할 때 첫 번째 보이는 약속을 기준으로 selectedDate 변경
   // const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -82,16 +85,21 @@ const AppointmentList: React.FC = () => {
         // scrollEventThrottle={16} // 성능 최적화
       >
         {appointments.length > 0 ? (
-          appointments.map((appointmentListInfo) => (
-            <View
-              key={appointmentListInfo.appointmentInfo.appointmentId}
-              className="p-4">
-              <AppointmentItem
-                appointmentListInfo={appointmentListInfo}
-                userImages={userImages}
-              />
-            </View>
-          ))
+          appointments
+            .filter(
+              (appointmentListInfo) =>
+                appointmentListInfo.voteStatus !== 'NOT_PARTICIPANT',
+            )
+            .map((appointmentListInfo) => (
+              <View
+                key={appointmentListInfo.appointmentInfo.appointmentId}
+                className="p-4">
+                <AppointmentItem
+                  appointmentListInfo={appointmentListInfo}
+                  userImages={userImages}
+                />
+              </View>
+            ))
         ) : (
           <Text>예정된 약속이 없습니다.</Text>
         )}

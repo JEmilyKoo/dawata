@@ -14,14 +14,23 @@ export interface AppointmentInfo {
 }
 
 export interface ParticipantInfo {
-  email: string
+  participantId: number
   isAttending: boolean
   dailyStatus: string
+  role: string
+  img: any
 }
 
 export interface VoteInfo {
-  content: string
+  title: string
+  category: string
+  detail: string
+  linkUrl: string
+  roadAddress: string
+  latitude: number
+  longitude: number
   isSelected: boolean
+  percentage: number
 }
 
 export interface AppointmentDetailInfo {

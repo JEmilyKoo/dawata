@@ -1,6 +1,8 @@
-import { Image, Text, TouchableOpacity, View } from "react-native"
+import { Image, Text, TouchableOpacity, View } from 'react-native'
 
-import { AppointmentListInfo } from "@/types/appointment"
+import { useRouter } from 'expo-router'
+
+import { AppointmentListInfo } from '@/types/appointment'
 
 export default function AppointmentItem({
   appointmentListInfo,
@@ -9,8 +11,17 @@ export default function AppointmentItem({
   appointmentListInfo: AppointmentListInfo
   userImages: any
 }) {
+  const router = useRouter()
+  const { voteStatus, appointmentInfo } = appointmentListInfo
+
+  const handlePress = () => {
+    router.push(
+      `/appointment/detail?id=${appointmentInfo.appointmentId}&status=${voteStatus}`,
+    )
+  }
   return (
     <TouchableOpacity
+      onPress={handlePress}
       key={appointmentListInfo.appointmentInfo.appointmentId}
       className="flex-row justify-between items-center pb-4 rounded-xl mb-3">
       <Image
