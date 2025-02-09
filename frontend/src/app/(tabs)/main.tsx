@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Image,
+  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   Text,
@@ -23,6 +23,7 @@ import { AppointmentListInfo } from '@/types/appointment'
 import { Club } from '@/types/club'
 
 import AppointmentList from '../appointment/AppointmentList'
+import ImageThumbnail from '@/components/ImageThumbnail'
 
 interface ClubInfo {
   clubId: string
@@ -229,23 +230,35 @@ export default function MainScreen() {
               />
             </Link>
           </View>
+          {!showClubLoading && (
+            <View className="inset-0 items-center justify-center">
+              <ActivityIndicator
+                size="small"
+                color={Colors.primary}
+              />
+            </View>
+          )}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             className="space-x-4">
-            {myClubs.map((club) => (
-              <TouchableOpacity
-                key={club.clubId}
-                className="items-center p-2"
-                onPress={() => handleClubPress(club.clubId)}>
-                <Image
-                  source={club.img}
-                  className="w-20 h-20 rounded-xl mb-2"
-                />
-                <Text className="text-base font-medium">{club.name}</Text>
-                <Text className="text-sm text-gray-500">{club.category}</Text>
-              </TouchableOpacity>
-            ))}
+            {showClubLoading &&
+              clubs.map((club) => (
+                <View key={club.id} className="relative">
+                  <TouchableOpacity
+                    className="items-center p-2 w-[100px]"
+                    onPress={() => handleClubPress(club.id)}>
+                    <ImageThumbnail
+                      img={'https://picsum.photos/80'}
+                      defaultImg={require('@/assets/clubs/club1.png')}
+                      width={80}
+                      height={80}
+                    />
+                    <Text className="text-base font-medium  text-center truncate w-full">{club.name}</Text>
+                    <Text className="text-sm text-text-secondary text-center w-full">{t(`category.${club.category}`)}</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
           </ScrollView>
         </View>
         {/* 다가오는 약속 섹션 */}
