@@ -17,7 +17,9 @@ import com.ssafy.dawata.domain.common.exception.BusinessException;
 import com.ssafy.dawata.domain.common.exception.NotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -26,6 +28,7 @@ public class GlobalExceptionHandler {
 		final HttpClientErrorException.Forbidden e,
 		final HttpServletRequest request
 	) {
+		log.error("ForbiddenException: {}", e.getMessage());
 		return ErrorResponse.toResponseEntity(CommonErrorCode.FORBIDDEN);
 	}
 
@@ -34,6 +37,7 @@ public class GlobalExceptionHandler {
 		final BusinessException e,
 		final HttpServletRequest request
 	) {
+		log.error("BusinessException: {}", e.getMessage());
 		return ErrorResponse.toResponseEntity(e.getErrorCode());
 	}
 
@@ -41,6 +45,7 @@ public class GlobalExceptionHandler {
 	protected ResponseEntity<ErrorResponse> handleNotFoundException(
 		final NotFoundException e
 	) {
+		log.error("NotFoundException: {}", e.getMessage());
 		return ErrorResponse.toResponseEntity(e.getErrorCode());
 	}
 
@@ -70,6 +75,8 @@ public class GlobalExceptionHandler {
 		final Exception e,
 		final HttpServletRequest request
 	) {
+		log.error("Exception: {}", e.getMessage());
+		e.printStackTrace();
 		return ErrorResponse.toResponseEntity(CommonErrorCode.INTERNAL_SERVER_ERROR);
 	}
 }

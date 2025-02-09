@@ -42,9 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			Collection<GrantedAuthority> authorities = new ArrayList<>();
 			authorities.add((GrantedAuthority) () -> "ROLE_ANONYMOUS");
 
-			// 이메일 -> ROLE_ANONYMOUS, 비밀번호 -> null 로 Authentication 객체 생성
+			// 익명 사용자는 테스터 계정
 			Authentication authentication = new UsernamePasswordAuthenticationToken(
-				"ROLE_ANONYMOUS", null, authorities);
+				new SecurityMemberDetails(
+					Member.createMember(1L, "test@email.com", "테스터")
+				), null, authorities);
 
 			// SecurityContextHolder에 Authentication 객체 저장
 			SecurityContextHolder.getContext().setAuthentication(authentication);
