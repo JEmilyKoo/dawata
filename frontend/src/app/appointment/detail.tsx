@@ -8,8 +8,10 @@ import {
   View,
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
+import { useSelector } from 'react-redux'
 
 import { useRoute } from '@react-navigation/native'
+import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 
 import { getAppointmentDetail } from '@/apis/appointment'
@@ -21,6 +23,8 @@ import AppointmentExpiredDetail from '@/components/AppointmentExpiredDetail'
 import AppointmentNotSelectedDetail from '@/components/AppointmentNotSelectedDetail'
 import AppointmentSelectedDetail from '@/components/AppointmentSelectedDetail'
 import BackButton from '@/components/BackButton'
+import KebabMenu from '@/components/KebabMenu'
+import { RootState } from '@/store/store'
 import { AppointmentDetailInfo } from '@/types/appointment'
 
 // 한국어 설정
@@ -74,6 +78,21 @@ export default function AppointmentDetail() {
   const { id, status } = useLocalSearchParams()
   const [appointmentDetail, setAppointmentDetail] =
     useState<AppointmentDetailInfo>()
+  const [isKebabMenuVisible, setIsKebabMenuVisible] = useState(false)
+
+  const { user } = useSelector((state: RootState) => state.member)
+  const router = useRouter()
+
+  // TODO: 호스트 여부 확인 (호스트 아이디와 유저 아이디 비교하고 싶은데 호스트 아이디가 없음, 참여자 아이디는 pk라 비교 불가)
+  // TODO: 참여 여부 확인 (참여자 아이디와 유저 아이디 비교하고 싶은데 참여자 아이디는 pk라 비교 불가)
+  // 아래 두 메서드는 participantId가 memberId와 같을 때 호스트 여부와 참여 여부를 확인할 수 있음
+  // const isHost = user?.id === appointmentDetail?.appointmentInfo.hostId
+  // const isAttending = appointmentDetail?.participantInfos.some(
+  //   (participant) =>
+  //     participant.participantId === user?.id && participant.isAttending,
+  // )
+  const isHost = true // 임시
+  const isAttending = true // 임시
 
   useEffect(() => {
     const fetchAppointmentDetail = async () => {
@@ -95,38 +114,78 @@ export default function AppointmentDetail() {
 
   console.log('🦖🦖 약속 상세 정보 : ', appointmentDetail)
 
+  const handleEdit = () => {
+    console.log('🦖🦖 약속 수정 페이지로 이동')
+    router.push(
+      `/appointment/update1?id=${appointmentDetail?.appointmentInfo.appointmentId}`,
+    )
+  }
+
+  const handleDelete = () => {
+    // TODO: 삭제 로직 구현
+    console.log('약속 삭제')
+  }
+
+  const handleToggleParticipation = () => {
+    // TODO: 참여/불참 토글 로직 구현
+    console.log(isAttending ? '불참 처리' : '참여 처리')
+  }
+
   return (
     <View className="flex-1 items-center justify-center">
-      <Text className="text-lg font-bold mb-4">Appointment Detail</Text>
-      <Text className="text-gray-500 mb-4">약속 ID: {id}</Text>
-      <Text className="text-gray-500 mb-4">상태: {status}</Text>
+      <View className="absolute top-0 right-0 p-4">
+        <TouchableOpacity onPress={() => setIsKebabMenuVisible(true)}>
+          <MoreIcon
+            height={24}
+            width={24}
+          />
+        </TouchableOpacity>
+      </View>
 
-      {/* 상태에 따라 다른 컴포넌트 렌더링 */}
-      {status === 'EXPIRED' && appointmentDetail && (
-        <AppointmentExpiredDetail appointmentDetail={appointmentDetail} />
-      )}
-      {status === 'SELECTED' && appointmentDetail && (
-        <AppointmentSelectedDetail appointmentDetail={appointmentDetail} />
-      )}
-      {status === 'NOT_SELECTED' && appointmentDetail && (
-        <AppointmentNotSelectedDetail appointmentDetail={appointmentDetail} />
+      {appointmentDetail && (
+        <KebabMenu
+          isVisible={isKebabMenuVisible}
+          onClose={() => setIsKebabMenuVisible(false)}
+          isHost={isHost}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleParticipation={handleToggleParticipation}
+          isAttending={isAttending}
+        />
       )}
 
-      {/* 참여 인원 리스트 */}
-      <View>
-        <Text>
-          참여 인원 :{' '}
-          {
-            appointmentDetail?.participantInfos.filter(
-              (participant) => participant.isAttending,
-            ).length
-          }
-        </Text>
-        {appointmentDetail?.participantInfos
-          .filter((participant) => participant.isAttending)
-          .map((participant) => (
-            <Text key={participant.participantId}>{participant.img}</Text>
-          ))}
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-lg font-bold mb-4">Appointment Detail</Text>
+        <Text className="text-gray-500 mb-4">약속 ID: {id}</Text>
+        <Text className="text-gray-500 mb-4">상태: {status}</Text>
+
+        {/* 상태에 따라 다른 컴포넌트 렌더링 */}
+        {status === 'EXPIRED' && appointmentDetail && (
+          <AppointmentExpiredDetail appointmentDetail={appointmentDetail} />
+        )}
+        {status === 'SELECTED' && appointmentDetail && (
+          <AppointmentSelectedDetail appointmentDetail={appointmentDetail} />
+        )}
+        {status === 'NOT_SELECTED' && appointmentDetail && (
+          <AppointmentNotSelectedDetail appointmentDetail={appointmentDetail} />
+        )}
+
+        {/* 참여 인원 리스트 */}
+        <View>
+          <Text>
+            참여 인원 :{' '}
+            {
+              appointmentDetail?.participantInfos.filter(
+                (participant) => participant.isAttending,
+              ).length
+            }
+          </Text>
+          {appointmentDetail?.participantInfos
+            .filter((participant) => participant.isAttending)
+            .map((participant) => (
+              <Text key={participant.participantId}>{participant.img}</Text>
+            ))}
+        </View>
       </View>
     </View>
 
