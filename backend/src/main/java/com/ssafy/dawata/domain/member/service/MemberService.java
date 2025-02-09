@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
+import com.ssafy.dawata.domain.club.dto.request.ClubJoinSearchRequest;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
+import com.ssafy.dawata.domain.member.dto.response.ClubJoinSearchResponse;
 import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
@@ -38,6 +40,11 @@ public class MemberService {
 		return memberRepository
 			.customFindById(1L)
 			.orElseThrow(IllegalArgumentException::new);
+	}
+
+	public ClubJoinSearchResponse findUserEmail(ClubJoinSearchRequest clubJoinSearchRequest) {
+		return memberRepository.customFindByEmail(clubJoinSearchRequest.email())
+			.orElseThrow(() -> new IllegalArgumentException("이메일 없음둥"));
 	}
 
 	@Transactional
