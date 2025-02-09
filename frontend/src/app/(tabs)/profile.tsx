@@ -1,9 +1,12 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
 import ProfileHeader from '@/components/ProfileHeader'
 import ProfileStats from '@/components/ProfileStats'
+
+import { useAttendanceStatus } from '../profile/hooks/useAttendanceStatus'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -48,9 +51,12 @@ LocaleConfig.locales['kr'] = {
 
 LocaleConfig.defaultLocale = 'kr'
 export default function Profile() {
+  const { attendanceStatus, loading } = useAttendanceStatus()
+
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
     '2025-01-22': { marked: true, dotColor: '#ff8339' },
+
     '2025-01-23': { marked: true, dotColor: '#ff8339' },
     '2025-01-24': { marked: true, dotColor: '#ff8339' },
     '2025-01-25': { marked: true, dotColor: '#ff8339' },
@@ -86,7 +92,7 @@ export default function Profile() {
           current={'2025-01-21'}
         />
       </View>
-      <ProfileStats />
+      <ProfileStats attendanceStatus={attendanceStatus} />
     </ScrollView>
   )
 }
