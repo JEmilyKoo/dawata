@@ -40,6 +40,12 @@
     "EXERCISE": "운동",
     "OTHER": "기타"
   },
+  "voteStatus": {
+    "NOT_PARTICIPANT": "미참여",
+    "EXPIRED": "투표 마감",
+    "SELECTED": "투표 완료",
+    "NOT_SELECTED": "투표 가능"
+  },
   "goToHome": "홈으로",
   "confirm" : "확인",
   "error": {

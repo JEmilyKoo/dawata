@@ -1,19 +1,19 @@
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
+import { Text, TouchableOpacity, View } from 'react-native'
 
 import { useRouter } from 'expo-router'
 
+import ImageThumbnail from '@/components/ImageThumbnail'
 import { AppointmentListInfo } from '@/types/appointment'
 
 export default function AppointmentItem({
   appointmentListInfo,
-  userImages,
 }: {
   appointmentListInfo: AppointmentListInfo
-  userImages: any
 }) {
   const router = useRouter()
+  const { t } = useTranslation()
   const { voteStatus, appointmentInfo } = appointmentListInfo
-
   const handlePress = () => {
     router.push(
       `/appointment/detail?id=${appointmentInfo.appointmentId}&status=${voteStatus}`,
@@ -24,42 +24,53 @@ export default function AppointmentItem({
       onPress={handlePress}
       key={appointmentListInfo.appointmentInfo.appointmentId}
       className="flex-row justify-between items-center pb-4 rounded-xl mb-3">
-      <Image
-        source={appointmentListInfo.clubInfo.img}
-        className="w-6 h-6 rounded-xl mb-2"
+      <ImageThumbnail
+        img={appointmentListInfo.clubInfo.img}
+        defaultImg={require('@/assets/clubs/club2.png')}
+        className="rounded-xl"
+        width={80}
+        height={60}
       />
+
       <View className="flex-1 ml-2">
-        <Text className="text-base font-medium mb-1">
-          {appointmentListInfo.appointmentInfo.name}
-        </Text>
-        <Text className="text-sm text-gray-500 mb-2">
-          장소투표중 #{`${appointmentListInfo.appointmentInfo.category} `}
-        </Text>
+        <View className="flex-row justify-between content-end">
+          <Text className="text-sm font-medium text-text-primary truncate">
+            {appointmentListInfo.appointmentInfo.name}
+          </Text>
+          <Text className="text-text-primary text-xs pt-[1px]">
+            {new Date(
+              appointmentListInfo.appointmentInfo.voteEndTime,
+            ).toLocaleString('ko', {
+              month: 'long',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            })}
+          </Text>
+        </View>
+        <View className="flex-row justify-between">
+          <Text className="text-sm text-text-secondary">
+            장소투표중 #
+            {t(`category.${appointmentListInfo.appointmentInfo.category}`)}
+          </Text>
+          <Text className="text-xs">
+            {t(`voteStatus.${appointmentListInfo.voteStatus}`)}</Text>
+          {/* 나중에 db 연결 확인하고 수정 예정 (voteStatus에 따라 투표 상태 보여주기) */}
+        </View>
         <View className="flex-row space-x-1">
           {appointmentListInfo.participantInfos.map((participant, index) => (
-            <View
+            <ImageThumbnail
               key={index}
-              className="w-6 h-6 rounded-full bg-gray-300 pr-2">
-              <Image
-                source={userImages[index]}
-                style={{ width: 24, height: 24 }}
-              />
-            </View>
+              img={participant.img}
+              defaultImg={require('@/assets/avatars/user1.png')}
+              className="rounded-full"
+              width={24}
+              height={24}
+            />
           ))}
         </View>
       </View>
-      {/* {appointmentDetailInfo.voteInfo.some((vote) => vote.isSelected) && ( */}
-      <View className="flex-column items-end">
-        <Text className="text-text-primary text-xs">
-          {appointmentListInfo.appointmentInfo.voteEndTime}
-        </Text>
-        <View className="px-3 py-1.5">
-          <Text className="text-xs">{appointmentListInfo.voteStatus}</Text>
-          {/* 나중에 db 연결 확인하고 수정 예정 (voteStatus에 따라 투표 상태 보여주기) */}
-        </View>
-      </View>
-
-      {/* )} */}
     </TouchableOpacity>
   )
 }
