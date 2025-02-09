@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.appointment.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import com.ssafy.dawata.domain.vote.entity.Voter;
 import com.ssafy.dawata.domain.vote.enums.VoteStatus;
 import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 import com.ssafy.dawata.domain.vote.repository.VoterRepository;
+import com.ssafy.dawata.global.util.DateUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -69,21 +71,35 @@ public class AppointmentService {
 		});
 	}
 
-	public List<AppointmentWithExtraInfoResponse> findMyAllAppointmentList(Long memberId, Integer nextRange,
-		Integer prevRange) {
-		// TODO: nextRange 와 prevRange 로 where 조건 추가하기
-		// TODO: participantInfos 에 participant_id -> email 로 변경하기 + profile_url 추가
-		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberId(memberId);
+	public List<AppointmentWithExtraInfoResponse> findMyAllAppointmentList(
+		Long memberId,
+		Integer nextRange,
+		Integer prevRange,
+		Optional<Integer> currentMonth
+	) {
+		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberId(
+			memberId,
+			prevRange,
+			nextRange,
+			currentMonth.orElseGet(() -> LocalDate.now().getMonthValue())
+		);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
 	}
 
-	public List<AppointmentWithExtraInfoResponse> findMyAppointmentListByClubId(Long memberId, Long clubId,
+	public List<AppointmentWithExtraInfoResponse> findMyAppointmentListByClubId(
+		Long memberId,
+		Long clubId,
 		Integer nextRange,
-		Integer prevRange) {
-		// TODO: nextRange와 prevRange로 where 조건 추가하기
-		// TODO: participantInfos 에 participant_id -> email 로 변경하기 + profile_url 추가
-		List<Appointment> appointments = appointmentRepository.findAppointmentsByClubId(clubId);
+		Integer prevRange,
+		Optional<Integer> currentMonth
+	) {
+		List<Appointment> appointments = appointmentRepository.findAppointmentsByClubId(
+			clubId,
+			prevRange,
+			nextRange,
+			currentMonth.orElseGet(() -> LocalDate.now().getMonthValue())
+		);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
 	}
@@ -111,13 +127,14 @@ public class AppointmentService {
 			.map(p -> {
 				Photo photo = photoRepository.findByEntityId(p.getClubMember().getMember().getId())
 					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
-				return AppointmentDetailResponse.ParticipantResponse.of(p, photo.getPhotoName());
+				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getNickname(), photo.getPhotoName());
 			})
 			.toList();
 
 		return AppointmentDetailResponse.of(
 			clubMember.getClub().getId(),
 			clubMember.getClubName(),
+			clubMember.getClub().getImg(),
 			appointment,
 			participantResponses,
 			makeVoteResponses(voteItems, voters, participant.getId())
@@ -189,6 +206,15 @@ public class AppointmentService {
 				String clubName =
 					participant.isPresent() ? targetClubMember.getClubName() : targetClubMember.getClub().getName();
 
+				List<AppointmentWithExtraInfoResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
+					.stream()
+					.map(p -> {
+						Photo photo = photoRepository.findByEntityId(p.getClubMember().getMember().getId())
+							.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+						return AppointmentWithExtraInfoResponse.ParticipantResponse.of(p, photo.getPhotoName());
+					})
+					.toList();
+
 				// Vote Status 로직 추가하기
 				VoteStatus voteStatus = VoteStatus.NOT_SELECTED;
 
@@ -203,8 +229,9 @@ public class AppointmentService {
 				return AppointmentWithExtraInfoResponse.of(
 					targetClubMember.getClub().getId(),
 					clubName,
+					targetClubMember.getClub().getImg(),
 					appointment,
-					appointment.getParticipants(),
+					participantResponses,
 					voteStatus
 				);
 			})

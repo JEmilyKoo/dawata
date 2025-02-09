@@ -59,16 +59,17 @@ public class AppointmentController {
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
 		@RequestParam(required = false) Optional<Long> clubId,
 		@RequestParam(defaultValue = "4") Integer nextRange,
-		@RequestParam(defaultValue = "4") Integer prevRange
+		@RequestParam(defaultValue = "4") Integer prevRange,
+		@RequestParam(required = false) Optional<Integer> currentMonth
 	) {
 		return clubId.map(cId -> ResponseEntity.ok(
 				ApiResponse.success(
 					appointmentService.findMyAppointmentListByClubId(memberDetails.member().getId(), cId, nextRange,
-						prevRange))))
+						prevRange, currentMonth))))
 			.orElseGet(() -> ResponseEntity.ok(
 				ApiResponse.success(
 					appointmentService.findMyAllAppointmentList(memberDetails.member().getId(), nextRange,
-						prevRange))));
+						prevRange, currentMonth))));
 	}
 
 	@Operation(summary = "약속 상세 조회", description = "특정 약속의 상세 정보를 조회합니다.")

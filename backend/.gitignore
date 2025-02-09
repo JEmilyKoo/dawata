@@ -180,3 +180,6 @@ $RECYCLE.BIN/
 !application.yml
 
 .env
+
+### Querydsl
+/src/main/generated

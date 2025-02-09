@@ -34,13 +34,17 @@ public record AppointmentDetailResponse(
 		Long clubId,
 
 		@Schema(description = "클럽 이름", example = "스터디 클럽")
-		String name
+		String name,
+
+		@Schema(description = "클럽 이미지 파일명", example = "image.jpg")
+		String img
 	) {
 
-		public static ClubResponse of(Long clubId, String name) {
+		public static ClubResponse of(Long clubId, String name, String img) {
 			return ClubResponse.builder()
 				.clubId(clubId)
 				.name(name)
+				.img(img)
 				.build();
 		}
 	}
@@ -57,6 +61,9 @@ public record AppointmentDetailResponse(
 		@Schema(description = "출결 상태", example = "PRESENT")
 		DailyStatus dailyStatus,
 
+		@Schema(description = "참여자 이름", example = "참여자 닉네임")
+		String name,
+
 		@Schema(description = "역할", example = "HOST")
 		Role role,
 
@@ -64,11 +71,12 @@ public record AppointmentDetailResponse(
 		String img
 	) {
 
-		public static ParticipantResponse of(Participant entity, String img) {
+		public static ParticipantResponse of(Participant entity, String name, String img) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
 				.isAttending(entity.getIsAttending())
 				.dailyStatus(entity.getDailyStatus())
+				.name(name)
 				.role(entity.getRole())
 				.img(img)
 				.build();
@@ -124,12 +132,13 @@ public record AppointmentDetailResponse(
 	public static AppointmentDetailResponse of(
 		Long clubId,
 		String clubName,
+		String img,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
 		List<VoteResponse> voteInfos
 	) {
 		return AppointmentDetailResponse.builder()
-			.clubInfo(ClubResponse.of(clubId, clubName))
+			.clubInfo(ClubResponse.of(clubId, clubName, img))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteInfos(voteInfos)
