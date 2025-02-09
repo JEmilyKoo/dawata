@@ -1,27 +1,15 @@
 package com.ssafy.dawata.domain.club.controller;
 
-import com.ssafy.dawata.domain.club.dto.request.BanClubMemberRequest;
-import com.ssafy.dawata.domain.club.dto.request.CreateClubRequest;
-import com.ssafy.dawata.domain.club.dto.request.JoinClubByCodeRequest;
-import com.ssafy.dawata.domain.club.dto.request.JoinClubByEmailRequest;
-import com.ssafy.dawata.domain.club.dto.request.UpdateAdminRequest;
-import com.ssafy.dawata.domain.club.dto.request.UpdateClubMemberRequest;
-import com.ssafy.dawata.domain.club.dto.request.UpdateClubRequest;
+import com.ssafy.dawata.domain.club.dto.request.*;
 import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
 import com.ssafy.dawata.domain.club.dto.response.ClubMemberInfoResponse;
 import com.ssafy.dawata.domain.club.service.ClubService;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/clubs")
@@ -33,7 +21,7 @@ public class ClubController {
     // 클럽 생성
     @PostMapping
     public ResponseEntity<ApiResponse<ClubInfoResponse>> createClub(
-        @RequestBody CreateClubRequest request) {
+            @RequestBody CreateClubRequest request) {
         return ResponseEntity.ok(clubService.createClub(request));
     }
 
@@ -52,7 +40,7 @@ public class ClubController {
     // 클럽 정보 수정
     @PatchMapping("/{clubId}")
     public ResponseEntity<ApiResponse<Boolean>> updateClub(@PathVariable Long clubId,
-        @RequestBody UpdateClubRequest request) {
+                                                           @RequestBody UpdateClubRequest request) {
         return ResponseEntity.ok(clubService.updateClub(request, clubId));
     }
 
@@ -71,59 +59,81 @@ public class ClubController {
     // 클럽에 속하는 전체 멤버 데이터 조회
     @GetMapping("/{clubId}/members")
     public ResponseEntity<ApiResponse<List<ClubMemberInfoResponse>>> getClubMembers(
-        @PathVariable Long clubId) {
+            @PathVariable Long clubId) {
         return ResponseEntity.ok(clubService.getClubMembers(clubId));
     }
 
     // 클럽 내 특정 멤버 조회
     @GetMapping("/{clubId}/members/{clubMemberId}")
     public ResponseEntity<ApiResponse<ClubMemberInfoResponse>> getClubMember(
-        @PathVariable Long clubId,
-        @PathVariable Long clubMemberId) {
+            @PathVariable Long clubId,
+            @PathVariable Long clubMemberId) {
         return ResponseEntity.ok(clubService.getClubMember(clubId, clubMemberId));
     }
 
     // 이메일로 클럽 멤버 추가
     @PostMapping("/{clubId}/members/email")
     public ResponseEntity<ApiResponse<Boolean>> addClubMemberByEmail(@PathVariable Long clubId,
-        @RequestBody JoinClubByEmailRequest request) {
+                                                                     @RequestBody JoinClubByEmailRequest request) {
         return ResponseEntity.ok(clubService.addClubMemberByEmail(request, clubId));
     }
 
     // 코드로 클럽 멤버 추가
     @PostMapping("/{clubId}/members/code")
     public ResponseEntity<ApiResponse<Boolean>> addClubMemberByCode(@PathVariable Long clubId,
-        @RequestBody JoinClubByCodeRequest request) {
+                                                                    @RequestBody JoinClubByCodeRequest request) {
         return ResponseEntity.ok(clubService.addClubMemberByCode(request, clubId));
     }
 
     // 클럽 멤버 정보 수정
     @PatchMapping("/{clubId}/members/{clubMemberId}")
     public ResponseEntity<ApiResponse<Boolean>> updateClubMember(@PathVariable Long clubId,
-        @PathVariable Long clubMemberId,
-        @RequestBody UpdateClubMemberRequest request) {
+                                                                 @PathVariable Long clubMemberId,
+                                                                 @RequestBody UpdateClubMemberRequest request) {
         return ResponseEntity.ok(clubService.updateClubMember(clubId, clubMemberId, request));
     }
 
     // 클럽 멤버 탈퇴
     @DeleteMapping("/{clubId}/members/{clubMemberId}")
     public ResponseEntity<ApiResponse<Boolean>> leaveClub(@PathVariable Long clubId,
-        @PathVariable Long clubMemberId) {
+                                                          @PathVariable Long clubMemberId) {
         return ResponseEntity.ok(clubService.leaveClub(clubId, clubMemberId));
     }
 
     // 클럽 멤버 강제 탈퇴 (클럽장만 가능)
     @DeleteMapping("/{clubId}/members/ban")
     public ResponseEntity<ApiResponse<Boolean>> banClubMember(@PathVariable Long clubId,
-        @RequestBody BanClubMemberRequest request) {
+                                                              @RequestBody BanClubMemberRequest request) {
         return ResponseEntity.ok(clubService.banClubMember(clubId, request));
     }
 
     //클럽장 교체 (클럽장만 가능)
     @PatchMapping("/{clubId}/admin")
     public ResponseEntity<ApiResponse<Boolean>> updateClubAdmin(@PathVariable Long clubId,
-        @RequestBody UpdateAdminRequest request) {
+                                                                @RequestBody UpdateAdminRequest request) {
         ApiResponse<Boolean> response = clubService.updateAdmin(request, clubId);
         return ResponseEntity.ok(response);
     }
+
+    //사진 추가
+    @PutMapping("/{clubId}/clubImg")
+    public ResponseEntity<ApiResponse<Boolean>> updateClubPhoto(@PathVariable Long clubId,
+                                                                @RequestBody
+                                                                ClubPhotoRequest request) {
+        ApiResponse<Boolean> response = clubService.updateClubPhoto(clubId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{clubId}/photo")
+    public ApiResponse<String> getClubPhoto(@PathVariable Long clubId) {
+        return clubService.getClubPhoto(clubId);
+    }
+
+    //사진 삭제
+    @DeleteMapping("/{clubId}/clubImg")
+    public ResponseEntity<ApiResponse<Boolean>> deleteClubPhoto(@PathVariable Long clubId) {
+        ApiResponse<Boolean> response = clubService.deleteClubPhoto(clubId);
+        return ResponseEntity.ok(response);
+    }
+
 }
