@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Link, useRouter } from 'expo-router'
 
@@ -15,7 +16,11 @@ import { getAppointments } from '@/apis/appointment'
 import { getClubs } from '@/apis/club'
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg'
 import AppointmentItem from '@/components/AppointmentItem'
+import Colors from '@/constants/Colors'
+import { setClubs } from '@/store/slices/clubSlice'
+import { RootState } from '@/store/store'
 import { AppointmentListInfo } from '@/types/appointment'
+import { Club } from '@/types/club'
 
 import AppointmentList from '../appointment/AppointmentList'
 
@@ -52,9 +57,13 @@ interface AppointmentsInfo {
   voteInfo: VoteInfo[]
 }
 export default function MainScreen() {
+  const dispatch = useDispatch()
+  const { clubs } = useSelector((state: RootState) => state.club)
   const [appoList, setAppoList] = useState<AppointmentListInfo[]>()
   // TODO: 추후 코드가 정돈되면 appoList를 appointmentList로 바꿀 것.
   // TODO: 필요 없는 더미 데이터를 지울 것.
+  const [showClubLoading, setShowClubLoading] = useState(false)
+
   const fetchAppointments = async () => {
     try {
       console.log('페이지 처음 마운트 될 때 실행')
@@ -75,12 +84,16 @@ export default function MainScreen() {
 
   const fetchClubs = async () => {
     try {
-      const result = await getClubs()
+      setShowClubLoading(false)
+      const result: Club[] | null = await getClubs()
       console.log('🔍 클럽 리스트 조회 결과:', result)
+      dispatch(setClubs(result))
+      setShowClubLoading(true);
     } catch (error) {
       console.error('클럽 목록을 가져오는 중 오류 발생:', error)
     }
   }
+
   useEffect(() => {
     fetchAppointments()
     fetchClubs()
@@ -179,7 +192,7 @@ export default function MainScreen() {
     },
   ]
 
-  const handleClubPress = (clubId: string) => {
+  const handleClubPress = (clubId: number) => {
     router.push({
       pathname: '/club/main',
       params: { clubId },

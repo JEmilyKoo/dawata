@@ -6,10 +6,11 @@ import type { RootState } from '../store'
 const initialState = {
   clubs: [
     {
-      clubId: 1,
+      id: 1,
       name: '테스트 클럽',
       img: '',
-      category: '',
+      category: 'FRIEND',
+      teamCode: "H9UKRI",
       appointment: [
         {
           appointmentId: 1,
@@ -27,18 +28,22 @@ const clubSlice = createSlice({
   reducers: {
     setAppointments(state, action) {
       const club = state.clubs.find(
-        (club) => club.clubId === action.payload.clubId,
+        (club) => club.id === action.payload.id,
       )
       if (club) {
         club.appointment = action.payload.appointmentList
       }
     },
+    setClubs(state, action) {
+      state.clubs = action.payload
+    },
   },
 })
 
+
 // selector를 별도로 정의
 export const selectAppointments = (state: RootState, clubId: number) =>
-  state.club.clubs.find((club) => club.clubId === clubId)?.appointment ?? []
+  state.club.clubs.find((club) => club.id === clubId)?.appointment ?? []
 
-export const { setAppointments } = clubSlice.actions
+export const { setAppointments, setClubs} = clubSlice.actions
 export default clubSlice.reducer
