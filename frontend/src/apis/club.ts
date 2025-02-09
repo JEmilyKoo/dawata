@@ -2,6 +2,7 @@ import { Club } from "@/types/club"
 import handleApiError from "@/utils/errorHandler"
 
 import api from "./api"
+import { AxiosResponse } from "axios"
 
 //그룹 생성
 interface CreateClubParams {
@@ -47,7 +48,7 @@ export const getClub = async ({ clubId }: GetClubParams) => {
 export const getClubs = async () => {
   try {
     const response = await api.get<Club[]>("/clubs")
-    return response
+    return response.data
   } catch (error) {
     console.error("⛔ 전체 그룹 데이터 조회 실패:", handleApiError(error))
     return null
