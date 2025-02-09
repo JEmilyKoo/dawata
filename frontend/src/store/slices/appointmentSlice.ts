@@ -18,8 +18,9 @@ const appointmentSlice = createSlice({
   name: 'appointment',
   initialState,
   reducers: {
-    resetCreate(state) {
+    initCreate(state, action) {
       state.create = initialState.create
+      setCreateClubId(action)
     },
     setCreateName(state, action) {
       state.create.name = action.payload
@@ -44,7 +45,7 @@ const appointmentSlice = createSlice({
 })
 
 export const {
-  resetCreate,
+  initCreate,
   setCreateName,
   setCreateCategory,
   setCreateScheduledAt,

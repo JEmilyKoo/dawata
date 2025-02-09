@@ -4,7 +4,12 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 
 const initialState = {
+  create: {
+    name: '',
+    category: 'FRIEND',
+  },
   clubs: [
+
     {
       id: 1,
       name: '테스트 클럽',
@@ -26,9 +31,20 @@ const clubSlice = createSlice({
   name: 'appointment',
   initialState,
   reducers: {
+    resetCreate(state) {
+      state.create = initialState.create
+    },
+    setCreateName(state, action) {
+      state.create.name = action.payload
+    },
+
+    setCreateCategory(state, action) {
+      state.create.category = action.payload
+    },
     setAppointments(state, action) {
       const club = state.clubs.find(
         (club) => club.id === action.payload.id,
+
       )
       if (club) {
         club.appointment = action.payload.appointmentList
@@ -45,5 +61,5 @@ const clubSlice = createSlice({
 export const selectAppointments = (state: RootState, clubId: number) =>
   state.club.clubs.find((club) => club.id === clubId)?.appointment ?? []
 
-export const { setAppointments, setClubs} = clubSlice.actions
+export const { resetCreate, setCreateName, setCreateCategory, setAppointments, setClubs} = clubSlice.actions
 export default clubSlice.reducer
