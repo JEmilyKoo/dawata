@@ -31,13 +31,13 @@ export const createAppointment = async (
   appointmentCreateInfo: AppointmentCreateInfo,
 ): Promise<boolean> => {
   try {
-    const { data } = await api.post<BooleanResponse>(
+    const {status} = await api.post<BooleanResponse>(
       `/appointments`,
       appointmentCreateInfo,
-    )
-    return data.status === 'success'
+    ) as unknown as BooleanResponse
+    return status === 'success'
   } catch (error) {
-    console.error('⛔ 약속 생성 실패:')
+    console.error('⛔ 약속 생성 실패')
     return false
   }
 }
