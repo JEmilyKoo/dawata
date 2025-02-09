@@ -12,6 +12,7 @@ import "global.css"
 
 import i18n from "../../i18n"
 import store from "../store/store"
+import ErrorModal from '@/components/ErrorModal'
 
 // Redux store import
 export {
@@ -59,6 +60,7 @@ function RootLayoutNav() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>
+          <ErrorModal />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen

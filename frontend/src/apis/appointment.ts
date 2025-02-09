@@ -1,5 +1,5 @@
+import { BooleanResponse } from '@/types/api'
 import { AppointmentCreateInfo } from '@/types/appointment'
-import handleApiError from '@/utils/errorHandler'
 
 import api from './api'
 
@@ -21,29 +21,34 @@ export const getAppointments = async ({
     })
     return response.data
   } catch (error) {
-    console.error('⛔ 약속 리스트 조회 실패:', handleApiError(error))
+    console.error('⛔ 약속 리스트 조회 실패:')
     return null
   }
 }
+
 // 약속 생성
 export const createAppointment = async (
   appointmentCreateInfo: AppointmentCreateInfo,
-) => {
+): Promise<boolean> => {
   try {
-    const response = await api.post(`/appointments`, appointmentCreateInfo)
-    return response.data
+    const { data } = await api.post<BooleanResponse>(
+      `/appointments`,
+      appointmentCreateInfo,
+    )
+    return data.status === 'success'
   } catch (error) {
-    console.error('⛔ 약속 리스트 조회 실패:', handleApiError(error))
-    return null
+    console.error('⛔ 약속 생성 실패:')
+    return false
   }
 }
+
 // 약속 상세 조회
 export const getAppointmentDetail = async (appointmentId: number) => {
   try {
     const response = await api.get(`/appointments/${appointmentId}`)
     return response.data
   } catch (error) {
-    console.error('⛔ 약속 상세 조회 실패:', handleApiError(error))
+    console.error('⛔ 약속 상세 조회 실패:')
     return null
   }
 }

@@ -5,6 +5,7 @@ import appointmentReducer from './slices/appointmentSlice'
 import clubReducer from './slices/clubSlice'
 import liveReducer from './slices/liveSlice'
 import memberReducer from './slices/memberSlice'
+import errorModalReducer from './slices/errorModalSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     club: clubReducer,
     member: memberReducer,
     live: liveReducer,
+    errorModal: errorModalReducer,
   },
 })
 

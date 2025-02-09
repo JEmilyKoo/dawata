@@ -1,15 +1,15 @@
 import axios from 'axios'
 
+import { handleDefaultError } from '@/utils/error/handleDefaultError'
+
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_BASE_URL,
   timeout: 5000,
-
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// 요청 인터셉터
 api.interceptors.request.use(
   (config) => {
     console.log('📤 요청 보냄:', config.url)
@@ -22,14 +22,10 @@ api.interceptors.request.use(
 )
 
 api.interceptors.response.use(
-  (response) => {
-    console.log('✅ 응답 성공:', response.data)
-    return response.data
-  },
+  (response) => response.data,
   (error) => {
-    console.error('❌ 응답 실패:', error.response?.data || error.message)
-    return Promise.reject(error)
+    return handleDefaultError(error)
   },
 )
-console.log('api', api)
+
 export default api

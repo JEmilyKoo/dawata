@@ -1,13 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
+
 import { Member } from '../../types/member'
 
 const initialState = {
-  user : {
-    id : 1,
-    email: "test@email.com",
-    name: "구정은",
-    img: "profile1.png",
-    createdAt: "2025-02-07T01:35:58"
+  user: {
+    id: 1,
+    email: 'test@email.com',
+    name: '구정은',
+    img: 'profile1.png',
+    createdAt: '2025-02-07T01:35:58',
   },
   members: [
     {

@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, jest, test } from '@jest/globals'
 
 import { AttendanceStatus } from '@/types/profile'
-import handleApiError from '@/utils/errorHandler'
 
 import api from '../api'
 import { getAttendanceStatus } from '../profile'
@@ -23,7 +22,7 @@ jest.mock('../api', () => ({
 //         { id: 2, title: "약속2" },
 //       ]
 //     } catch (error) {
-//       console.error("⛔ 특정 그룹 데이터 조회 실패:", handleApiError(error))
+//       console.error("⛔ 특정 그룹 데이터 조회 실패:")
 //       return null
 //     }
 //   }

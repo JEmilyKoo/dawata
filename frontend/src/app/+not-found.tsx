@@ -1,22 +1,25 @@
-import { StyleSheet } from "react-native"
-
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Link, Stack } from "expo-router"
-
-import { Text, View } from "@/components/Themed"
+import { useTranslation } from "react-i18next"
 
 export default function NotFoundScreen() {
+  const { t } = useTranslation()
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
-
-        <Link
-          href="/"
-          style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
+      <View className="flex-1 items-center justify-center bg-white">
+       <Text className="text-xl px-10 mb-4 text-text-primary text-center">
+        에러가 발생했습니다. <br/> 다시 시도해주세요.
+      </Text>
+      <Link href="/(tabs)/main">
+        <TouchableOpacity className="bg-primary p-2 rounded">
+          <Text className="text-white text-center text-bold">
+            {t('goToHome')}
+          </Text>
+        </TouchableOpacity>
+      </Link>
       </View>
+
     </>
   )
 }

@@ -10,14 +10,13 @@ import {
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
 import { useActionSheet } from '@expo/react-native-action-sheet'
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
-import ClubAddModal from '@/components/ClubAddModal'
 
 import AppointmentList from './components/ClubAppointmentList'
 import ClubHeader from './components/ClubHeader'
@@ -25,6 +24,9 @@ import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
 import { useClub } from './hooks/useClubInfo'
 
+
+import { useDispatch } from 'react-redux'
+import { initCreate, setCreateCategory, setCreateMemberIds } from '../../store/slices/appointmentSlice'
 LocaleConfig.locales['kr'] = {
   monthNames: [
     '1월',
@@ -67,7 +69,7 @@ LocaleConfig.locales['kr'] = {
 }
 LocaleConfig.defaultLocale = 'kr'
 
-type RouteParams = {
+export type RouteParams = {
   clubId: string
 }
 
@@ -103,7 +105,14 @@ function ClubMain() {
       tag: '#스터디',
     },
   ]
-
+  const router = useRouter()
+  const dispatch = useDispatch()
+  const onPressCreateAppointment = () => {
+    dispatch(initCreate(params.clubId))
+    dispatch(setCreateCategory(clubInfo?.category))
+    dispatch(setCreateMemberIds(clubInfo?.members.map((member) => member.id)))
+    router.push('/appointment/create1')
+  }
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 헤더 */}
@@ -114,7 +123,6 @@ function ClubMain() {
       />
       <ScrollView>
         <ClubMemberList clubId={Number(params.clubId)} />
-
         <View className="p-4">
           <Text className="text-lg font-bold mb-4">No.1 캘린더</Text>
           <Calendar
@@ -150,7 +158,15 @@ function ClubMain() {
       </ScrollView>
 
       <View className="absolute right-4 bottom-8">
-        <ClubAddModal />
+        <TouchableOpacity
+          onPress={onPressCreateAppointment}
+          className="absolute right-4 bottom-8 w-14 h-14 rounded-full bg-primary items-center justify-center shadow-lg">
+          <PlusIcon
+            height={30}
+            width={30}
+            color="#fff"
+          />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   )
