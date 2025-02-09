@@ -1,23 +1,27 @@
-import { Stack } from "expo-router"
+import { Stack, usePathname } from 'expo-router'
 
-import TabBar from "@/components/TabBar"
+import TabBar from '@/components/TabBar'
 
 export default function ClubLayout() {
+  const pathname = usePathname()
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
-          name="create"
+          name="create1"
           options={{
+            title: '그룹 생성',
             headerShown: true,
-            title: "그룹 생성",
-            headerShadowVisible: false,
-            presentation: "modal", // 모달로 표시하면 탭이 자동으로 숨겨짐
           }}
         />
-        <Stack.Screen name="main" />
+        <Stack.Screen
+          name="main"
+        />
+        <Stack.Screen
+          name="list"
+        />
       </Stack>
-      <TabBar />
+      {pathname.indexOf('create') == -1 && <TabBar />}
     </>
   )
 }
