@@ -14,12 +14,14 @@ interface ImageThumbnailProps {
   defaultImg: any
   width: number
   height: number
+  className : string
 }
 const ImageThumbnail = ({
   img,
   defaultImg,
   width,
   height,
+  className
 }: ImageThumbnailProps) => {
   const [imageError, setImageError] = useState(false)
   const isLoading = useRef(false)
@@ -30,7 +32,7 @@ const ImageThumbnail = ({
       <View className="relative">
         <Image
           source={imageError ? defaultImg : { uri: img }} // ✅ 직접 적용
-          className="rounded-xl"
+          className={className}
             style={{ width: width || 80, height: height || 80 }}
           resizeMode="stretch" 
           defaultSource={defaultImg}

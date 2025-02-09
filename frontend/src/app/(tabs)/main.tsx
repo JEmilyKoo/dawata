@@ -244,20 +244,24 @@ export default function MainScreen() {
             className="space-x-4">
             {showClubLoading &&
               clubs.map((club) => (
-                <View key={club.id} className="relative">
-                  <TouchableOpacity
-                    className="items-center p-2 w-[100px]"
-                    onPress={() => handleClubPress(club.id)}>
-                    <ImageThumbnail
-                      img={'https://picsum.photos/80'}
-                      defaultImg={require('@/assets/clubs/club1.png')}
-                      width={80}
-                      height={80}
-                    />
-                    <Text className="text-base font-medium  text-center truncate w-full">{club.name}</Text>
-                    <Text className="text-sm text-text-secondary text-center w-full">{t(`category.${club.category}`)}</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  key={club.id}
+                  className=" relativeitems-center p-2 w-[100px]"
+                  onPress={() => handleClubPress(club.id)}>
+                  <ImageThumbnail
+                    img={'https://picsum.photos/80'}
+                    defaultImg={require('@/assets/clubs/club1.png')}
+                    width={80}
+                    height={80}
+                    className="rounded-xl"
+                  />
+                  <Text className="text-base font-medium text-center line-clamp-2 w-full">
+                    {club.name}
+                  </Text>
+                  <Text className="text-sm text-text-secondary text-center w-full">
+                    {t(`category.${club.category}`)}
+                  </Text>
+                </TouchableOpacity>
               ))}
           </ScrollView>
         </View>
