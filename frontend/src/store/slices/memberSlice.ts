@@ -1,19 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
-
 import { Member } from '../../types/member'
 
-// 기존의 Member 인터페이스를 사용하여 초기 상태 설정
-
-// const initialState: Member = {
-//   createdAt: '',
-//   updatedAt: '',
-//   id: 0,
-//   email: '',
-//   name: '',
-//   withdrawn: false,
-// }
-
 const initialState = {
+  user : {
+    id : 1,
+    email: "test@email.com",
+    name: "구정은",
+    img: "profile1.png",
+    createdAt: "2025-02-07T01:35:58"
+  },
   members: [
     {
       createdAt: '',
@@ -54,6 +49,12 @@ const memberSlice = createSlice({
         }
       } else {
         state.members.push(action.payload)
+      }
+    },
+    setUser(state, action) {
+      state.user = {
+        ...state.user,
+        ...action.payload,
       }
     },
   },
