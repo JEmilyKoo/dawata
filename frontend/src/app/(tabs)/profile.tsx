@@ -5,6 +5,10 @@ import { Calendar, LocaleConfig } from 'react-native-calendars'
 
 import ProfileHeader from '@/components/ProfileHeader'
 import ProfileStats from '@/components/ProfileStats'
+import {
+  AttendanceStatusData,
+  profileCalendarData,
+} from '@/constants/profileData'
 
 import { useAttendanceStatus } from '../profile/hooks/useAttendanceStatus'
 
@@ -51,7 +55,7 @@ LocaleConfig.locales['kr'] = {
 
 LocaleConfig.defaultLocale = 'kr'
 export default function Profile() {
-  const { attendanceStatus, loading } = useAttendanceStatus()
+  // const { attendanceStatus, loading } = useAttendanceStatus()
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
@@ -92,7 +96,7 @@ export default function Profile() {
           current={'2025-01-21'}
         />
       </View>
-      <ProfileStats attendanceStatus={attendanceStatus} />
+      <ProfileStats attendanceStatus={AttendanceStatusData} />
     </ScrollView>
   )
 }

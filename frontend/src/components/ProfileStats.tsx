@@ -8,11 +8,28 @@ interface ProfileStatsProps {
 }
 
 const ProfileStats = ({ attendanceStatus }: ProfileStatsProps) => {
+  console.log(attendanceStatus)
+  const totalCount = attendanceStatus.reduce(
+    (acc, curr) => acc + curr.totalCount,
+    0,
+  )
+  const appointmentTotalCount = attendanceStatus.reduce(
+    (acc, curr) => acc + curr.appointmentTotalCount,
+    0,
+  )
+  const lateTotalCount = attendanceStatus.reduce(
+    (acc, curr) => acc + curr.lateTotalCount,
+    0,
+  )
+  const onTimeAttendanceTotalCount = attendanceStatus.reduce(
+    (acc, curr) => acc + curr.onTimeAttendanceTotalCount,
+    0,
+  )
   const data = [
     {
       name: '정시 도착',
 
-      population: 15,
+      population: appointmentTotalCount,
       color: '#4CAF50',
       legendFontColor: '#7F7F7F',
 
@@ -20,14 +37,14 @@ const ProfileStats = ({ attendanceStatus }: ProfileStatsProps) => {
     },
     {
       name: '지각',
-      population: 3,
+      population: lateTotalCount,
       color: '#FF9800',
       legendFontColor: '#7F7F7F',
       legendFontSize: 15,
     },
     {
       name: '노쇼',
-      population: 2,
+      population: onTimeAttendanceTotalCount,
       color: '#FF5722',
       legendFontColor: '#7F7F7F',
       legendFontSize: 15,
@@ -36,7 +53,9 @@ const ProfileStats = ({ attendanceStatus }: ProfileStatsProps) => {
 
   return (
     <View className="items-center mb-4">
-      <Text className="text-xl mb-2">총 20번의 약속 중 15번 정시 도착</Text>
+      <Text className="text-xl mb-2">
+        총 {totalCount}번의 약속 중 {appointmentTotalCount}번 정시 도착
+      </Text>
       <PieChart
         data={data}
         width={Dimensions.get('window').width - 40}
