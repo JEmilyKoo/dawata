@@ -1,24 +1,15 @@
-import { Club } from "@/types/club"
-import handleApiError from "@/utils/errorHandler"
+import { Club } from '@/types/club'
+import type { ClubCreateInfo } from '@/types/club'
 
-import api from "./api"
-import { AxiosResponse } from "axios"
+import api from './api'
 
 //그룹 생성
-interface CreateClubParams {
-  name: string
-  category: string
-}
 
-export const createClub = async ({ name, category }: CreateClubParams) => {
+export const createClub = async (params: ClubCreateInfo) => {
   try {
-    const response = await api.post(`/clubs`, {
-      name,
-      category,
-    })
+    const response = await api.post('/clubs', params)
     return response.data
   } catch (error) {
-    console.error("⛔ 그룹 생성 실패:", handleApiError(error))
     return null
   }
 }
@@ -33,13 +24,13 @@ interface GetClubParams {
 export const getClub = async ({ clubId }: GetClubParams) => {
   try {
     const response = await api.get(`/clubs/${clubId}`)
-    console.log("결과가 나옴에 의의를 둠" + response)
+    console.log('결과가 나옴에 의의를 둠' + response)
     return [
-      { id: 1, title: "약속1" },
-      { id: 2, title: "약속2" },
+      { id: 1, title: '약속1' },
+      { id: 2, title: '약속2' },
     ]
   } catch (error) {
-    console.error("⛔ 특정 그룹 데이터 조회 실패:", handleApiError(error))
+    console.error('⛔ 특정 그룹 데이터 조회 실패:')
     return null
   }
 }
@@ -47,10 +38,10 @@ export const getClub = async ({ clubId }: GetClubParams) => {
 // 전체 그룹 데이터 조회
 export const getClubs = async () => {
   try {
-    const response = await api.get<Club[]>("/clubs")
+    const response = await api.get<Club[]>('/clubs')
     return response.data
   } catch (error) {
-    console.error("⛔ 전체 그룹 데이터 조회 실패:", handleApiError(error))
+    console.error('⛔ 전체 그룹 데이터 조회 실패:')
     return null
   }
 }
@@ -71,13 +62,13 @@ export const updateClub = async ({
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange },
     })
-    console.log("결과가 나옴에 의의를 둠" + response)
+    console.log('결과가 나옴에 의의를 둠' + response)
     return [
-      { id: 1, title: "약속1" },
-      { id: 2, title: "약속2" },
+      { id: 1, title: '약속1' },
+      { id: 2, title: '약속2' },
     ]
   } catch (error) {
-    console.error("⛔ 그룹 데이터 수정실패:", handleApiError(error))
+    console.error('⛔ 그룹 데이터 수정실패:')
     return null
   }
 }
@@ -98,13 +89,13 @@ export const deleteClub = async ({
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange },
     })
-    console.log("결과가 나옴에 의의를 둠" + response)
+    console.log('결과가 나옴에 의의를 둠' + response)
     return [
-      { id: 1, title: "약속1" },
-      { id: 2, title: "약속2" },
+      { id: 1, title: '약속1' },
+      { id: 2, title: '약속2' },
     ]
   } catch (error) {
-    console.error("⛔ 그룹 삭제 실패:", handleApiError(error))
+    console.error('⛔ 그룹 삭제 실패:')
     return null
   }
 }
@@ -115,10 +106,10 @@ interface ClubIdParams {
 
 export const getClubCode = async ({ clubId }: ClubIdParams) => {
   try {
-    const response = await api.get(`/clubs/${clubId}/code`);
-    return response;
+    const response = await api.get(`/clubs/${clubId}/code`)
+    return response
   } catch (error) {
-    console.error("⛔ 그룹 코드 조회 실패:", handleApiError(error))
+    console.error('⛔ 그룹 코드 조회 실패:')
     return null
   }
 }
@@ -127,9 +118,9 @@ export const getClubCode = async ({ clubId }: ClubIdParams) => {
 export const getClubMembers = async ({ clubId }: ClubIdParams) => {
   try {
     const response = await api.get(`/clubs/${clubId}/members`)
-    return response;
+    return response
   } catch (error) {
-    console.error("⛔ 클럽 멤버 전체 조회 실패:", handleApiError(error))
+    console.error('⛔ 클럽 멤버 전체 조회 실패:')
     return null
   }
 }
@@ -149,13 +140,13 @@ export const addMemberByCode = async ({
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange },
     })
-    console.log("결과가 나옴에 의의를 둠" + response)
+    console.log('결과가 나옴에 의의를 둠' + response)
     return [
-      { id: 1, title: "약속1" },
-      { id: 2, title: "약속2" },
+      { id: 1, title: '약속1' },
+      { id: 2, title: '약속2' },
     ]
   } catch (error) {
-    console.error("⛔ 클럽 멤버 코드로 추가 실패:", handleApiError(error))
+    console.error('⛔ 클럽 멤버 코드로 추가 실패:')
     return null
   }
 }
@@ -176,13 +167,13 @@ export const addMemberByEmail = async ({
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange },
     })
-    console.log("결과가 나옴에 의의를 둠" + response)
+    console.log('결과가 나옴에 의의를 둠' + response)
     return [
-      { id: 1, title: "약속1" },
-      { id: 2, title: "약속2" },
+      { id: 1, title: '약속1' },
+      { id: 2, title: '약속2' },
     ]
   } catch (error) {
-    console.error("⛔ 클럽 멤버 이메일로 추가 실패:", handleApiError(error))
+    console.error('⛔ 클럽 멤버 이메일로 추가 실패:')
     return null
   }
 }
@@ -201,7 +192,7 @@ export const getClubMember = async ({
     const response = await api.get(`/clubs/${clubId}/members/${clubMemberId}`)
     return response
   } catch (error) {
-    console.error("⛔ 그룹 내 특정 멤버 조회 실패:", handleApiError(error))
+    console.error('⛔ 그룹 내 특정 멤버 조회 실패:')
     return false
   }
 }
@@ -227,7 +218,7 @@ export const updateClubMember = async ({
     )
     return response
   } catch (error) {
-    console.error("⛔ 멤버 정보 수정 실패:", handleApiError(error))
+    console.error('⛔ 멤버 정보 수정 실패:')
     return false
   }
 }
@@ -248,7 +239,7 @@ export const deleteClubMember = async ({
     )
     return response
   } catch (error) {
-    console.error("⛔ 그룹 회원 탈퇴 실패:", handleApiError(error))
+    console.error('⛔ 그룹 회원 탈퇴 실패:')
     return false
   }
 }
@@ -271,7 +262,7 @@ export const banMember = async ({
     })
     return response
   } catch (error) {
-    console.error("⛔ 특정 회원 강퇴 실패:", handleApiError(error))
+    console.error('⛔ 특정 회원 강퇴 실패:')
     return false
   }
 }

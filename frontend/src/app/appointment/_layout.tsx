@@ -33,7 +33,7 @@ export default function AppointmentLayout() {
         />
         <Stack.Screen name="detail" />
       </Stack>
-      {pathname.indexOf("create") == 0 && <TabBar />}
+      {pathname.indexOf("create") == -1 && <TabBar />}
     </>
   )
 }

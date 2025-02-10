@@ -1,0 +1,1 @@
+export default ['NOT_PARTICIPANT', 'EXPIRED', 'SELECTED', 'NOT_SELECTED']

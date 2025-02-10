@@ -17,7 +17,6 @@ import { useLocalSearchParams } from 'expo-router'
 import { router } from 'expo-router'
 
 import { useDispatch } from 'react-redux'
-import { resetCreate } from '../../store/slices/appointmentSlice'
 import AppointmentCalendar from '@/app/appointment/AppointmentCalendar'
 import AppointmentList from '@/app/appointment/AppointmentList'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
@@ -27,7 +26,6 @@ import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import AppointmentItem from '@/components/AppointmentItem'
 import BackButton from '@/components/BackButton'
-import ClubAddModal from '@/components/ClubAddModal'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -223,10 +221,6 @@ function Appointment() {
   }
 
   const dispatch = useDispatch()
-  const onPressCreateAppointment = () => {
-    dispatch(resetCreate())
-    router.push('/appointment/create1')
-  }
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 헤더 */}
@@ -258,19 +252,6 @@ function Appointment() {
         ))} */}
         <AppointmentList />
       </ScrollView>
-
-      {/* 플로팅 버튼 */}
-      <View className="absolute right-4 bottom-8">
-        <TouchableOpacity
-          onPress={onPressCreateAppointment}
-          className="absolute right-4 bottom-8 w-14 h-14 rounded-full bg-primary items-center justify-center shadow-lg">
-          <PlusIcon
-            height={30}
-            width={30}
-            color="#fff"
-          />
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   )
 }

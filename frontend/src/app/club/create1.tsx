@@ -1,29 +1,34 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 
 import { Picker } from '@react-native-picker/picker'
 import { useRouter } from 'expo-router'
 
 import Category from '@/constants/Category'
 import { RootState } from '@/store/store'
-import { AppointmentCreateInfo } from '@/types/appointment'
+import { ClubCreateInfo } from '@/types/club'
 
 import {
   setCreateCategory,
   setCreateName,
-} from '../../store/slices/appointmentSlice'
+} from '../../store/slices/clubSlice'
+import { createClub } from '@/apis/club'
+import SlideModalUI from '@/components/SlideModalUI'
+import { NavigationOptions } from 'expo-router/build/global-state/routing'
 
-const AppointmentCreate1 = () => {
+const ClubCreate1 = () => {
   const { t } = useTranslation()
-  const { create } = useSelector((state: RootState) => state.appointment)
-
+  const { create } = useSelector((state: RootState) => state.club)
+  const [isVisible, setIsVisible] = useState(false)
+  const [clubId, setClubId] = useState(0);
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<AppointmentCreateInfo>({
+  } = useForm<ClubCreateInfo>({
     defaultValues: {
       name: create.name,
       category: create.category,
@@ -32,27 +37,48 @@ const AppointmentCreate1 = () => {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const onSubmit = (data: AppointmentCreateInfo) => {
+  const onSubmit = async (data: ClubCreateInfo) => {
     dispatch(setCreateName(data.name))
     dispatch(setCreateCategory(data.category))
-    router.push('/appointment/create2')
+    const result = await createClub(data)
+
+    if (result) {
+      setClubId(result.id)
+      setIsVisible(true)
+    }
+  }
+
+  const onPressMove = () => {
+    router.push({
+      pathname: '/club/main',
+      params: { clubId },
+    })
+    setIsVisible(false)
+  }
+
+  const onPressGoToHome = () => {
+    router.push('/(tabs)/main')
+    setIsVisible(false)
   }
 
   return (
-    <View className="flex-1 p-4">
+    <SafeAreaView className="flex-1 p-4 bg-white">
+      <View className="flex-1 justify-between">
+        <View>
       <Text className="text-xl font-bold mb-2 text-text-primary">
-        {t('createAppointment.name.title')}
+
+        {t('createClub.name.title')}
       </Text>
       <Text className="text-xs font-bold mb-2 text-text-secondary">
-        {t('createAppointment.name.subTitle')}
+        {t('createClub.name.subTitle')}
       </Text>
       <Controller
         control={control}
         name="name"
-        rules={{ required: t('createAppointment.name.error') }}
+        rules={{ required: t('createClub.name.error') }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
-            placeholder={t('createAppointment.name.title')}
+            placeholder={t('createClub.name.title')}
             onBlur={onBlur}
             className="border-b-2 mb-4 border-primary"
             onChangeText={onChange}
@@ -64,8 +90,8 @@ const AppointmentCreate1 = () => {
         <Text className="text-light-red">{errors.name.message}</Text>
       )}
 
-      <Text className="text-xl font-bold mb-2 text-text-primary">
-        {t('createAppointment.category.title')}
+      <Text className="text-xl font-bold mb-2">
+        {t('createClub.category.title')}
       </Text>
       <Controller
         control={control}
@@ -86,13 +112,26 @@ const AppointmentCreate1 = () => {
           </Picker>
         )}
       />
+      </View>
       <TouchableOpacity
         className="bg-primary p-2 rounded"
         onPress={handleSubmit(onSubmit)}>
-        <Text className="text-white text-center font-bold">{t('next')}</Text>
+        <Text className="text-white text-center font-bold">{t('finish')}</Text>
       </TouchableOpacity>
-    </View>
+      </View>
+      <SlideModalUI
+        isVisible={isVisible}
+        setVisible={setIsVisible}
+        modalTitle="그룹을 생성했습니다."
+        modalContent={`${create.name} 그룹으로 이동하시겠습니까?`}
+        primaryButtonText="이동"
+        primaryButtonOnPress={onPressMove}
+        secondaryButtonText={t('goToHome')}
+        secondaryButtonOnPress={onPressGoToHome}
+      />
+    </SafeAreaView>
+
   )
 }
 
-export default AppointmentCreate1
+export default ClubCreate1

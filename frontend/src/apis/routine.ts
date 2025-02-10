@@ -1,5 +1,3 @@
-import handleApiError from "@/utils/errorHandler"
-
 import api from "./api"
 
 // 루틴 리스트 조회
@@ -10,7 +8,7 @@ export const getRoutines = async () => {
     console.log("response", response)
     return response
   } catch (error) {
-    console.error("⛔ 루틴 리스트 조회 실패:", handleApiError(error))
+    console.error("⛔ 루틴 리스트 조회 실패:")
     return null
   }
 }

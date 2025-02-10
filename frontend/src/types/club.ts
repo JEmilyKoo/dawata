@@ -31,3 +31,8 @@ export interface ClubCalendarProps {
   markedDates: { [key: string]: { marked: boolean; dotColor: string } }
   currentDate: string
 }
+
+export interface ClubCreateInfo {
+  name: string
+  category: string
+}

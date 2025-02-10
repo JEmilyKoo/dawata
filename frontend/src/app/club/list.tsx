@@ -16,7 +16,7 @@ import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
-import ClubAddModal from '@/components/ClubAddModal'
+import ClubAddModal from '@/app/club/components/ClubAddModal'
 import ClubItem from '@/components/ClubItem'
 
 LocaleConfig.locales['kr'] = {
