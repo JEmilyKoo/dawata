@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
+import { useDispatch } from 'react-redux'
 
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -18,15 +19,18 @@ import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
 
+import {
+  initCreate,
+  setCreateCategory,
+  setCreateMemberIds,
+} from '../../store/slices/appointmentSlice'
 import AppointmentList from './components/ClubAppointmentList'
 import ClubHeader from './components/ClubHeader'
 import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
 import { useClub } from './hooks/useClubInfo'
+import { useClubMember } from './hooks/useClubMember'
 
-
-import { useDispatch } from 'react-redux'
-import { initCreate, setCreateCategory, setCreateMemberIds } from '../../store/slices/appointmentSlice'
 LocaleConfig.locales['kr'] = {
   monthNames: [
     '1월',
@@ -81,9 +85,16 @@ function ClubMain() {
   const { clubInfo, loading: clubInfoLoading } = useClub({
     clubId: Number(params.clubId),
   })
+  const { isMember, isAdmin } = useClubMember({
+    clubId: Number(params.clubId),
+  })
+  console.log('⛔[clubInfo]', clubInfo)
+  console.log('⛔[isMember]', isMember)
+  console.log('⛔[isAdmin]', isAdmin)
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
+
     '2025-01-22': { marked: true, dotColor: '#ff8339' },
     '2025-01-23': { marked: true, dotColor: '#ff8339' },
     '2025-01-24': { marked: true, dotColor: '#ff8339' },
