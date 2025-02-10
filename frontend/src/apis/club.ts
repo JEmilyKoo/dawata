@@ -256,7 +256,6 @@ export const searchMemberByEmail = async (email: string) => {
     const response = await api.post(`/clubs/search/email`, {
       email: 'test@email.com',
     })
-    console.log('⛔⛔[response]', response)
     return response
   } catch (error) {
     console.error('⛔ 이메일로 멤버 검색 실패:')
