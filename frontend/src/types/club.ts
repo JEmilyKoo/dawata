@@ -1,10 +1,11 @@
 export interface ClubMember {
-  id: number
+  clubMemberId: number
   memberId: number
   clubId: number
   nickname: string
   clubName: string
   createdBy: number
+  email: string
 }
 
 export interface Club {
