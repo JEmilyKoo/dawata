@@ -22,6 +22,7 @@ export interface ParticipantInfo {
 }
 
 export interface VoteInfo {
+  voteItemId: number
   title: string
   category: string
   detail: string
