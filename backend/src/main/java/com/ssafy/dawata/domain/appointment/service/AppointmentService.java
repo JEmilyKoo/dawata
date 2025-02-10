@@ -159,8 +159,14 @@ public class AppointmentService {
 	public void deleteAppointment(Long memberId, Long appointmentId) {
 		validateParticipant(memberId, appointmentId);
 
-		Appointment appointment = appointmentRepository.findById(appointmentId)
+		Appointment appointment = appointmentRepository.findAppointmentByIdWithParticipant(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
+
+		List<VoteItem> voteItems = appointmentRepository.findAppointmentByIdWithVoteItems(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."))
+			.getVoteItems();
+
+		voteItemRepository.deleteAll(voteItems);
 		appointmentRepository.delete(appointment);
 	}
 

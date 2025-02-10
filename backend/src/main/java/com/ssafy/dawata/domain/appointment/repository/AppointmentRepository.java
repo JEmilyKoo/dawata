@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.appointment.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,21 +18,31 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 
 	@Query(
 		"""
-			SELECT new com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse (
-				a.name,
-				cm.club.name,
-				a.scheduledAt,
-				a.voteEndTime
-			)
-			FROM Member m
-			JOIN ClubMember cm ON m.id = cm.member.id
-			JOIN Participant p ON cm.id = p.clubMember.id
-			JOIN Appointment a ON p.appointment.id = a.id
-			WHERE m.id = :memberId
-				AND FUNCTION('YEAR', a.scheduledAt) = :year
-				AND FUNCTION('MONTH', a.scheduledAt) = :month
-		"""
+				SELECT new com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse (
+					a.name,
+					cm.club.name,
+					a.scheduledAt,
+					a.voteEndTime
+				)
+				FROM Member m
+				JOIN ClubMember cm ON m.id = cm.member.id
+				JOIN Participant p ON cm.id = p.clubMember.id
+				JOIN Appointment a ON p.appointment.id = a.id
+				WHERE m.id = :memberId
+					AND FUNCTION('YEAR', a.scheduledAt) = :year
+					AND FUNCTION('MONTH', a.scheduledAt) = :month
+			"""
 	)
 	List<AppointmentInMonthResponse> findByScheduledAtInDate(
 		@Param("memberId") Long memberId, @Param("year") String year, @Param("month") String month);
+
+	@Query("SELECT DISTINCT a FROM Appointment a " +
+		"JOIN FETCH a.participants p " +
+		"WHERE a.id = :appointmentId")
+	Optional<Appointment> findAppointmentByIdWithParticipant(Long appointmentId);
+
+	@Query("SELECT a FROM Appointment a " +
+		"JOIN FETCH a.voteItems p " +
+		"WHERE a.id = :appointmentId")
+	Optional<Appointment> findAppointmentByIdWithVoteItems(Long appointmentId);
 }

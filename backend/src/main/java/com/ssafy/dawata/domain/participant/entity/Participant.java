@@ -1,11 +1,16 @@
 package com.ssafy.dawata.domain.participant.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.common.enums.Role;
 import com.ssafy.dawata.domain.participant.enums.DailyStatus;
 import com.ssafy.dawata.domain.participant.enums.DailyStatusConverter;
+import com.ssafy.dawata.domain.vote.entity.Voter;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -17,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +52,9 @@ public class Participant {
 		nullable = false
 	)
 	private ClubMember clubMember;
+
+	@OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Voter> voters = new ArrayList<>();
 
 	@Column
 	private Boolean isAttending = false;
