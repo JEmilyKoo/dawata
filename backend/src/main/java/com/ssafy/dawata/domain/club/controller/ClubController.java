@@ -6,12 +6,9 @@ import com.ssafy.dawata.domain.club.dto.response.ClubInfoResponse;
 import com.ssafy.dawata.domain.club.dto.response.ClubMemberInfoResponse;
 import com.ssafy.dawata.domain.club.service.ClubService;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
-import com.ssafy.dawata.domain.member.dto.response.ClubJoinSearchResponse;
-import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.service.MemberService;
-
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,15 +19,9 @@ import java.util.List;
 @RequestMapping("/clubs")
 @RequiredArgsConstructor
 public class ClubController {
-	private final MemberService memberService;
-	private final ClubService clubService;
+    private final MemberService memberService;
+    private final ClubService clubService;
 
-	// 클럽 생성
-	@PostMapping
-	public ResponseEntity<ApiResponse<ClubInfoResponse>> createClub(
-		@RequestBody CreateClubRequest request) {
-		return ResponseEntity.ok(clubService.createClub(request));
-	}
 
     // 클럽 생성
     @Operation(summary = "클럽 생성",
