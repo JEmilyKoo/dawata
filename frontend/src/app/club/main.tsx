@@ -29,7 +29,6 @@ import ClubHeader from './components/ClubHeader'
 import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
 import { useClub } from './hooks/useClubInfo'
-import { useClubMember } from './hooks/useClubMember'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -85,12 +84,6 @@ function ClubMain() {
   const { clubInfo, loading: clubInfoLoading } = useClub({
     clubId: Number(params.clubId),
   })
-  const { isMember, isAdmin } = useClubMember({
-    clubId: Number(params.clubId),
-  })
-  console.log('⛔[clubInfo]', clubInfo)
-  console.log('⛔[isMember]', isMember)
-  console.log('⛔[isAdmin]', isAdmin)
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
