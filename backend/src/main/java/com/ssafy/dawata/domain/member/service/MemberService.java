@@ -1,10 +1,5 @@
 package com.ssafy.dawata.domain.member.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.club.dto.request.ClubJoinSearchRequest;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
@@ -15,68 +10,63 @@ import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberService {
-	private final MemberRepository memberRepository;
-	private final AppointmentRepository appointmentRepository;
-	private final ParticipantRepository participantRepository;
+    private final MemberRepository memberRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final ParticipantRepository participantRepository;
 
-	public Member findMyMemberInfo() {
-		// TODO : SecurityContextHolder 구현되면 삭제 예정
-		// TODO: Test를 위한 코드 추후에 SecurityContextHolder 에서 정보 가져오기
-		Long id = 1L;
-		return memberRepository
-			.findById(id)
-			.orElseThrow(IllegalArgumentException::new);
-	}
+    public Member findMyMemberInfo(Member member) {
+        // TODO : SecurityContextHolder 구현되면 삭제 예정
+        // TODO: Test를 위한 코드 추후에 SecurityContextHolder 에서 정보 가져오기
 
-	public MemberInfoResponse findMemberInfo() {
-		// TODO : 내 정보 처리 로직 (SecurityContextHolder 구현 후 위 findMemberInfo 메소드에 적용 예정)
-		return memberRepository
-			.customFindById(1L)
-			.orElseThrow(IllegalArgumentException::new);
-	}
+        return memberRepository
+                .findById(member.getId())
+                .orElseThrow(IllegalArgumentException::new);
+    }
 
-	public ClubJoinSearchResponse findUserEmail(ClubJoinSearchRequest clubJoinSearchRequest) {
-		return memberRepository.customFindByEmail(clubJoinSearchRequest.email())
-			.orElseThrow(() -> new IllegalArgumentException("이메일 없음둥"));
-	}
+    public MemberInfoResponse findMemberInfo(Member member) {
+        // TODO : 내 정보 처리 로직 (SecurityContextHolder 구현 후 위 findMemberInfo 메소드에 적용 예정)
+        return memberRepository
+                .customFindById(member.getId())
+                .orElseThrow(IllegalArgumentException::new);
+    }
 
-	@Transactional
-	public void updateMyInfo(MemberInfoUpdateRequest memberInfoUpdateRequest) {
-		Long id = 1L;
+    @Transactional
+    public void updateMyInfo(MemberInfoUpdateRequest memberInfoUpdateRequest, Member member) {
 
-		Member member = memberRepository
-			.findById(id)
-			.orElseThrow(IllegalArgumentException::new);
+        memberRepository
+                .findById(member.getId())
+                .orElseThrow(IllegalArgumentException::new);
 
-		//더티 체킹 사용
-		member.updateName(memberInfoUpdateRequest.name());
-	}
+        //더티 체킹 사용
+        member.updateName(memberInfoUpdateRequest.name());
+    }
 
-	@Transactional
-	public void withdraw() {
-		Long id = 1L;
+    @Transactional
+    public void withdraw(Member member) {
+        memberRepository
+                .findById(member.getId())
+                .orElseThrow(IllegalArgumentException::new);
 
-		Member member = memberRepository
-			.findById(id)
-			.orElseThrow(IllegalArgumentException::new);
+        //더티 체킹 사용
+        member.updateIsWithdrawn(true);
+    }
 
-		//더티 체킹 사용
-		member.updateIsWithdrawn(true);
-	}
+    public List<AppointmentInfoResponse> findAllMyAppointmentCondition(Member member) {
+        return participantRepository.countByMemberId(member.getId());
+    }
 
-	public List<AppointmentInfoResponse> findAllMyAppointmentCondition() {
-		return participantRepository.countByMemberId(1L);
-	}
-
-	public List<AppointmentInMonthResponse> findMyAppointmentInfoInMonth(String date) {
-		String[] arr = date.split("-");
-		return appointmentRepository.findByScheduledAtInDate(1L, arr[0], arr[1]);
-	}
+    public List<AppointmentInMonthResponse> findMyAppointmentInfoInMonth(String date, Member member) {
+        String[] arr = date.split("-");
+        return appointmentRepository.findByScheduledAtInDate(member.getId(), arr[0], arr[1]);
+    }
 }
