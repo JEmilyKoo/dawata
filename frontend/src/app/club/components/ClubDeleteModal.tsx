@@ -1,8 +1,13 @@
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
+import { useDispatch } from 'react-redux'
 
 import { useRouter } from 'expo-router'
 
+import { deleteClub } from '@/apis/club'
+import { useClubMember } from '@/app/club/hooks/useClubMember'
 import SlideModalUI from '@/components/SlideModalUI'
+import { setErrorModal } from '@/store/slices/errorModalSlice'
 
 const ClubDeleteModal = ({
   isVisible,
@@ -15,13 +20,31 @@ const ClubDeleteModal = ({
   clubName: string
   clubId: number
 }) => {
+  const { t } = useTranslation()
   const router = useRouter()
-  const onPressCancel = () => {
-
+  const { isAdmin } = useClubMember({ clubId })
+  const dispatch = useDispatch()
+  const onPressDelete = async () => {
+    if (isAdmin) {
+      const result = await deleteClub({ clubId })
+      if (result) {
+        router.navigate('/(tabs)/main')
+      }
+    } else {
+      dispatch(
+        setErrorModal({
+          modalTitle: `error.${403}.title`,
+          modalContent: `error.${403}.content`,
+          primaryButtonType: 'confirm',
+          secondaryButtonType: 'goToHome',
+          isVisible: true,
+        }),
+      )
+    }
     setVisible(false)
   }
-  const onPressDelete = () => {
-    router.navigate('/club/create1')
+
+  const onPressCancel = () => {
     setVisible(false)
   }
   return (
@@ -29,15 +52,14 @@ const ClubDeleteModal = ({
       <SlideModalUI
         isVisible={isVisible}
         setVisible={setVisible}
-        modalTitle="그룹 해산"
-        modalContent="그룹을 해산하시겠습니까?"
-        primaryButtonText="그룹 해산"
+        modalTitle={t('club.deleteClub')}
+        modalContent={t('deleteClub.title', { val: clubName })}
+        primaryButtonText={t('club.deleteClub')}
         primaryButtonOnPress={onPressDelete}
-        secondaryButtonText="취소"
+        secondaryButtonText={t('cancel')}
         secondaryButtonOnPress={onPressCancel}
       />
     </View>
   )
 }
-
 export default ClubDeleteModal
