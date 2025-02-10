@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
-import { AppointmentDetailInfo } from '@/types/appointment'
+import DropDown from '@/components/DropDown'
+import VoteItem from '@/components/VoteItem'
 import { AppointmentDetailInfo, VoteInfo } from '@/types/appointment'
 
 export default function AppointmentNotSelectedDetail({
@@ -28,7 +29,23 @@ export default function AppointmentNotSelectedDetail({
 
   return (
     <View>
-      <Text>AppointmentNotSelectedDetail</Text>
+      <DropDown title="장소 투표">
+        <View>
+          {selectedVotes.map((vote) => (
+            <VoteItem
+              key={vote.voteItemId}
+              voteInfo={vote}
+              onSelect={handleSelect}
+            />
+          ))}
+
+          <TouchableOpacity
+            className="mt-4 px-4 py-4 bg-primary rounded-full"
+            onPress={handleVoteSubmit}>
+            <Text className="text-white text-center font-bold">투표하기</Text>
+          </TouchableOpacity>
+        </View>
+      </DropDown>
     </View>
   )
 }

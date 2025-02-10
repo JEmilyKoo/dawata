@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   SafeAreaView,
   ScrollView,
@@ -27,6 +28,7 @@ import AppointmentExpiredDetail from '@/components/AppointmentExpiredDetail'
 import AppointmentNotSelectedDetail from '@/components/AppointmentNotSelectedDetail'
 import AppointmentSelectedDetail from '@/components/AppointmentSelectedDetail'
 import BackButton from '@/components/BackButton'
+import DropDown from '@/components/DropDown'
 import KebabMenu from '@/components/KebabMenu'
 import { RootState } from '@/store/store'
 import { AppointmentDetailInfo } from '@/types/appointment'
@@ -79,6 +81,7 @@ import { AppointmentDetailInfo } from '@/types/appointment'
 // }
 
 export default function AppointmentDetail() {
+  const { t } = useTranslation()
   const { id, status } = useLocalSearchParams()
   const [appointmentDetail, setAppointmentDetail] =
     useState<AppointmentDetailInfo>()
@@ -145,7 +148,7 @@ export default function AppointmentDetail() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center">
+    <View className="flex-1 items-center justify-center bg-white">
       <View className="absolute top-0 right-0 p-4">
         <TouchableOpacity onPress={() => setIsKebabMenuVisible(true)}>
           <MoreIcon
@@ -167,37 +170,45 @@ export default function AppointmentDetail() {
         />
       )}
 
-      <View className="flex-1 items-center justify-center">
+      <View className="items-center justify-center w-full p-4">
         <Text className="text-lg font-bold mb-4">Appointment Detail</Text>
         <Text className="text-gray-500 mb-4">약속 ID: {id}</Text>
-        <Text className="text-gray-500 mb-4">상태: {status}</Text>
-
-        {/* 상태에 따라 다른 컴포넌트 렌더링 */}
-        {status === 'EXPIRED' && appointmentDetail && (
-          <AppointmentExpiredDetail appointmentDetail={appointmentDetail} />
-        )}
-        {status === 'SELECTED' && appointmentDetail && (
-          <AppointmentSelectedDetail appointmentDetail={appointmentDetail} />
-        )}
-        {status === 'NOT_SELECTED' && appointmentDetail && (
-          <AppointmentNotSelectedDetail appointmentDetail={appointmentDetail} />
-        )}
-
+        <Text className="text-gray-500 mb-4">
+          상태: {t(`voteStatus.${status}`)}
+        </Text>
+        <View className="flex-1 w-full">
+          {/* 상태에 따라 다른 컴포넌트 렌더링 */}
+          {status === 'EXPIRED' && appointmentDetail && (
+            <AppointmentExpiredDetail appointmentDetail={appointmentDetail} />
+          )}
+          {status === 'SELECTED' && appointmentDetail && (
+            <AppointmentSelectedDetail appointmentDetail={appointmentDetail} />
+          )}
+          {status === 'NOT_SELECTED' && appointmentDetail && (
+            <AppointmentNotSelectedDetail
+              appointmentDetail={appointmentDetail}
+            />
+          )}
+        </View>
         {/* 참여 인원 리스트 */}
-        <View>
-          <Text>
-            참여 인원 :{' '}
-            {
-              appointmentDetail?.participantInfos.filter(
-                (participant) => participant.isAttending,
-              ).length
-            }
-          </Text>
-          {appointmentDetail?.participantInfos
-            .filter((participant) => participant.isAttending)
-            .map((participant) => (
-              <Text key={participant.participantId}>{participant.img}</Text>
-            ))}
+        <View className="w-full">
+          <DropDown title="참여 인원">
+            <View>
+              <Text>
+                참여 인원 :{' '}
+                {
+                  appointmentDetail?.participantInfos.filter(
+                    (participant) => participant.isAttending,
+                  ).length
+                }
+              </Text>
+              {appointmentDetail?.participantInfos
+                .filter((participant) => participant.isAttending)
+                .map((participant) => (
+                  <Text key={participant.participantId}>{participant.img}</Text>
+                ))}
+            </View>
+          </DropDown>
         </View>
       </View>
     </View>
