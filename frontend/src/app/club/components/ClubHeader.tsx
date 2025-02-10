@@ -15,18 +15,16 @@ import { RootState } from '@/store/store'
 import { ClubHeaderProps } from '@/types/club'
 import { MenuItem } from '@/types/menu'
 
+import { useClubMember } from '../hooks/useClubMember'
 import ClubDeleteModal from './ClubDeleteModal'
 import ClubLeaveModal from './ClubLeaveModal'
 
 const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
-  const [isAdmin, setIsAdmin] = useState(true)
-  const [isMember, setIsMember] = useState(true)
   const { user } = useSelector((state: RootState) => state.member)
   const { t } = useTranslation()
   const router = useRouter()
 
   const updateClubInfo = () => {
-
     router.push({ pathname: '/club/updateInfo', params: { clubId: clubId } })
   }
   const getMemberList = () => {
@@ -79,13 +77,15 @@ const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
     },
     {
       title: t('club.leaveClub'),
-      onSelect: () => leaveClub,
+      onSelect: leaveClub,
       color: Colors.light.red,
     },
   ]
+  const { isMember, isAdmin } = useClubMember({ clubId: clubId })
   const menu = isAdmin ? adMinMenu : memberMenu
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false)
+
   return (
     <View className="flex-row p-4 border-b-2 border-bord">
       <View className="flex-1 w-full">
@@ -105,17 +105,19 @@ const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
         </View>
       </View>
       <TouchableOpacity className="">
-        <Menu>
-          <MenuTrigger>
-            <MoreIcon
-              height={24}
-              width={24}
-            />
-          </MenuTrigger>
-          <MenuOptions>
-            <MenuCustomOptions menuList={menu} />
-          </MenuOptions>
-        </Menu>
+        {isMember && (
+          <Menu>
+            <MenuTrigger>
+              <MoreIcon
+                height={24}
+                width={24}
+              />
+            </MenuTrigger>
+            <MenuOptions>
+              <MenuCustomOptions menuList={menu} />
+            </MenuOptions>
+          </Menu>
+        )}
       </TouchableOpacity>
       <View>
         <ClubDeleteModal

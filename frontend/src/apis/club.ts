@@ -71,26 +71,14 @@ export const updateClub = async ({
 
 interface DeleteClubParams {
   clubId: number
-  nextRange?: number
-  prevRange?: number
 }
 
-export const deleteClub = async ({
-  clubId,
-  nextRange = 4,
-  prevRange = 4,
-}: DeleteClubParams) => {
+export const deleteClub = async ({ clubId }: DeleteClubParams) => {
   try {
-    const response = await api.get(`/appointments`, {
-      params: { clubId, nextRange, prevRange },
-    })
-    console.log('결과가 나옴에 의의를 둠' + response)
-    return [
-      { id: 1, title: '약속1' },
-      { id: 2, title: '약속2' },
-    ]
+    const response = await api.delete(`/clubs/${clubId}`)
+    return response
   } catch (error) {
-    console.error('⛔ 그룹 삭제 실패:')
+    console.error('⛔ 그룹 삭제 실패')
     return null
   }
 }

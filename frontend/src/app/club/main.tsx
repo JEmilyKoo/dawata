@@ -88,7 +88,6 @@ function ClubMain() {
 
   const markedDates = {
     '2025-01-21': { marked: true, dotColor: '#ff8339' },
-
     '2025-01-22': { marked: true, dotColor: '#ff8339' },
     '2025-01-23': { marked: true, dotColor: '#ff8339' },
     '2025-01-24': { marked: true, dotColor: '#ff8339' },
@@ -116,7 +115,9 @@ function ClubMain() {
     dispatch(initCreate(params.clubId))
     if (clubInfo) {
       dispatch(setCreateCategory(clubInfo.category))
-      dispatch(setCreateMemberIds(clubInfo?.members.map((member) => member.id)))
+      dispatch(
+        setCreateMemberIds(clubInfo?.members.map((member) => member.memberId)),
+      )
     }
     router.push('/appointment/create1')
   }
@@ -127,7 +128,7 @@ function ClubMain() {
         <ClubHeader
           name={clubInfo.name}
           category={clubInfo.category}
-          teamCode={clubInfo?.teamCode}
+          teamCode={clubInfo.teamCode}
           clubId={Number(params.clubId)}
         />
       )}
