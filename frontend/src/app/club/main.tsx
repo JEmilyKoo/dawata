@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
+import { useDispatch } from 'react-redux'
 
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -17,16 +18,19 @@ import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
+import { Club } from '@/types/club'
 
+import {
+  initCreate,
+  setCreateCategory,
+  setCreateMemberIds,
+} from '../../store/slices/appointmentSlice'
 import AppointmentList from './components/ClubAppointmentList'
 import ClubHeader from './components/ClubHeader'
 import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
 import { useClub } from './hooks/useClubInfo'
 
-
-import { useDispatch } from 'react-redux'
-import { initCreate, setCreateCategory, setCreateMemberIds } from '../../store/slices/appointmentSlice'
 LocaleConfig.locales['kr'] = {
   monthNames: [
     '1월',
@@ -109,18 +113,23 @@ function ClubMain() {
   const dispatch = useDispatch()
   const onPressCreateAppointment = () => {
     dispatch(initCreate(params.clubId))
-    dispatch(setCreateCategory(clubInfo?.category))
-    dispatch(setCreateMemberIds(clubInfo?.members.map((member) => member.id)))
+    if (clubInfo) {
+      dispatch(setCreateCategory(clubInfo.category))
+      dispatch(setCreateMemberIds(clubInfo?.members.map((member) => member.id)))
+    }
     router.push('/appointment/create1')
   }
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 헤더 */}
-      <ClubHeader
-        name={clubInfo?.name}
-        category={clubInfo?.category}
-        teamCode={clubInfo?.teamCode}
-      />
+      {clubInfo && (
+        <ClubHeader
+          name={clubInfo.name}
+          category={clubInfo.category}
+          teamCode={clubInfo?.teamCode}
+          clubId={Number(params.clubId)}
+        />
+      )}
       <ScrollView>
         <ClubMemberList clubId={Number(params.clubId)} />
         <View className="p-4">

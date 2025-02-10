@@ -16,10 +16,11 @@ export interface Club {
 }
 
 export interface ClubHeaderProps {
-  name?: string
-  category?: string
-  createdAt?: string
-  teamCode?: string
+  name: string
+  category: string
+  createdAt: string
+  teamCode: string
+  clubId: number
 }
 
 export interface ClubMemberListProps {

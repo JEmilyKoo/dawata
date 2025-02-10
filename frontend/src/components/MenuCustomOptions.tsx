@@ -1,6 +1,8 @@
 import { Text } from 'react-native'
 import { MenuOption, MenuOptions } from 'react-native-popup-menu'
+
 import { MenuItem } from '@/types/menu'
+
 interface MenuCustomOptionsProps {
   menuList: MenuItem[]
 }
@@ -8,8 +10,9 @@ interface MenuCustomOptionsProps {
 const MenuCustomOptions = ({ menuList }: MenuCustomOptionsProps) => {
   return (
     <MenuOptions>
-      {menuList.map((menuItem: MenuItem) => (
+      {menuList.map((menuItem: MenuItem, index) => (
         <MenuOption
+          key={index}
           onSelect={menuItem.onSelect}
           disabled={menuItem.disabled}>
           <Text style={{ color: menuItem.color }}>{menuItem.title}</Text>
