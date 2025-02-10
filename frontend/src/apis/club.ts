@@ -260,3 +260,16 @@ export const banMember = async ({
     return false
   }
 }
+
+// 이메일로 멤버 검색
+export const searchMemberByEmail = async (email: string) => {
+  try {
+    const response = await api.get(`/clubs/search/email`, {
+      params: { email },
+    })
+    return response
+  } catch (error) {
+    console.error('⛔ 이메일로 멤버 검색 실패:')
+    return false
+  }
+}
