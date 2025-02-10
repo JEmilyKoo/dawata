@@ -1,8 +1,13 @@
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
+import { useDispatch } from 'react-redux'
 
 import { useRouter } from 'expo-router'
 
+import { deleteClubMember } from '@/apis/club'
+import { useClubMember } from '@/app/club/hooks/useClubMember'
 import SlideModalUI from '@/components/SlideModalUI'
+import { setErrorModal } from '@/store/slices/errorModalSlice'
 
 const ClubLeaveModal = ({
   isVisible,
@@ -17,24 +22,45 @@ const ClubLeaveModal = ({
   clubId: number
   memberId: number
 }) => {
+  const { t } = useTranslation()
   const router = useRouter()
+  const { isAdmin, isMember } = useClubMember({ clubId })
+  const dispatch = useDispatch()
+
+  const onPressLeave = async () => {
+    if (!isAdmin && isMember) {
+      const result = await deleteClubMember({ clubId, clubMemberId: memberId })
+      if (result) {
+        router.navigate('/(tabs)/main')
+      }
+    } else {
+      dispatch(
+        setErrorModal({
+          modalTitle: `error.${403}.title`,
+          modalContent: `error.${403}.content`,
+          primaryButtonType: 'confirm',
+          secondaryButtonType: 'goToHome',
+          isVisible: true,
+        }),
+      )
+    }
+    setVisible(false)
+  }
+
   const onPressCancel = () => {
     setVisible(false)
   }
-  const onPressLeave = () => {
-    router.navigate('/club/create1')
-    setVisible(false)
-  }
+
   return (
     <View className="flex-1 justify-center items-center">
       <SlideModalUI
         isVisible={isVisible}
         setVisible={setVisible}
-        modalTitle="그룹 탈퇴"
-        modalContent="그룹을 탈퇴하시겠습니까?"
-        primaryButtonText="그룹 탈퇴"
+        modalTitle={t('club.leaveClub')}
+        modalContent={t('leaveClub.title', { val: clubName })}
+        primaryButtonText={t('club.leaveClub')}
         primaryButtonOnPress={onPressLeave}
-        secondaryButtonText="취소"
+        secondaryButtonText={t('cancel')}
         secondaryButtonOnPress={onPressCancel}
       />
     </View>
