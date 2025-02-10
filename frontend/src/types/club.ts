@@ -1,10 +1,11 @@
 export interface ClubMember {
-  id: number
+  clubMemberId: number
   memberId: number
   clubId: number
   nickname: string
   clubName: string
   createdBy: number
+  email: string
 }
 
 export interface Club {
@@ -36,4 +37,11 @@ export interface ClubCalendarProps {
 export interface ClubCreateInfo {
   name: string
   category: string
+}
+
+export interface SearchMemberByEmailResponse {
+  id: number
+  email: string
+  name: string
+  photoName: string
 }
