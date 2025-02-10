@@ -57,7 +57,7 @@ class MemberControllerTest {
 			new MemberInfoResponse("tester@email.com", "tester", null, LocalDateTime.now());
 
 		//when
-		when(memberService.findMemberInfo()).thenReturn(response);
+		when(memberService.findMemberInfo(member)).thenReturn(response);
 
 		// then
 		mockMvc.perform(get("/members")

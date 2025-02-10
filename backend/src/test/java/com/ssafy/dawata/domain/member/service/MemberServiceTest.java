@@ -41,7 +41,7 @@ class MemberServiceTest {
 			.thenReturn(Optional.of(response));
 
 		// then
-		MemberInfoResponse result = memberService.findMemberInfo();
+		MemberInfoResponse result = memberService.findMemberInfo(member);
 
 		assertEquals(result.name(), member.getName());
 		assertEquals(result.email(), member.getEmail());
@@ -57,7 +57,7 @@ class MemberServiceTest {
 		// then
 		assertThrows(
 			IllegalArgumentException.class, () -> {
-				memberService.findMemberInfo();
+				memberService.findMemberInfo(any(Member.class));
 			}
 		);
 	}
@@ -81,7 +81,7 @@ class MemberServiceTest {
 		Mockito.when(memberRepository.findById(anyLong()))
 			.thenReturn(Optional.of(memberSpy));
 
-		memberService.updateMyInfo(request);
+		memberService.updateMyInfo(request, memberSpy);
 
 		// then
 		verify(memberRepository, times(1)).findById(anyLong());
@@ -98,7 +98,7 @@ class MemberServiceTest {
 		// then
 		assertThrows(
 			IllegalArgumentException.class, () -> {
-				memberService.updateMyInfo(any(MemberInfoUpdateRequest.class));
+				memberService.updateMyInfo(any(MemberInfoUpdateRequest.class), any(Member.class));
 			}
 		);
 	}
@@ -114,7 +114,7 @@ class MemberServiceTest {
 		Mockito.when(memberRepository.findById(1L))
 			.thenReturn(Optional.of(memberSpy));
 
-		memberService.withdraw();
+		memberService.withdraw(memberSpy);
 		// then
 		assertTrue(memberSpy.isWithdrawn());
 	}
@@ -129,7 +129,7 @@ class MemberServiceTest {
 		// then
 		assertThrows(
 			IllegalArgumentException.class, () -> {
-				memberService.findMemberInfo();
+				memberService.findMemberInfo(any(Member.class));
 			}
 		);
 	}

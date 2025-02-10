@@ -128,7 +128,7 @@ public class AppointmentService {
 			.map(p -> {
 				Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
 					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
-				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getNickname(), photo.getPhotoName());
+				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getMember().getId(), p.getClubMember().getNickname(), photo.getPhotoName());
 			})
 			.toList();
 
