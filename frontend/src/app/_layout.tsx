@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react"
 import { I18nextProvider } from "react-i18next"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { MenuProvider } from "react-native-popup-menu"
 import "react-native-reanimated"
 import { Provider } from "react-redux"
 
@@ -58,21 +59,23 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Provider store={store}>
-        <I18nextProvider i18n={i18n}>
-          <ErrorModal />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen
-              name="club"
-              options={{
-                headerShown: false,
-                headerShadowVisible: false,
-              }}
-            />
-          </Stack>
-        </I18nextProvider>
-      </Provider>
+      <MenuProvider>
+        <Provider store={store}>
+          <I18nextProvider i18n={i18n}>
+            <ErrorModal />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen
+                name="club"
+                options={{
+                  headerShown: false,
+                  headerShadowVisible: false,
+                }}
+              />
+            </Stack>
+          </I18nextProvider>
+        </Provider>
+      </MenuProvider>
     </GestureHandlerRootView>
   )
 }

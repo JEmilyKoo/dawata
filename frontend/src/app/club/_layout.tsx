@@ -14,14 +14,18 @@ export default function ClubLayout() {
             headerShown: true,
           }}
         />
+        <Stack.Screen name="main" />
+        <Stack.Screen name="list" />{' '}
         <Stack.Screen
-          name="main"
-        />
-        <Stack.Screen
-          name="list"
+          name="updateInfo"
+          options={{
+            title: '그룹 수정',
+            headerShown: true,
+          }}
         />
       </Stack>
-      {pathname.indexOf('create') == -1 && <TabBar />}
+      {(pathname.indexOf('create') == -1 ||
+        pathname.indexOf('update') == -1) && <TabBar />}
     </>
   )
 }

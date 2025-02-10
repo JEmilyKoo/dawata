@@ -18,6 +18,7 @@ import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
+import { Club } from '@/types/club'
 
 import {
   initCreate,
@@ -113,18 +114,23 @@ function ClubMain() {
   const dispatch = useDispatch()
   const onPressCreateAppointment = () => {
     dispatch(initCreate(params.clubId))
-    dispatch(setCreateCategory(clubInfo?.category))
-    dispatch(setCreateMemberIds(clubInfo?.members.map((member) => member.id)))
+    if (clubInfo) {
+      dispatch(setCreateCategory(clubInfo.category))
+      dispatch(setCreateMemberIds(clubInfo?.members.map((member) => member.id)))
+    }
     router.push('/appointment/create1')
   }
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 헤더 */}
-      <ClubHeader
-        name={clubInfo?.name}
-        category={clubInfo?.category}
-        teamCode={clubInfo?.teamCode}
-      />
+      {clubInfo && (
+        <ClubHeader
+          name={clubInfo.name}
+          category={clubInfo.category}
+          teamCode={clubInfo?.teamCode}
+          clubId={Number(params.clubId)}
+        />
+      )}
       <ScrollView>
         <ClubMemberList clubId={Number(params.clubId)} />
         <View className="p-4">
