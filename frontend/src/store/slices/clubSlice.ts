@@ -9,13 +9,12 @@ const initialState = {
     category: 'FRIEND',
   },
   clubs: [
-
     {
       id: 1,
       name: '테스트 클럽',
       img: '',
       category: 'FRIEND',
-      teamCode: "H9UKRI",
+      teamCode: 'H9UKRI',
       appointment: [
         {
           appointmentId: 1,
@@ -28,7 +27,7 @@ const initialState = {
 }
 
 const clubSlice = createSlice({
-  name: 'appointment',
+  name: 'club',
   initialState,
   reducers: {
     resetCreate(state) {
@@ -42,10 +41,7 @@ const clubSlice = createSlice({
       state.create.category = action.payload
     },
     setAppointments(state, action) {
-      const club = state.clubs.find(
-        (club) => club.id === action.payload.id,
-
-      )
+      const club = state.clubs.find((club) => club.id === action.payload.id)
       if (club) {
         club.appointment = action.payload.appointmentList
       }
@@ -56,10 +52,15 @@ const clubSlice = createSlice({
   },
 })
 
-
 // selector를 별도로 정의
 export const selectAppointments = (state: RootState, clubId: number) =>
   state.club.clubs.find((club) => club.id === clubId)?.appointment ?? []
 
-export const { resetCreate, setCreateName, setCreateCategory, setAppointments, setClubs} = clubSlice.actions
+export const {
+  resetCreate,
+  setCreateName,
+  setCreateCategory,
+  setAppointments,
+  setClubs,
+} = clubSlice.actions
 export default clubSlice.reducer
