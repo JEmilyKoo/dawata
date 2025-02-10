@@ -14,11 +14,12 @@ import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.service.MemberService;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,29 +34,28 @@ public class FeedService {
 
 
     @Transactional
-    public FeedResponse createFeed(Long appointmentId, FeedCreateRequest request) {
-        Member member = memberService.findMyMemberInfo();
+    public FeedResponse createFeed(Long appointmentId, FeedCreateRequest request, Member member) {
         //피드 생성
         ClubMember clubMember = clubMemberRepository.findById(member.getId())
-            .orElseThrow(() -> new EntityNotFoundException("클럽 멤버 X."));
+                .orElseThrow(() -> new EntityNotFoundException("클럽 멤버 X."));
 
         boolean isParticipant = participantRepository.findByClubMemberIdAndAppointmentId(
-            clubMember.getId(), appointmentId).isPresent();
+                clubMember.getId(), appointmentId).isPresent();
         if (!isParticipant) {
             throw new IllegalStateException("약속 참여자 X");
         }
         Appointment appointment = appointmentRepository.findById(appointmentId)
-            .orElseThrow(() -> new IllegalArgumentException("appointment 존재X"));
+                .orElseThrow(() -> new IllegalArgumentException("appointment 존재X"));
 
         Feed feed = Feed.create(request.content(), member.getEmail(), appointment);
 
         List<TagMember> tagMembers = request.tagClubMemberIds().stream()
-            .map(clubMemberId -> {
-                ClubMember tagMember = clubMemberRepository.findById(clubMemberId)
-                    .orElseThrow(() -> new IllegalStateException("클럽멤버X"));
-                return TagMember.create(tagMember, feed);
-            })
-            .collect(Collectors.toList());
+                .map(clubMemberId -> {
+                    ClubMember tagMember = clubMemberRepository.findById(clubMemberId)
+                            .orElseThrow(() -> new IllegalStateException("클럽멤버X"));
+                    return TagMember.create(tagMember, feed);
+                })
+                .collect(Collectors.toList());
 
         tagMembers.forEach(feed::addTagMember);
         feedRepository.save(feed);
@@ -68,7 +68,7 @@ public class FeedService {
         //validateClubMember(clubMemberId); 이 과정을 굳이 넣는 게 맞을까 ..
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
-            .orElseThrow(() -> new IllegalStateException("약속 존재 X"));
+                .orElseThrow(() -> new IllegalStateException("약속 존재 X"));
 
         List<Feed> feeds = feedRepository.findByAppointment(appointment);
         return feeds.stream().map(FeedResponse::from).toList();
@@ -79,7 +79,7 @@ public class FeedService {
         //validateClubMember(clubMemberId);
 
         Feed feed = feedRepository.findByIdAndAppointmentId(feedId, appointmentId)
-            .orElseThrow(() -> new IllegalStateException("피드 X"));
+                .orElseThrow(() -> new IllegalStateException("피드 X"));
 
         return FeedResponse.from(feed);
     }
@@ -89,7 +89,7 @@ public class FeedService {
     @Transactional
     public FeedResponse updateFeed(Long appointmentId, Long feedId, FeedUpdateRequest request) {
         Feed feed = feedRepository.findByIdAndAppointmentId(feedId, appointmentId)
-            .orElseThrow(() -> new IllegalStateException("피드 X"));
+                .orElseThrow(() -> new IllegalStateException("피드 X"));
 
         if (request.content() != null) {
             feed.updateContent(request.content());
@@ -101,12 +101,12 @@ public class FeedService {
 
             // 새로운 태그 멤버 추가
             List<TagMember> tagMembers = request.tagClubMemberIds().stream()
-                .map(clubMemberId -> {
-                    ClubMember tagMember = clubMemberRepository.findById(clubMemberId)
-                        .orElseThrow(() -> new IllegalStateException("태그할 클럽 멤버 X."));
-                    return TagMember.create(tagMember, feed);
-                })
-                .collect(Collectors.toList());
+                    .map(clubMemberId -> {
+                        ClubMember tagMember = clubMemberRepository.findById(clubMemberId)
+                                .orElseThrow(() -> new IllegalStateException("태그할 클럽 멤버 X."));
+                        return TagMember.create(tagMember, feed);
+                    })
+                    .collect(Collectors.toList());
 
             tagMembers.forEach(feed::addTagMember);
         }
@@ -118,7 +118,7 @@ public class FeedService {
     @Transactional
     public void deleteFeed(Long appointmentId, Long feedId, Long requesterId) {
         Feed feed = feedRepository.findByIdAndAppointmentId(feedId, appointmentId)
-            .orElseThrow(() -> new IllegalStateException("피드 X"));
+                .orElseThrow(() -> new IllegalStateException("피드 X"));
 
         feedRepository.delete(feed);
     }

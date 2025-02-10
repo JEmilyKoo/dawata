@@ -10,7 +10,6 @@ import com.ssafy.dawata.domain.club.repository.ClubRepository;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
-import com.ssafy.dawata.domain.member.service.MemberService;
 import com.ssafy.dawata.domain.photo.entity.Photo;
 import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
@@ -29,14 +28,12 @@ public class ClubService {
     private final ClubRepository clubRepository;
     private final MemberRepository memberRepository;
     private final ClubMemberRepository clubMemberRepository;
-    private final MemberService memberService;
     private final PhotoRepository photoRepository;
 
     //클럽 생성
     @Transactional
-    public ApiResponse<ClubInfoResponse> createClub(CreateClubRequest request) {
+    public ApiResponse<ClubInfoResponse> createClub(CreateClubRequest request, Member member) {
         //추후에 SecurityContextHolder에서 가져오도록 하겠습니다.
-        Member member = memberService.findMyMemberInfo();
         List<ClubMember> clubMembers = clubMemberRepository.findAllWithClubByMemberId(
                 member.getId());
         String teamCode = generateTeamCode();
@@ -53,8 +50,8 @@ public class ClubService {
     }
 
     //멤버가 속해있는 특정 클럽 id로 데이터 조회하기
-    public ApiResponse<ClubInfoResponse> getClubById(Long clubId) {
-        Member member = memberService.findMyMemberInfo();
+    public ApiResponse<ClubInfoResponse> getClubById(Long clubId, Member member) {
+
         Club club = validateClubAndMember(clubId, member.getId());
         List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
 
@@ -64,8 +61,7 @@ public class ClubService {
     //클라이언트의 멤버 정보 가져와서 -> 해당 유저가 속한 모든 그룹의 정보 가져오기
     //Member랑 Club 엔티티가 직접 연결되어 있지 않아서 ClubMember를 거쳐서 데이터를 가져오는데
     // 보통 이렇게 하는 게 맞나요 ..
-    public ApiResponse<List<ClubInfoResponse>> getAllClubsByMemberId() {
-        Member member = memberService.findMyMemberInfo();
+    public ApiResponse<List<ClubInfoResponse>> getAllClubsByMemberId(Member member) {
         List<ClubMember> clubMembers = clubMemberRepository.findAllWithClubByMemberId(
                 member.getId());
         List<ClubInfoResponse> response = clubMembers.stream()
@@ -81,11 +77,11 @@ public class ClubService {
 
     //클럽 데이터 수정
     @Transactional
-    public ApiResponse<Boolean> updateClub(UpdateClubRequest request, Long clubId) {
-        //클라이언트의 멤버데이터 가져오고
-        Member member = memberService.findMyMemberInfo();
+    public ApiResponse<Boolean> updateClub(UpdateClubRequest request, Long clubId, Member member) {
         //해당 멤버가 팀에 속하는지 체크하고, 해당 클럽 id의 클럽 존재 체크
         Club club = validateClubAndMember(clubId, member.getId());
+        //클럽장 체크
+        validateAdmin(member.getId(), clubId);
 
         //클럽명 요청 값 존재 시 반영
         request.name().ifPresent(club::updateName);
@@ -97,21 +93,21 @@ public class ClubService {
 
     //클럽장 교체
     @Transactional
-    public ApiResponse<Boolean> updateAdmin(UpdateAdminRequest request, Long clubId) {
-        ClubMember currentAdmin = validateAdmin(request.currentAdminId(), clubId);
+    public ApiResponse<Boolean> updateAdmin(UpdateAdminRequest request, Long clubId, Member member) {
+        ClubMember currentAdmin = validateAdmin(member.getId(), clubId);
         ClubMember newAdmin = validateMember(request.newAdminId(), clubId);
-
-        currentAdmin.setCreatedBy(1);
-        newAdmin.setCreatedBy(0);
+        currentAdmin.setRole(1);
+        newAdmin.setRole(0);
+        clubMemberRepository.save(currentAdmin);
+        clubMemberRepository.save(newAdmin);
 
         return ApiResponse.success(true);
     }
 
     //클럽 삭제
     @Transactional
-    public ApiResponse<Boolean> deleteClub(Long clubId) {
+    public ApiResponse<Boolean> deleteClub(Long clubId, Member member) {
         //클럽장 여부 체크
-        Member member = memberService.findMyMemberInfo();
         Club club = validateAdmin(member.getId(), clubId).getClub();
         clubMemberRepository.deleteAllByClubId(clubId);
         clubRepository.delete(club);
@@ -119,16 +115,14 @@ public class ClubService {
     }
 
     //클럽 코드 조회
-    public ApiResponse<String> getClubCode(Long clubId) {
-        Member member = memberService.findMyMemberInfo();
+    public ApiResponse<String> getClubCode(Long clubId, Member member) {
         Club club = validateClubAndMember(clubId, member.getId());
         return ApiResponse.success(club.getTeamCode());
     }
 
     //클럽 id로 멤버 list 조회
-    public ApiResponse<List<ClubMemberInfoResponse>> getClubMembers(Long clubId) {
+    public ApiResponse<List<ClubMemberInfoResponse>> getClubMembers(Long clubId, Member member) {
         //요청자 정보 갖고오기
-        Member member = memberService.findMyMemberInfo();
         validateClubAndMember(clubId, member.getId());
         List<ClubMemberInfoResponse> response = clubMemberRepository.findAllByClubId(clubId)
                 .stream()
@@ -139,18 +133,24 @@ public class ClubService {
 
     //이메일로 멤버 추가
     @Transactional
-    public ApiResponse<Boolean> addClubMemberByEmail(JoinClubByEmailRequest request, long clubId) {
-        validateMember(request.adminId(), clubId);
+    public ApiResponse<Boolean> addClubMemberByEmail(JoinClubByEmailRequest request, long clubId, Member member) {
+        if (request.emails() == null || request.emails().isEmpty()) {
+            throw new IllegalArgumentException("추가할 이메일 리스트가 비어 있습니다.");
+        }
 
-        //추가할 이메일이 멤버로 존재하는지 체크
-        Member newMember = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("요청 email의 멤버 데이터 X"));
+        validateMember(member.getId(), clubId);
 
-        validateUniqueMember(newMember.getId(), clubId);
+        for (String email : request.emails()) {
+            // 추가할 이메일이 멤버로 존재하는지 체크
+            Member newMember = memberRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("요청 email의 멤버 데이터 X"));
 
-        Club club = validateClub(clubId);
-        ClubMember clubMember = ClubMember.createClubMember(newMember, club, 1);
-        clubMemberRepository.save(clubMember);
+            validateUniqueMember(newMember.getId(), clubId);
+
+            Club club = validateClub(clubId);
+            ClubMember clubMember = ClubMember.createClubMember(newMember, club, 1);
+            clubMemberRepository.save(clubMember);
+        }
         return ApiResponse.success(true);
     }
 
@@ -174,8 +174,7 @@ public class ClubService {
     }
 
     //그룹의 특정 멤버 데이터 조회
-    public ApiResponse<ClubMemberInfoResponse> getClubMember(Long clubId, Long clubMemberId) {
-        Member member = memberService.findMyMemberInfo();
+    public ApiResponse<ClubMemberInfoResponse> getClubMember(Long clubId, Long clubMemberId, Member member) {
         validateClubAndMember(clubId, member.getId());
 
         //반환값 때문에 validate 메서드 사용X
@@ -188,8 +187,8 @@ public class ClubService {
     //클럽 멤버 정보 수정
     @Transactional
     public ApiResponse<Boolean> updateClubMember(Long clubId, Long clubMemberId,
-                                                 UpdateClubMemberRequest request) {
-        Member member = memberService.findMyMemberInfo();
+                                                 UpdateClubMemberRequest request, Member member) {
+
         //해당 클럽 존재하고 그 클럽의 멤버 체크
         validateClubAndMember(clubId, member.getId());
 
@@ -208,8 +207,7 @@ public class ClubService {
 
     //탈퇴
     @Transactional
-    public ApiResponse<Boolean> leaveClub(Long clubId, Long clubMemberId) {
-        Member member = memberService.findMyMemberInfo();
+    public ApiResponse<Boolean> leaveClub(Long clubId, Long clubMemberId, Member member) {
         validateClubAndMember(clubId, member.getId());
         ClubMember clubMember = clubMemberRepository.findById(clubMemberId)
                 .orElseThrow(() -> new IllegalArgumentException("클라이언트가 그룹멤버아님"));
@@ -225,9 +223,7 @@ public class ClubService {
 
     //(클럽장이)강퇴
     @Transactional
-    public ApiResponse<Boolean> banClubMember(Long clubId, BanClubMemberRequest request) {
-        //클라이언트
-        Member admin = memberService.findMyMemberInfo();
+    public ApiResponse<Boolean> banClubMember(Long clubId, BanClubMemberRequest request, Member admin) {
 
         //클럽장 체크
         validateAdmin(admin.getId(), clubId);
@@ -243,7 +239,9 @@ public class ClubService {
 
     //클럽 사진 추가 혹은 수정
     @Transactional
-    public ApiResponse<Boolean> updateClubPhoto(Long clubId, ClubPhotoRequest request) {
+    public ApiResponse<Boolean> updateClubPhoto(Long clubId, ClubPhotoRequest request, Member admin) {
+        //클럽장 체크
+        validateAdmin(admin.getId(), clubId);
         String fileName = request.fileName();
 
         Club club = clubRepository.findById(clubId)
@@ -269,7 +267,9 @@ public class ClubService {
 
     //클럽 사진 삭제
     @Transactional
-    public ApiResponse<Boolean> deleteClubPhoto(Long clubId) {
+    public ApiResponse<Boolean> deleteClubPhoto(Long clubId, Member admin) {
+        //클럽장 체크
+        validateAdmin(admin.getId(), clubId);
 
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 클럽"));
@@ -311,9 +311,9 @@ public class ClubService {
     private ClubMember validateAdmin(Long memberId, Long clubId) {
 
         ClubMember clubMember = validateMember(memberId, clubId);
-        if (clubMember.getCreatedBy() != 0) {
-            throw new IllegalArgumentException("클라이언트가 클럽장 아님");
-        }
+//        if (clubMember.getRole() != 0) {
+//            throw new IllegalArgumentException("클라이언트가 클럽장 아님");
+//        }
         return clubMember;
     }
 
@@ -324,9 +324,14 @@ public class ClubService {
         }
     }
 
-    //팀코드 생성
+    //팀코드 생성 (중복 체크 추가)
     private String generateTeamCode() {
-        return TeamCodeGenerator.generateTeamCode();
+        String teamCode;
+        do {
+            teamCode = TeamCodeGenerator.generateTeamCode();
+        } while (clubRepository.existsByTeamCode(teamCode));
+
+        return teamCode;
     }
 
     //클럽 데이터 + 클럽 멤버 데이터 유틸 메서드

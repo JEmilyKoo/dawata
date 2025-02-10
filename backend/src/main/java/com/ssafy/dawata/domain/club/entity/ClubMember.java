@@ -1,15 +1,7 @@
 package com.ssafy.dawata.domain.club.entity;
 
 import com.ssafy.dawata.domain.member.entity.Member;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,10 +32,10 @@ public class ClubMember {
     private String clubName;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
-    private int createdBy;
+    private int role;
 
     @Builder
-    public ClubMember(Member member, Club club, String nickname, String clubName, int createdBy) {
+    public ClubMember(Member member, Club club, String nickname, String clubName, int role) {
         this.member = member;
         this.club = club;
 
@@ -59,17 +51,17 @@ public class ClubMember {
             this.clubName = club.getName();
         }
 
-        this.createdBy = createdBy;
+        this.role = role;
     }
 
-    public static ClubMember createClubMember(Member member, Club club, int createdBy) {
+    public static ClubMember createClubMember(Member member, Club club, int role) {
         return ClubMember.builder()
-            .member(member)
-            .club(club)
-            .nickname(member.getName())
-            .clubName(club.getName())
-            .createdBy(createdBy)
-            .build();
+                .member(member)
+                .club(club)
+                .nickname(member.getName())
+                .clubName(club.getName())
+                .role(role)
+                .build();
     }
 
     public void updateNickname(String nickname) {
@@ -84,7 +76,7 @@ public class ClubMember {
         this.clubName = clubName;
     }
 
-    public void setCreatedBy(int createdBy) {
-        this.createdBy = createdBy;
+    public void setRole(int role) {
+        this.role = role;
     }
 }
