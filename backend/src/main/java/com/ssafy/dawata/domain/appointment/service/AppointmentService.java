@@ -24,6 +24,7 @@ import com.ssafy.dawata.domain.participant.entity.Participant;
 import com.ssafy.dawata.domain.participant.enums.DailyStatus;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 import com.ssafy.dawata.domain.photo.entity.Photo;
+import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
 import com.ssafy.dawata.domain.vote.entity.VoteItem;
 import com.ssafy.dawata.domain.vote.entity.Voter;
@@ -125,7 +126,7 @@ public class AppointmentService {
 		List<AppointmentDetailResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
 			.stream()
 			.map(p -> {
-				Photo photo = photoRepository.findByEntityId(p.getClubMember().getMember().getId())
+				Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
 					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
 				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getNickname(), photo.getPhotoName());
 			})
@@ -209,7 +210,7 @@ public class AppointmentService {
 				List<AppointmentWithExtraInfoResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
 					.stream()
 					.map(p -> {
-						Photo photo = photoRepository.findByEntityId(p.getClubMember().getMember().getId())
+						Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
 							.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
 						return AppointmentWithExtraInfoResponse.ParticipantResponse.of(p, photo.getPhotoName());
 					})

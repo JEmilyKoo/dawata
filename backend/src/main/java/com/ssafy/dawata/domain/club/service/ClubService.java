@@ -249,7 +249,7 @@ public class ClubService {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 클럽"));
 
-        photoRepository.findByEntityId(clubId).ifPresent(photoRepository::delete);
+        photoRepository.findByEntityIdAndEntityCategory(clubId, EntityCategory.CLUB).ifPresent(photoRepository::delete);
 
         Photo newPhoto = Photo.createPhoto(fileName, EntityCategory.CLUB, clubId);
         photoRepository.save(newPhoto);
@@ -274,7 +274,7 @@ public class ClubService {
         Club club = clubRepository.findById(clubId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 클럽"));
 
-        photoRepository.findByEntityId(clubId).ifPresent(photoRepository::delete);
+        photoRepository.findByEntityIdAndEntityCategory(clubId, EntityCategory.CLUB).ifPresent(photoRepository::delete);
         club.updateImg(null);
 
         return ApiResponse.success(true);
