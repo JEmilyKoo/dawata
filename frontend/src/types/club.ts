@@ -4,12 +4,12 @@ export interface ClubMember {
   clubId: number
   nickname: string
   clubName: string
-  createdBy: number
+  role: number
   email: string
 }
 
 export interface Club {
-  id: number
+  clubId: number
   name: string
   category: string
   teamCode: string
@@ -19,7 +19,6 @@ export interface Club {
 export interface ClubHeaderProps {
   name: string
   category: string
-  createdAt: string
   teamCode: string
   clubId: number
 }

@@ -30,7 +30,7 @@ export const useClubMember = ({ clubId, memberId }: UseClubMemberProps) => {
       const targetMember = getTargetMember(clubMembers, memberId ?? user.id)
       if (targetMember) {
         setIsMember(true)
-        if (targetMember.createdBy === 0) {
+        if (targetMember.role === 0) {
           setIsAdmin(true)
         }
       } else {

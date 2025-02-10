@@ -30,6 +30,7 @@ import ClubHeader from './components/ClubHeader'
 import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
 import { useClub } from './hooks/useClubInfo'
+import { useClubMemberList } from './hooks/useClubMemberList'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -83,6 +84,9 @@ function ClubMain() {
     clubId: Number(params.clubId),
   })
   const { clubInfo, loading: clubInfoLoading } = useClub({
+    clubId: Number(params.clubId),
+  })
+  const { clubMemberList } = useClubMemberList({
     clubId: Number(params.clubId),
   })
 

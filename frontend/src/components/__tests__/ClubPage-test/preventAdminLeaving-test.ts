@@ -34,7 +34,7 @@ test('관리자일때는 그룹에서 탈퇴할 수 없다.', () => {
   }
 
   const clubInfo: Club = {
-    id: 1,
+    clubId: 1,
     name: 'No.1',
     category: 'study',
     teamCode: 'testTeamCode',
@@ -75,7 +75,7 @@ test('일반 유저는 그룹에서 탈퇴할 수 없다.', () => {
   }
 
   const clubInfo: Club = {
-    id: 1,
+    clubId: 1,
     name: 'No.1',
     category: 'study',
     teamCode: 'testTeamCode',

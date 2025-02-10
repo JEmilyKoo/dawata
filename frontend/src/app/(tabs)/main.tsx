@@ -130,9 +130,9 @@ export default function MainScreen() {
             {showClubLoading &&
               clubs.map((club) => (
                 <TouchableOpacity
-                  key={club.id}
+                  key={club.clubId}
                   className=" relativeitems-center p-2 w-[100px]"
-                  onPress={() => handleClubPress(club.id)}>
+                  onPress={() => handleClubPress(club.clubId)}>
                   <ImageThumbnail
                     img={'https://picsum.photos/80'}
                     defaultImg={require('@/assets/clubs/club1.png')}

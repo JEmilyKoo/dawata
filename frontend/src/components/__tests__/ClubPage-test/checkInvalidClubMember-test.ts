@@ -63,7 +63,7 @@ test('로그인한 유저의 id가 getClubMembers로 받은 데이터에 존재�
 
   const clubList: Club[] = [
     {
-      id: 1,
+      clubId: 1,
       name: 'No.1',
       category: 'study',
       teamCode: 'testTeamCode',
