@@ -2,6 +2,7 @@ package com.ssafy.dawata.domain.vote.entity;
 
 import com.ssafy.dawata.domain.participant.entity.Participant;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

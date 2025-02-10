@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.appointment.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -9,7 +10,9 @@ import com.ssafy.dawata.domain.common.entity.BaseEntity;
 import com.ssafy.dawata.domain.common.enums.Category;
 import com.ssafy.dawata.domain.common.enums.CategoryConverter;
 import com.ssafy.dawata.domain.participant.entity.Participant;
+import com.ssafy.dawata.domain.vote.entity.VoteItem;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -45,8 +48,11 @@ public class Appointment extends BaseEntity {
 	@Column
 	private LocalDateTime voteEndTime;
 
-	@OneToMany(mappedBy = "appointment")
-	private List<Participant> participants;
+	@OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Participant> participants = new ArrayList<>();
+
+	@OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<VoteItem> voteItems = new ArrayList<>();
 
 	@Builder(access = AccessLevel.PRIVATE)
 	private Appointment(String name, Category category, LocalDateTime scheduledAt, LocalDateTime voteEndTime) {

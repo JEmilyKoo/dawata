@@ -1,8 +1,12 @@
 package com.ssafy.dawata.domain.vote.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ssafy.dawata.domain.address.entity.Address;
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,19 +30,22 @@ public class VoteItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(
 		name = "address_id",
 		referencedColumnName = "id"
 	)
 	private Address address;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(
 		name = "appointment_id",
 		referencedColumnName = "id"
 	)
 	private Appointment appointment;
+
+	@OneToMany(mappedBy = "voteItem", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Voter> voters = new ArrayList<>();
 
 	@Column
 	private String title;
