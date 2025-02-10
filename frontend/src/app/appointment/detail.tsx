@@ -14,7 +14,11 @@ import { useRoute } from '@react-navigation/native'
 import { useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 
-import { getAppointmentDetail } from '@/apis/appointment'
+import {
+  deleteAppointment,
+  getAppointmentDetail,
+  updateMyAppointmentAttendance,
+} from '@/apis/appointment'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
@@ -92,8 +96,9 @@ export default function AppointmentDetail() {
   //     participant.participantId === user?.id && participant.isAttending,
   // )
   const isHost = true // 임시
-  const isAttending = true // 임시
+  const isAttending = false // 임시
 
+  // TODO: param으로 status 주지 않고 약속 상세 페이지에서 약속 상태 확인
   useEffect(() => {
     const fetchAppointmentDetail = async () => {
       const data = await getAppointmentDetail(Number(id))
@@ -112,22 +117,30 @@ export default function AppointmentDetail() {
   //   '2025-01-25': { marked: true, dotColor: '#ff8339' },
   // }
 
-  console.log('🦖🦖 약속 상세 정보 : ', appointmentDetail)
+  console.log('약속 상세 정보 : ', appointmentDetail)
 
   const handleEdit = () => {
-    console.log('🦖🦖 약속 수정 페이지로 이동')
+    console.log('약속 수정 페이지로 이동')
     router.push(
       `/appointment/update1?id=${appointmentDetail?.appointmentInfo.appointmentId}`,
     )
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     // TODO: 삭제 로직 구현
+    console.log('🦖🦖 id:', Number(id))
+    const data = await deleteAppointment(Number(id))
+    router.replace('/appointment')
+    console.log('약속 삭제 결과 : ', data)
     console.log('약속 삭제')
   }
 
-  const handleToggleParticipation = () => {
+  const handleToggleParticipation = async () => {
     // TODO: 참여/불참 토글 로직 구현
+    const data = await updateMyAppointmentAttendance(Number(id), {
+      isAttending: !isAttending,
+    })
+    // console.log('약속 참여 상태 변경 결과 : ', data)
     console.log(isAttending ? '불참 처리' : '참여 처리')
   }
 
