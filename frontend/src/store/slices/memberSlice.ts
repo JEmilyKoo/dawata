@@ -6,7 +6,7 @@ const initialState = {
   user: {
     id: 1,
     email: 'test@email.com',
-    name: '구정은',
+    name: '주노리',
     img: 'profile1.png',
     createdAt: '2025-02-07T01:35:58',
   },
