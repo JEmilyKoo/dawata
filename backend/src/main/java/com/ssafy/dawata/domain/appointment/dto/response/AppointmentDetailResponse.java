@@ -55,6 +55,9 @@ public record AppointmentDetailResponse(
 		@Schema(description = "참여자 아이디", example = "1")
 		Long participantId,
 
+		@Schema(description = "멤버 아이디", example = "1")
+		Long memberId,
+
 		@Schema(description = "참석 여부", example = "true")
 		Boolean isAttending,
 
@@ -71,9 +74,10 @@ public record AppointmentDetailResponse(
 		String img
 	) {
 
-		public static ParticipantResponse of(Participant entity, String name, String img) {
+		public static ParticipantResponse of(Participant entity, Long memberId, String name, String img) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
+				.memberId(memberId)
 				.isAttending(entity.getIsAttending())
 				.dailyStatus(entity.getDailyStatus())
 				.name(name)
@@ -86,6 +90,9 @@ public record AppointmentDetailResponse(
 	@Schema(description = "투표 응답 스키마")
 	@Builder
 	public record VoteResponse(
+		@Schema(description = "투표 항목 ID", example = "1")
+		Long voteItemId,
+
 		@Schema(description = "제목", example = "투표 제목")
 		String title,
 
@@ -116,6 +123,7 @@ public record AppointmentDetailResponse(
 
 		public static VoteResponse of(VoteItem entity, boolean isSelected, double percentage) {
 			return VoteResponse.builder()
+				.voteItemId(entity.getId())
 				.title(entity.getTitle())
 				.category(entity.getCategory())
 				.detail(entity.getDetail())
