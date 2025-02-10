@@ -63,7 +63,7 @@ const ClubCreate1 = () => {
 
   return (
     <SafeAreaView className="flex-1 p-4 bg-white">
-      <View className="flex-1 bg-secondary justify-between">
+      <View className="flex-1 justify-between">
         <View>
       <Text className="text-xl font-bold mb-2 text-text-primary">
 

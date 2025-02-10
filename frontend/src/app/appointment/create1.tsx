@@ -54,7 +54,7 @@ const AppointmentCreate1 = () => {
           <TextInput
             placeholder={t('createAppointment.name.title')}
             onBlur={onBlur}
-            className="border-b-2 mb-4"
+            className="border-b-2 mb-4 border-primary"
             onChangeText={onChange}
             value={value}
           />
@@ -64,7 +64,7 @@ const AppointmentCreate1 = () => {
         <Text className="text-light-red">{errors.name.message}</Text>
       )}
 
-      <Text className="text-xl font-bold mb-2">
+      <Text className="text-xl font-bold mb-2 text-text-primary">
         {t('createAppointment.category.title')}
       </Text>
       <Controller
