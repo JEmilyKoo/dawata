@@ -38,3 +38,10 @@ export interface ClubCreateInfo {
   name: string
   category: string
 }
+
+export interface SearchMemberByEmailResponse {
+  id: number
+  email: string
+  name: string
+  photoName: string
+}
