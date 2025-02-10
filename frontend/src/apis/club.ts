@@ -1,5 +1,6 @@
 import { Club } from '@/types/club'
 import type { ClubCreateInfo } from '@/types/club'
+import { SearchMemberByEmailResponse } from '@/types/club'
 
 import api from './api'
 
@@ -246,5 +247,18 @@ export const banMember = async ({
   } catch (error) {
     console.error('⛔ 특정 회원 강퇴 실패:')
     return false
+  }
+}
+
+// 이메일로 멤버 검색
+export const searchMemberByEmail = async (email: string) => {
+  try {
+    const response = await api.post(`/clubs/search/email`, {
+      email: 'test@email.com',
+    })
+    return response
+  } catch (error) {
+    console.error('⛔ 이메일로 멤버 검색 실패:')
+    return null
   }
 }
