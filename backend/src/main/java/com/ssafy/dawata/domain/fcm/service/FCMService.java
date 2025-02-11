@@ -33,13 +33,13 @@ public class FCMService {
 	private final FcmRepository fcmRepository;
 
 	@Transactional
-	public void insertFcmToken(FcmRequest fcmRequest) {
-		if (fcmRepository.findTokenUseMember(1L) == null) {
+	public void insertFcmToken(Long id, FcmRequest fcmRequest) {
+		if (fcmRepository.findTokenUseMember(id) == null) {
 			fcmRepository.save(FcmToken.createToken(fcmRequest.token()));
 		}
 
 		FcmToken fcmToken =
-			fcmRepository.findById(1L).orElseThrow(IllegalArgumentException::new);
+			fcmRepository.findById(id).orElseThrow(IllegalArgumentException::new);
 
 		fcmToken.updateToken(fcmRequest.token());
 	}
