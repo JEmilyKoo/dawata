@@ -15,18 +15,20 @@ const ClubMemberList = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView>
-        <Text className="flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
+        <Text className="text-xl font-bold mb-2 text-text-primary flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
           클럽 멤버 목록
         </Text>
         {clubMemberList.map((item, index) => (
           <View
             key={index}
-            style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
+            className="flex-row p-2.5 items-center">
             <View>
-              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+              <Text className="text-xl font-bold mb-2 text-text-primary">
                 {item.nickname}
               </Text>
-              <Text>{item.email}</Text>
+              <Text className="text-xs font-bold mb-2 text-text-secondary">
+                {item.email}
+              </Text>
             </View>
           </View>
         ))}
