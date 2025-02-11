@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.club.entity;
 
+import com.ssafy.dawata.domain.common.entity.BaseEntity;
 import com.ssafy.dawata.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "club_member")
-public class ClubMember {
+public class ClubMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
