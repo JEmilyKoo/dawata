@@ -37,6 +37,7 @@ public class S3Controller {
 			description = "엔티티 type 지정", example = "MEMBER")
 		@RequestParam(value = "entityCategory", required = false) EntityCategory entityCategory
 	) {
-		return ResponseEntity.ok(ApiResponse.success(s3Service.generatePresignedUrl(fileName, method, entityCategory)));
+		return ResponseEntity.ok(
+			ApiResponse.success(s3Service.generatePresignedUrl(fileName, method, entityCategory, 1L)));
 	}
 }
