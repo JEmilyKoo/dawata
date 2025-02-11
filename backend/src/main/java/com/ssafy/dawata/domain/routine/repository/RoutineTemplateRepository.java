@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.routine.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,4 +43,5 @@ public interface RoutineTemplateRepository extends JpaRepository<RoutineTemplate
 	List<RoutineElementResponse> customFindByRoutineId(@Param("routineId") Long routineId);
 
 	RoutineTemplate save(RoutineTemplate routineTemplate);
+
 }

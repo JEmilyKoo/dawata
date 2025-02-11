@@ -3,10 +3,12 @@ package com.ssafy.dawata.domain.routine.service;
 import static com.ssafy.dawata.domain.routine.entity.RoutineTemplate.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,11 +16,21 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 import com.ssafy.dawata.domain.routine.dto.request.RoutineElementRequest;
@@ -31,19 +43,37 @@ import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
 import com.ssafy.dawata.domain.routine.repository.RoutineElementRepository;
 import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class RoutineServiceTest {
-	@Mock
+	@MockBean
 	private RoutineTemplateRepository routineTemplateRepository;
-	@Mock
+	@MockBean
 	private RoutineElementRepository routineElementRepository;
-	@Mock
+
+	@MockBean
 	private MemberRepository memberRepository;
 
-	@InjectMocks
+	@Autowired
+	private MockMvc mockMvc;
+	@Autowired
+	private WebApplicationContext context;
+	@Autowired
 	private RoutineService routineService;
 
+	private final ObjectMapper objectMapper =
+		new ObjectMapper().registerModule(new JavaTimeModule());
+
+	@BeforeEach
+	void setUp() {
+		mockMvc = MockMvcBuilders
+			.webAppContextSetup(context)
+			.apply(springSecurity()) // ✅ Security 필터 적용
+			.build();
+	}
+
 	@Test
+	@WithMockUser(username = "testUser", roles = {"USER"})
 	@DisplayName("내 모든 루틴 조회 - 성공")
 	void success_findAllRoutines() {
 		// given
@@ -62,7 +92,7 @@ class RoutineServiceTest {
 
 		// then
 		Slice<RoutineTemplateResponse> routineElementResponses =
-			routineService.findAllRoutines();
+			routineService.findAllRoutines(anyLong());
 
 		assertEquals(routineTemplateResponseSlice.getContent().size(), 2);
 		assertEquals(routineTemplateResponseSlice.getContent().get(0).name(),
@@ -72,11 +102,10 @@ class RoutineServiceTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testUser", roles = {"USER"})
 	@DisplayName("내 특정 루틴 조회 - 성공")
 	void success_findRoutine() {
 		// given
-		Long routineId = 1L;
-		Long userId = 1L;
 		RoutineTemplate routineTemplate =
 			new RoutineTemplate("test", null);
 		RoutineElementResponse response1 =
@@ -87,13 +116,13 @@ class RoutineServiceTest {
 			List.of(response1, response2);
 
 		// when
-		when(routineTemplateRepository.findById(userId))
+		when(routineTemplateRepository.findById(anyLong()))
 			.thenReturn(Optional.of(routineTemplate));
-		when(routineTemplateRepository.customFindByRoutineId(routineId))
+		when(routineTemplateRepository.customFindByRoutineId(anyLong()))
 			.thenReturn(responseList);
 
 		// then
-		RoutineDetailResponse routineResponse = routineService.findRoutine(routineId);
+		RoutineDetailResponse routineResponse = routineService.findRoutine(anyLong(), anyLong());
 
 		assertEquals(routineResponse.name(), routineTemplate.getName());
 		assertEquals(routineResponse.routineTemplateList().size(), responseList.size());
@@ -106,6 +135,7 @@ class RoutineServiceTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testUser", roles = {"USER"})
 	@DisplayName("루틴 생성 - 성공")
 	void success_saveRoutine() {
 		// given
@@ -131,7 +161,7 @@ class RoutineServiceTest {
 		when(routineElementRepository.save(any(RoutineElement.class)))
 			.thenAnswer(invocation -> invocation.getArgument(0));
 
-		routineService.saveRoutine(request);
+		routineService.saveRoutine(anyLong(), request);
 
 		// then
 		verify(memberRepository, times(1)).getReferenceById(anyLong());
@@ -149,6 +179,7 @@ class RoutineServiceTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testUser", roles = {"USER"})
 	@DisplayName("루틴 수정 - 성공")
 	void success_updateRoutine() {
 		// given
@@ -173,8 +204,9 @@ class RoutineServiceTest {
 		doNothing().when(routineElementRepository).deleteAllByRoutineTemplate(any(RoutineTemplate.class));
 		when(routineElementRepository.save(any(RoutineElement.class)))
 			.thenAnswer(invocation -> invocation.getArgument(0));
+		when(routineTemplate.getMember().getId()).thenReturn(1L);
 
-		routineService.updateRoutine(1L, request);
+		routineService.updateRoutine(1L, anyLong() , request);
 
 		// then
 		verify(routineTemplateRepository, times(1))
@@ -195,6 +227,7 @@ class RoutineServiceTest {
 	}
 
 	@Test
+	@WithMockUser(username = "testUser", roles = {"USER"})
 	@DisplayName("루틴 삭제 - 성공")
 	void success_deleteRoutine() {
 		// given
@@ -213,14 +246,16 @@ class RoutineServiceTest {
 			= new RoutineRequest("tester", routineElementList);
 
 		// when
-		when(routineTemplateRepository.findById(anyLong()))
+		when(routineTemplateRepository.findById(1L))
 			.thenReturn(Optional.of(routineTemplate));
 		doNothing().when(routineElementRepository)
 			.deleteAllByRoutineTemplate(routineTemplate);
 		doNothing().when(routineTemplateRepository)
-			.deleteById(anyLong());
+			.deleteById(1L);
 
-		routineService.deleteRoutine(anyLong());
+		when(routineTemplate.getMember().getId()).thenReturn(1L);
+
+		routineService.deleteRoutine(1L, 1L);
 
 		// then
 		verify(routineTemplateRepository, times(1))

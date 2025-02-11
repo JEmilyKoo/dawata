@@ -25,17 +25,13 @@ public class RoutineService {
 	private final RoutineTemplateRepository routineTemplateRepository;
 	private final RoutineElementRepository routineElementRepository;
 
-	public Slice<RoutineTemplateResponse> findAllRoutines() {
-		Long id = 1L;
-
-		return routineTemplateRepository.customFindAllByMemberId(id);
+	public Slice<RoutineTemplateResponse> findAllRoutines(Long memberId) {
+		return routineTemplateRepository.customFindAllByMemberId(memberId);
 	}
 
-	public RoutineDetailResponse findRoutine(Long routineId) {
-		Long id = 1L;
-
+	public RoutineDetailResponse findRoutine(Long memberId, Long routineId) {
 		return RoutineDetailResponse.builder()
-			.name(routineTemplateRepository.findById(id)
+			.name(routineTemplateRepository.findById(memberId)
 				.orElseThrow(IllegalArgumentException::new).getName())
 			.routineTemplateList(
 				routineTemplateRepository.customFindByRoutineId(routineId))
@@ -43,13 +39,11 @@ public class RoutineService {
 	}
 
 	@Transactional
-	public void saveRoutine(RoutineRequest routineRequest) {
-		Long userId = 1L;
-
+	public void saveRoutine(Long memberId, RoutineRequest routineRequest) {
 		RoutineTemplate routineTemplate =
 			createRoutineTemplate(
 				routineRequest.name(),
-				memberRepository.getReferenceById(userId));
+				memberRepository.getReferenceById(memberId));
 
 		RoutineTemplate rt = routineTemplateRepository.save(routineTemplate);
 
@@ -64,10 +58,14 @@ public class RoutineService {
 	}
 
 	@Transactional
-	public void updateRoutine(Long routineId, RoutineRequest routineRequest) {
+	public void updateRoutine(Long memberId, Long routineId, RoutineRequest routineRequest) {
 		RoutineTemplate routineTemplate =
 			routineTemplateRepository.findById(routineId)
 				.orElseThrow(IllegalArgumentException::new);
+
+		if (routineTemplate.getMember().getId() != memberId) {
+			throw new IllegalArgumentException("자신의 루틴이 아닙니다요");
+		}
 
 		routineElementRepository.deleteAllByRoutineTemplate(routineTemplate);
 
@@ -82,10 +80,14 @@ public class RoutineService {
 	}
 
 	@Transactional
-	public void deleteRoutine(Long routineId) {
+	public void deleteRoutine(Long memberId, Long routineId) {
 		RoutineTemplate routineTemplate =
 			routineTemplateRepository.findById(routineId)
 				.orElseThrow(IllegalArgumentException::new);
+
+		if (routineTemplate.getMember().getId() != memberId) {
+			throw new IllegalArgumentException("자신의 루틴이 아닙니다요");
+		}
 
 		routineElementRepository.deleteAllByRoutineTemplate(routineTemplate);
 		routineTemplateRepository.deleteById(routineId);

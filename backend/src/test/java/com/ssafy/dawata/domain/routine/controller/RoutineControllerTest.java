@@ -2,6 +2,8 @@ package com.ssafy.dawata.domain.routine.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -16,43 +18,71 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.monitoring.v3.Service;
+import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
+import com.ssafy.dawata.domain.auth.handler.CustomOAuth2AuthenticationFailureHandler;
+import com.ssafy.dawata.domain.auth.handler.CustomOAuth2AuthenticationSuccessHandler;
+import com.ssafy.dawata.domain.auth.service.CustomOAuth2UserService;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
+import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.routine.dto.request.RoutineRequest;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineDetailResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
 import com.ssafy.dawata.domain.routine.service.RoutineService;
+import com.ssafy.dawata.global.config.SecurityConfig;
+import com.ssafy.dawata.global.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.ssafy.dawata.global.filter.JwtAuthenticationFilter;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class RoutineControllerTest {
-	@Mock
+	@MockBean
 	private RoutineService routineService;
 
-	@InjectMocks
-	private RoutineController routineController;
-
+	@Autowired
 	private MockMvc mockMvc;
+	@Autowired
+	private WebApplicationContext context;
+
 	private final ObjectMapper objectMapper =
 		new ObjectMapper().registerModule(new JavaTimeModule());
 
 	@BeforeEach
 	void setUp() {
-		mockMvc = MockMvcBuilders.standaloneSetup(routineController).build();
+		mockMvc = MockMvcBuilders
+			.webAppContextSetup(context)
+			.apply(springSecurity()) // ✅ Security 필터 적용
+			.build();
 	}
 
 	@Test
+	@WithMockUser(username = "testUser", roles = {"USER"})
 	@DisplayName("내 루틴 모두 조회 - 성공")
 	void success_getRoutineList() throws Exception {
 		// given
@@ -68,7 +98,8 @@ class RoutineControllerTest {
 		Slice<RoutineTemplateResponse> routineTemplateResponseSlice = new SliceImpl<>(noticeResponses, pageable, true);
 
 		//when
-		when(routineService.findAllRoutines()).thenReturn(routineTemplateResponseSlice);
+		when(routineService.findAllRoutines(anyLong()))
+			.thenReturn(routineTemplateResponseSlice);
 
 		// then
 		mockMvc.perform(get("/routines")
@@ -99,7 +130,7 @@ class RoutineControllerTest {
 			new RoutineDetailResponse("test", List.of(response1, response2));
 
 		//when
-		when(routineService.findRoutine(1L)).thenReturn(detailResponse);
+		when(routineService.findRoutine(anyLong(), anyLong())).thenReturn(detailResponse);
 
 		// then
 		mockMvc.perform(get("/routines/1")
