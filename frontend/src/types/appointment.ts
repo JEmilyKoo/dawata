@@ -15,6 +15,8 @@ export interface AppointmentInfo {
 
 export interface ParticipantInfo {
   participantId: number
+  memberId: number
+  name: string
   isAttending: boolean
   dailyStatus: string
   role: string
