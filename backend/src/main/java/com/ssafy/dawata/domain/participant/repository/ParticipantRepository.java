@@ -18,7 +18,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 				cm.clubName,
 				COUNT(*),
 				SUM(CASE WHEN p.dailyStatus = 'P' THEN 1 ELSE 0 END),
-        		SUM(CASE WHEN p.dailyStatus = 'L' THEN 1 ELSE 0 END),
+	       		SUM(CASE WHEN p.dailyStatus = 'L' THEN 1 ELSE 0 END),
 			    SUM(CASE WHEN p.dailyStatus = 'NS' THEN 1 ELSE 0 END)
 			)
 			FROM Participant p

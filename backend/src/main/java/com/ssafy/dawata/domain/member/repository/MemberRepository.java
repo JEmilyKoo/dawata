@@ -18,12 +18,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Query("""
 		    SELECT new com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse(
 		        m.email,
-				m.name, 
-				p.photoName, 
+				m.name,
+				p.photoName,
 				m.createdAt)
 		    FROM Member m
 		    JOIN Photo p ON p.entityId = m.id
-		    WHERE p.entityId = :memberId 
+		    WHERE p.entityId = :memberId
 		    AND p.entityCategory = 1
 		""")
 	Optional<MemberInfoResponse> customFindById(@Param("memberId") Long id);
@@ -32,11 +32,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 		    SELECT new com.ssafy.dawata.domain.member.dto.response.ClubJoinSearchResponse(
 		    	m.id,
 		        m.email,
-				m.name, 
+				m.name,
 				p.photoName)
 		    FROM Member m
 		    JOIN Photo p ON p.entityId = m.id
-		    WHERE m.email = :email 
+		    WHERE m.email = :email
 		    AND p.entityCategory = 1
 		""")
 	Optional<ClubJoinSearchResponse> customFindByEmail(@Param("email") String email);
@@ -44,10 +44,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Query("""
 		SELECT m.id
 		FROM Member m
-		JOIN ClubMember cm ON m.id = cm.member.id
-		JOIN Participant p ON cm.id = p.clubMember.id
-		JOIN Appointment a ON p.appointment.id = a.id
+			JOIN ClubMember cm ON m.id = cm.member.id
+			JOIN Participant p ON cm.id = p.clubMember.id
+			JOIN Appointment a ON p.appointment.id = a.id
 		WHERE a.id = :appointmentId
 	""")
 	List<Long> customFindAllByAppointmentId(@Param("appointmentId") Long appointmentId);
+
+	@Query("""
+		SELECT m.id
+		FROM Member m
+			JOIN ClubMember cm ON m.id = cm.member.id
+			JOIN Participant p ON cm.id = p.clubMember.id
+		WHERE p.id = :participantId
+	""")
+	Optional<Long> customFindByParticipantId(@Param("participantId") Long participantId);
 }
