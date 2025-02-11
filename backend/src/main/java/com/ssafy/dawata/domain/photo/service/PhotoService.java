@@ -18,11 +18,14 @@ public class PhotoService {
 	@Transactional
 	public void savePhoto(String photoName) {
 		String[] strArr = photoName.split("_");
-		photoRepository.save(
-			Photo.createPhoto(
-				photoName,
-				EntityCategory.valueOf(strArr[0]),
-				1L));
+
+		if (!photoRepository.existsByPhotoName(photoName)) {
+			photoRepository.save(
+				Photo.createPhoto(
+					photoName,
+					EntityCategory.valueOf(strArr[0]),
+					1L));
+		}
 	}
 
 	@Transactional

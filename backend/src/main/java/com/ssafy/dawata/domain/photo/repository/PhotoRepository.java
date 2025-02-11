@@ -12,5 +12,9 @@ import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 	void deleteByPhotoName(String photoName);
 
+	Optional<Photo> findByEntityId(Long entityId);
+
+	boolean existsByPhotoName(String photoName);
+
 	Optional<Photo> findByEntityIdAndEntityCategory(Long entityId, EntityCategory entityCategory);
 }
