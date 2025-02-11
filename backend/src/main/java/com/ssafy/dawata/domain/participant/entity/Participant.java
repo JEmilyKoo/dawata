@@ -102,4 +102,8 @@ public class Participant {
 	public void updateDailyStatus(DailyStatus dailyStatus) {
 		this.dailyStatus = dailyStatus;
 	}
+
+	public void updateRole(Role role) {
+		this.role = role;
+	}
 }

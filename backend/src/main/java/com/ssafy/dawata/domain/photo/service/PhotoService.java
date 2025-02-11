@@ -18,14 +18,20 @@ public class PhotoService {
 	@Transactional
 	public void savePhoto(String photoName) {
 		String[] strArr = photoName.split("_");
+		
+		Long entityId = Long.parseLong(strArr[0]);
+		EntityCategory entityCategory = EntityCategory.valueOf(strArr[1]);
 
-		if (!photoRepository.existsByPhotoName(photoName)) {
-			photoRepository.save(
-				Photo.createPhoto(
-					photoName,
-					EntityCategory.valueOf(strArr[0]),
-					1L));
-		}
+		photoRepository.findByEntityIdAndEntityCategory(entityId, entityCategory)
+			.ifPresentOrElse(
+				photo -> {
+					photo.updatePhotoName(photoName);
+				},
+				() -> {
+					Photo photo = Photo.createPhoto(photoName, entityCategory, entityId);
+					photoRepository.save(photo);
+				}
+			);
 	}
 
 	@Transactional

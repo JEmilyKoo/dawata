@@ -35,12 +35,14 @@ public class S3Service {
 	 *                       - {@code null}이 아닌 경우 해당 이름으로 파일 이름 유지. -> Update, Get, Delete
 	 * @param method         요청 메서드 유형. ("get", "put", "delete")
 	 * @param entityCategory 엔터티의 카테고리. ("MEMBER", "FEED", "CLUB", "CLUB_MEMBER","APPOINTMENT")
-	 * @return               생성된 Presigned URL을 반환합니다.
+	 * @return 생성된 Presigned URL을 반환합니다.
 	 */
 	public URL generatePresignedUrl(
 		String fileName,
 		String method,
-		EntityCategory entityCategory) {
+		EntityCategory entityCategory,
+		Long entityId
+	) {
 
 		// 공통으로 사용하는 빌더 초기화
 		Duration expiration = Duration.ofMinutes(expirationMinutes);
@@ -60,7 +62,7 @@ public class S3Service {
 				return s3Presigner.presignPutObject(builder -> builder
 					.putObjectRequest(PutObjectRequest.builder()
 						.bucket(bucketName)
-						.key(createImageName(fileName, entityCategory))
+						.key(createImageName(fileName, entityCategory, entityId))
 						.contentType("image/png")
 						.build())
 					.signatureDuration(expiration)
@@ -86,11 +88,9 @@ public class S3Service {
 	 * @param fileName 파일 이름 <br>
 	 * 					- {@code null} : 파일 이름 새로 생성. <br>
 	 *                 	- {@code notNull} : 아닌 경우 해당 이름으로 return <br>
-	 * @param entityCategory 엔터티의 카테고리. ("MEMBER", "FEED", "CLUB", "CLUB_MEMBER","APPOINTMENT")
+	 * @param entityCategory 엔터티의 카테고리. ("MEMBER", "CLUB", "APPOINTMENT")
 	 * */
-	private static String createImageName(String fileName, EntityCategory entityCategory) {
-		return fileName == null ?
-			entityCategory + "_" + LocalDateTime.now() + "_" + "userEmail" + ".png"
-			: fileName;
+	private static String createImageName(String fileName, EntityCategory entityCategory, Long entityId) {
+		return entityId + "_" + entityCategory + "_" + LocalDateTime.now() + "_" + fileName + ".png";
 	}
 }

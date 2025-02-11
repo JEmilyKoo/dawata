@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipantsRequest;
+import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentHostRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
@@ -131,6 +132,19 @@ public class AppointmentController {
 	) {
 		appointmentService.updateParticipantDailyStatus(memberDetails.member().getId(), appointmentId,
 			requestDto.dailyStatus());
+		return ResponseEntity.ok(
+			ApiResponse.success()
+		);
+	}
+
+	@Operation(summary = "약속 모임장 업데이트", description = "약속 모임장을 업데이트합니다.")
+	@PatchMapping("/{appointmentId}/host")
+	public ResponseEntity<ApiResponse<?>> updateAppointmentHost(
+		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
+		@PathVariable Long appointmentId,
+		@RequestBody UpdateAppointmentHostRequest requestDto
+	) {
+		appointmentService.updateAppointmentHost(requestDto, memberDetails.member().getId(), appointmentId);
 		return ResponseEntity.ok(
 			ApiResponse.success()
 		);

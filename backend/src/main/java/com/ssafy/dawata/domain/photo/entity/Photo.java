@@ -2,6 +2,7 @@ package com.ssafy.dawata.domain.photo.entity;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.dawata.domain.common.entity.BaseTimeEntity;
 import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 import com.ssafy.dawata.domain.photo.enums.EntityCategoryConverter;
 
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Photo {
+public class Photo extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,9 +36,6 @@ public class Photo {
 	@Column(nullable = false)
 	private Long entityId;
 
-	@Column(nullable = false)
-	private LocalDateTime createAt = LocalDateTime.now();
-
 	@Builder(access = AccessLevel.PRIVATE)
 	public Photo(String photoName, EntityCategory entityCategory, Long entityId) {
 		this.photoName = photoName;
@@ -51,5 +49,9 @@ public class Photo {
 			.entityCategory(entityCategory)
 			.entityId(entityId)
 			.build();
+	}
+
+	public void updatePhotoName(String photoName) {
+		this.photoName = photoName;
 	}
 }

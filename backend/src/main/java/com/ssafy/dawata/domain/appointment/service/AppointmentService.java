@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipantsRequest;
+import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentHostRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
+import com.ssafy.dawata.domain.club.entity.Club;
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.common.enums.Role;
@@ -126,6 +128,9 @@ public class AppointmentService {
 			.orElseThrow(() -> new IllegalArgumentException("내가 속해 있는 약속이 아닙니다!"));
 
 		ClubMember clubMember = participant.getClubMember();
+		Club club = clubMember.getClub();
+		Photo clubPhoto = photoRepository.findByEntityIdAndEntityCategory(club.getId(), EntityCategory.CLUB)
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
 
 		List<VoteItem> voteItems = voteItemRepository.findVoteItemsWithAddressByAppointmentId(appointmentId);
 		List<Voter> voters = voterRepository.findVotersByParticipantIds(
@@ -137,16 +142,18 @@ public class AppointmentService {
 		List<AppointmentDetailResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
 			.stream()
 			.map(p -> {
-				Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
+				Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(),
+						EntityCategory.MEMBER)
 					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
-				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getMember().getId(), p.getClubMember().getNickname(), photo.getPhotoName());
+				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getMember().getId(),
+					p.getClubMember().getNickname(), photo.getPhotoName());
 			})
 			.toList();
 
 		return AppointmentDetailResponse.of(
 			clubMember.getClub().getId(),
 			clubMember.getClubName(),
-			clubMember.getClub().getImg(),
+			clubPhoto.getPhotoName(),
 			appointment,
 			participantResponses,
 			makeVoteResponses(voteItems, voters, participant.getId())
@@ -200,11 +207,11 @@ public class AppointmentService {
 			.getVoteItems();
 
 		voteItemRepository.deleteAll(voteItems);
-		
+
 		appointmentRepository.delete(appointment);
 	}
 
-	private void  validateParticipant(Long memberId, Long appointmentId) {
+	private void validateParticipant(Long memberId, Long appointmentId) {
 		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
 
@@ -229,6 +236,29 @@ public class AppointmentService {
 		participant.updateDailyStatus(dailyStatus);
 	}
 
+	@Transactional
+	public void updateAppointmentHost(UpdateAppointmentHostRequest requestDto, Long memberId, Long appointmentId) {
+		validateIsHost(memberId, appointmentId);
+
+		Participant originalHost = participantRepository.findById(requestDto.oriHost().participantId())
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 참가자가 없습니다."));
+
+		Participant newHost = participantRepository.findById(requestDto.newHost().participantId())
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 참가자가 없습니다."));
+
+		originalHost.updateRole(Role.GUEST);
+		newHost.updateRole(Role.HOST);
+	}
+
+	private void validateIsHost(Long memberId, Long appointmentId) {
+		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
+
+		if (participant.getRole() != Role.HOST) {
+			throw new IllegalArgumentException("약속의 모임장이 아닙니다.");
+		}
+	}
+
 	private List<AppointmentWithExtraInfoResponse> makeAppointmentWithExtraInfoResponses(Long memberId,
 		List<Appointment> appointments) {
 		return appointments.stream()
@@ -247,10 +277,17 @@ public class AppointmentService {
 				String clubName =
 					participant.isPresent() ? targetClubMember.getClubName() : targetClubMember.getClub().getName();
 
+				Club targetClub = targetClubMember.getClub();
+
+				Photo clubPhoto = photoRepository.findByEntityIdAndEntityCategory(targetClub.getId(),
+						EntityCategory.CLUB)
+					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+
 				List<AppointmentWithExtraInfoResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
 					.stream()
 					.map(p -> {
-						Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
+						Photo photo = photoRepository.findByEntityIdAndEntityCategory(
+								p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
 							.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
 						return AppointmentWithExtraInfoResponse.ParticipantResponse.of(p, photo.getPhotoName());
 					})
@@ -268,9 +305,9 @@ public class AppointmentService {
 				}
 
 				return AppointmentWithExtraInfoResponse.of(
-					targetClubMember.getClub().getId(),
+					targetClub.getId(),
 					clubName,
-					targetClubMember.getClub().getImg(),
+					clubPhoto.getPhotoName(),
 					appointment,
 					participantResponses,
 					voteStatus
