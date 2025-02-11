@@ -70,6 +70,8 @@ public class AppointmentService {
 
 			participantRepository.save(participant);
 		});
+
+
 	}
 
 	public List<AppointmentWithExtraInfoResponse> findMyAllAppointmentList(
@@ -148,6 +150,10 @@ public class AppointmentService {
 
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
+
+		if (!appointment.getScheduledAt().isEqual(appointment.getScheduledAt())) {
+			// TODO : 만료시간 갱신
+		}
 
 		requestDto.name().ifPresent(appointment::updateName);
 		requestDto.category().ifPresent(appointment::updateCategory);

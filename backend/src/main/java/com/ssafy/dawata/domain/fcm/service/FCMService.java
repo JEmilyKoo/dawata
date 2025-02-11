@@ -34,19 +34,19 @@ public class FCMService {
 
 	@Transactional
 	public void insertFcmToken(FcmRequest fcmRequest) {
-		if (fcmRepository.findTokenUseMember() == null) {
+		if (fcmRepository.findTokenUseMember(1L) == null) {
 			fcmRepository.save(FcmToken.createToken(fcmRequest.token()));
 		}
 
 		FcmToken fcmToken =
-				fcmRepository.findById(1L).orElseThrow(IllegalArgumentException::new);
+			fcmRepository.findById(1L).orElseThrow(IllegalArgumentException::new);
 
 		fcmToken.updateToken(fcmRequest.token());
 	}
 
-	public void sendNotification(String type, String messageType, Long entityId) {
+	public void sendNotification(String type, String messageType, Long entityId, Long memberId) {
 		try {
-			int typeCode = Integer.parseInt(type+messageType);
+			int typeCode = Integer.parseInt(type + messageType);
 
 			Object[] messageValues = findMessageValue(typeCode, entityId);
 			NoticeType noticeType =
@@ -55,7 +55,7 @@ public class FCMService {
 			// 메시지 생성
 			Message message = Message.builder()
 				.setToken(
-					fcmRepository.findTokenUseMember())
+					fcmRepository.findTokenUseMember(memberId))
 				.setNotification(Notification.builder()
 					.setTitle(noticeType.getTitle())
 					.setBody(String.format(noticeType.getBody(), messageValues))

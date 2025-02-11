@@ -11,10 +11,11 @@ public enum NoticeType {
 	VOTE_END(22, "투표", "%s에서 투표가 마감되었습니다."),
 	APPOINTMENT_HISTORY_NOTICE(31, "약속", "약속 알림~"), // 요건 fe과 상의필요
 	APPOINTMENT_UPDATE(32, "약속", "%s 약속이 변경되었습니다."),
-	LIVE_OTHER_ARRIVED(41, "라이브", "%s님이 목적지에 도착했습니다."),
-	LIVE_HURRY_UP_NOTICE(42, "라이브", "%s님이 재촉하고 있습니다."),
-	LIVE_VIDEO_TELEPHONY(43, "라이브", "%s님이 화상통화를 걸었습니다."),
-	ROUTINE_NOTICE(51, "루틴","%s님, %s할 시간입니다.");
+	LIVE_START(33, "라이브", "%s live가 시작 되었습니다."),
+	LIVE_OTHER_ARRIVED(42, "라이브", "%s님이 목적지에 도착했습니다."),
+	LIVE_HURRY_UP_NOTICE(43, "라이브", "%s님이 재촉하고 있습니다."),
+	LIVE_VIDEO_TELEPHONY(44, "라이브", "%s님이 화상통화를 걸었습니다."),
+	ROUTINE_NOTICE(51, "루틴", "%s님, %s할 시간입니다.");
 
 	private final int code;
 	private final String title;

@@ -39,6 +39,7 @@ public class SqsService {
 	@PreDestroy
 	public void shutdown() {
 		running.set(false);
+
 		sqsAsyncClient.close();
 	}
 
