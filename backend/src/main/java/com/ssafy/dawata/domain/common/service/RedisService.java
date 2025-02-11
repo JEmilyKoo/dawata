@@ -6,7 +6,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class RedisService {
 	private static final int TWO_HOURS = 60 * 60 * 2;
 
@@ -47,13 +52,10 @@ public class RedisService {
 		String key
 	) {
 		try {
-			String value = redisTemplate.opsForValue().get(key);
-			// TODO : 없으면 에러
+			return redisTemplate.opsForValue().get(key);
 		} catch (RuntimeException e) {
 			throw new IllegalArgumentException(e);
 		}
-
-		return null;
 	}
 
 	/**

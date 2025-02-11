@@ -48,7 +48,7 @@ public class FCMService {
 		try {
 			int typeCode = Integer.parseInt(type + messageType);
 
-			Object[] messageValues = findMessageValue(typeCode, entityId);
+			Object[] messageValues = findMessageValue(typeCode, entityId, memberId);
 			NoticeType noticeType =
 				NoticeType.fromCodeToNoticeType(typeCode);
 
@@ -72,26 +72,30 @@ public class FCMService {
 		}
 	}
 
-	private Object[] findMessageValue(int typeCode, Long entityId) {
+	private Object[] findMessageValue(int typeCode, Long entityId, Long memberId) {
 		switch (typeCode / 10) {
 			case 1, 2 -> {
 				return Arrays.asList(
-					clubRepository.getReferenceById(entityId).getName()
+					clubRepository.findById(entityId)
+						.orElseThrow(IllegalArgumentException::new).getName()
 				).toArray();
 			}
 			case 3 -> {
 				return Arrays.asList(
-					appointmentRepository.getReferenceById(entityId).getName()
+					appointmentRepository.findById(entityId)
+						.orElseThrow(IllegalArgumentException::new).getName()
 				).toArray();
 			}
 			case 4 -> {
 				return Arrays.asList(
-					memberRepository.getReferenceById(entityId).getName()
+					memberRepository.findById(entityId)
+						.orElseThrow(IllegalArgumentException::new).getName()
 				).toArray();
 			}
 			case 5 -> {
 				return Arrays.asList(
-					memberRepository.getReferenceById(1L).getName(),
+					memberRepository.findById(memberId)
+						.orElseThrow(IllegalArgumentException::new).getName(),
 					routineElementRepository.getReferenceById(entityId).getPlay()
 				).toArray();
 			}

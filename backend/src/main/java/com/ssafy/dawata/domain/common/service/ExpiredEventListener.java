@@ -6,11 +6,10 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
-import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
-import com.ssafy.dawata.domain.appointment.entity.Appointment;
-import com.ssafy.dawata.domain.appointment.service.AppointmentService;
 import com.ssafy.dawata.domain.fcm.service.FCMService;
-import com.ssafy.dawata.domain.notice.service.NoticeService;
+import com.ssafy.dawata.domain.member.repository.MemberRepository;
+
+import com.ssafy.dawata.domain.appointment.service.AppointmentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ExpiredEventListener implements MessageListener {
 	private final FCMService fcmService;
+	private final MemberRepository memberRepository;
 	private final AppointmentService appointmentService;
 
 	@Override
@@ -35,17 +35,21 @@ public class ExpiredEventListener implements MessageListener {
 	}
 
 	private void handleExpiredKey(String expiredKey) {
-		if (expiredKey.contains("live start : ")) {
+		if (expiredKey.contains("live start :")) {
 			liveStart(expiredKey);
 		} else {
 			throw new IllegalArgumentException("정해진 키가 아님둥~");
 		}
 	}
 
+	// 라이브 시작 알림
 	private void liveStart(String expiredKey) {
 		Long id = Long.parseLong(expiredKey.substring(12));
 
-		// TODO : id로 약속내 모든 약속멤버 X -> base 멤버의 List룰 Get
-		fcmService.sendNotification("4", "1", 1L, null);
+		List<Long> l = memberRepository.customFindAllByAppointmentId(id);
+
+		for (Long memberId : l) {
+			fcmService.sendNotification("3", "3", id, memberId);
+		}
 	}
 }
