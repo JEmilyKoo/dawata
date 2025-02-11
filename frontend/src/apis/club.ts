@@ -260,3 +260,22 @@ export const searchMemberByEmail = async (email: string) => {
     return null
   }
 }
+
+interface ExchangeAdminRoleParams {
+  clubId: number
+  newAdminId: number
+}
+
+export const exchangeAdminRole = async ({
+  clubId,
+  newAdminId,
+}: ExchangeAdminRoleParams) => {
+  try {
+    const response = await api.patch(`/clubs/${clubId}/admin`, {
+      newAdminId,
+    })
+    return response
+  } catch (error) {
+    console.error('⛔ 관리자 권한 위임 실패:')
+  }
+}
