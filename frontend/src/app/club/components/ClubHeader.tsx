@@ -28,7 +28,10 @@ const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
     router.push({ pathname: '/club/updateInfo', params: { clubId: clubId } })
   }
   const getMemberList = () => {
-    router.push('/club/memberList')
+    router.push({
+      pathname: '/club/memberList',
+      params: { clubId: clubId },
+    })
   }
 
   const updateClubProfile = () => {

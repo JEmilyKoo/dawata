@@ -15,7 +15,8 @@ export default function ClubLayout() {
           }}
         />
         <Stack.Screen name="main" />
-        <Stack.Screen name="list" />{' '}
+        <Stack.Screen name="list" />
+        <Stack.Screen name="memberList" />
         <Stack.Screen
           name="updateInfo"
           options={{
