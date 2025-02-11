@@ -53,6 +53,7 @@ public class RedisService {
 	) {
 		try {
 			return redisTemplate.opsForValue().get(key);
+			// TODO : 없으면 에러
 		} catch (RuntimeException e) {
 			throw new IllegalArgumentException(e);
 		}

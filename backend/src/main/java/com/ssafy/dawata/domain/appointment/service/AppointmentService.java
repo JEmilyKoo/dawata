@@ -172,6 +172,7 @@ public class AppointmentService {
 				)
 			);
 		}
+
 		if (!appointment.getScheduledAt().isEqual(appointment.getScheduledAt())) {
 			// TODO : 만료시간 갱신
 		}
