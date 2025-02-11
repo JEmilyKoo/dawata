@@ -47,3 +47,23 @@ export interface SearchMemberByEmailResponse {
   name: string
   photoName: string
 }
+
+export interface ClubListResponseMember {
+  clubMemberId: number
+  clubId: number
+  clubName: string
+  memberId: number
+  nickname: string
+  role: number
+  img: string
+}
+
+export interface ClubListResponse {
+  clubId: number
+  name: string
+  category: string
+  teamCode: string
+  img: string
+  createDate: string
+  members: ClubListResponseMember[]
+}
