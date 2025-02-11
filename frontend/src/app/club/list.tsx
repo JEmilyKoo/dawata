@@ -11,13 +11,15 @@ import { Calendar, LocaleConfig } from 'react-native-calendars'
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams } from 'expo-router'
 
+import ClubAddModal from '@/app/club/components/ClubAddModal'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
-import ClubAddModal from '@/app/club/components/ClubAddModal'
 import ClubItem from '@/components/ClubItem'
+
+import { useClubList } from './hooks/useClubList'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -64,70 +66,10 @@ LocaleConfig.defaultLocale = 'kr'
 type RouteParams = {
   clubId: string
 }
-
-interface ParticipantInfo {
-  email: string
-  name: string
-  img: any
-  createdAt: string
-}
-
-interface ClubInfo {
-  clubId: string
-  name: string
-  img: any
-  category: string
-  createdAt: string
-  participantInfo: ParticipantInfo[]
-}
-
-const clubInfo: ClubInfo[] = [
-  {
-    clubId: '1',
-    name: 'No.1',
-    img: require('@/assets/clubs/club1.png'),
-    category: '스터디',
-    createdAt: '2025-01-07',
-    participantInfo: [
-      {
-        email: 'test@test.com',
-        name: '테스트',
-        img: require('@/assets/avatars/user1.png'),
-        createdAt: '2025-01-07',
-      },
-    ],
-  },
-  {
-    clubId: '2',
-    name: '역삼FC',
-    img: require('@/assets/clubs/club2.png'),
-    category: '축구',
-    createdAt: '2025-01-07',
-    participantInfo: [
-      {
-        email: 'test@test.com',
-        name: '테스트',
-        img: require('@/assets/avatars/user1.png'),
-        createdAt: '2025-01-07',
-      },
-      {
-        email: 'test@test.com',
-        name: '테스트',
-        img: require('@/assets/avatars/user2.png'),
-        createdAt: '2025-01-07',
-      },
-      {
-        email: 'test@test.com',
-        name: '테스트',
-        img: require('@/assets/avatars/user1.png'),
-        createdAt: '2025-01-07',
-      },
-    ],
-  },
-]
 export default function ClubMain() {
   const { showActionSheetWithOptions } = useActionSheet()
   const params = useLocalSearchParams<RouteParams>()
+  const { clubList } = useClubList()
   console.log('clubId:', params)
 
   const markedDates = {
@@ -169,7 +111,7 @@ export default function ClubMain() {
       </View>
 
       <ScrollView>
-        {clubInfo.map((club) => (
+        {clubList.map((club) => (
           <View className="m-2 px-4 border-b border-bord">
             <ClubItem clubInfo={club} />
           </View>
