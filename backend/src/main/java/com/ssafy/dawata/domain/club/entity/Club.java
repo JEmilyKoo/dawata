@@ -3,6 +3,7 @@ package com.ssafy.dawata.domain.club.entity;
 import com.ssafy.dawata.domain.common.entity.BaseEntity;
 import com.ssafy.dawata.domain.common.enums.Category;
 import com.ssafy.dawata.domain.common.enums.CategoryConverter;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,53 +18,45 @@ import java.util.List;
 @Table(name = "club")
 public class Club extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String name;
+	@Column(nullable = false)
+	private String name;
 
-    @Convert(converter = CategoryConverter.class)
-    @Column(nullable = false)
-    private Category category;
+	@Convert(converter = CategoryConverter.class)
+	@Column(nullable = false)
+	private Category category;
 
-    //일단은 업데이트 가능하게.
-    @Column(nullable = false, length = 6, unique = true)
-    private String teamCode;
+	//일단은 업데이트 가능하게.
+	@Column(nullable = false, length = 6, unique = true)
+	private String teamCode;
 
-    @Column
-    private String img;
+	@OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ClubMember> members;
 
+	@Builder(access = AccessLevel.PRIVATE)
+	public Club(String name, Category category, String teamCode) {
+		this.name = name;
+		this.category = category;
+		this.teamCode = teamCode;
+	}
 
-    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClubMember> members;
+	public static Club createClub(String name, Category category, String teamCode) {
+		return Club.builder()
+			.name(name)
+			.category(category)
+			.teamCode(teamCode)
+			.build();
+	}
 
-    @Builder(access = AccessLevel.PRIVATE)
-    public Club(String name, Category category, String teamCode) {
-        this.name = name;
-        this.category = category;
-        this.teamCode = teamCode;
-    }
+	public void updateName(String name) {
+		this.name = name;
+	}
 
-    public static Club createClub(String name, Category category, String teamCode) {
-        return Club.builder()
-                .name(name)
-                .category(category)
-                .teamCode(teamCode)
-                .build();
-    }
-
-    public void updateName(String name) {
-        this.name = name;
-    }
-
-    public void updateCategory(Category category) {
-        this.category = category;
-    }
-
-    public void updateImg(String img) {
-        this.img = img;
-    }
+	public void updateCategory(Category category) {
+		this.category = category;
+	}
 
 }
