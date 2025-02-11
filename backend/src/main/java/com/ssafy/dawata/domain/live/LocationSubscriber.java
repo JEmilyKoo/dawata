@@ -24,7 +24,7 @@ public class LocationSubscriber implements MessageListener {
 		container.addMessageListener(this, new PatternTopic("appointment:*"));
 	}
 
-	// TODO : 추후 에러 처리 예정
+	// TODO(고) : 추후 에러 처리 예정
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
 		// message의 channel
@@ -36,7 +36,7 @@ public class LocationSubscriber implements MessageListener {
 				objectMapper.readValue(new String(message.getBody()), LiveRequest.class);
 
 			/*
-			 * TODO :
+			 * TODO(고) :
 			 *  1. 도착 check
 			 *  2. 도착 예정 시간
 			 * */

@@ -40,4 +40,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 		    AND p.entityCategory = 1
 		""")
 	Optional<ClubJoinSearchResponse> customFindByEmail(@Param("email") String email);
+
+	@Query("""
+		SELECT m.id
+		FROM Member m
+		JOIN ClubMember cm ON m.id = cm.member.id
+		JOIN Participant p ON cm.id = p.clubMember.id
+		JOIN Appointment a ON p.appointment.id = a.id
+		WHERE a.id = :appointmentId
+	""")
+	List<Long> customFindAllByAppointmentId(@Param("appointmentId") Long appointmentId);
 }

@@ -52,7 +52,7 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
 
 	public void broadcast(String appointmentId, String message) throws IOException {
 		Set<WebSocketSession> sessions = sessionMap.get(appointmentId);
-		System.out.println(sessions);
+
 		if (sessions != null) {
 			for (WebSocketSession session : sessions) {
 				session.sendMessage(new TextMessage(message));

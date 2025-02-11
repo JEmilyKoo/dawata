@@ -12,7 +12,7 @@ public interface FcmRepository extends JpaRepository<FcmToken, Long> {
 	@Query("""
 		    SELECT fcm.token
 		    FROM FcmToken fcm
-		    JOIN Member m ON m.id = fcm.id
+		    JOIN Member m ON m.id = fcm.member.id
 		    WHERE m.id = :memberId
 		""")
 	String findTokenUseMember(@Param("memberId") Long id);

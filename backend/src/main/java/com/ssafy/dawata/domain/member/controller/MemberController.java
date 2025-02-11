@@ -27,7 +27,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "내 정보 조회",
-            description = "내 정보를 조회하는 작업을 수행합니다. img는 아직 구현 전 (null로 return)")
+            description = "내 정보를 조회하는 작업을 수행합니다.")
     @GetMapping()
     public ResponseEntity<ApiResponse<MemberInfoResponse>> getMyInfo(@AuthenticationPrincipal SecurityMemberDetails memberDetails) {
         return ResponseEntity.ok(ApiResponse.success(memberService.findMemberInfo(memberDetails.member())));

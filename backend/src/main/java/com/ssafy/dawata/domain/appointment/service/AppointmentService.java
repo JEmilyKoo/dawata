@@ -3,9 +3,9 @@ package com.ssafy.dawata.domain.appointment.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +18,8 @@ import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.common.enums.Role;
+import com.ssafy.dawata.domain.common.service.RedisService;
+import com.ssafy.dawata.domain.live.enums.ExpiredKeyCategory;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 import com.ssafy.dawata.domain.participant.entity.Participant;
@@ -31,7 +33,6 @@ import com.ssafy.dawata.domain.vote.entity.Voter;
 import com.ssafy.dawata.domain.vote.enums.VoteStatus;
 import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 import com.ssafy.dawata.domain.vote.repository.VoterRepository;
-import com.ssafy.dawata.global.util.DateUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +48,9 @@ public class AppointmentService {
 	private final VoteItemRepository voteItemRepository;
 	private final VoterRepository voterRepository;
 	private final PhotoRepository photoRepository;
+
+	private final RedisTemplate<String, String> redisTemplateForOthers;
+	private final RedisService redisService;
 
 	@Transactional
 	public void createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
@@ -71,7 +75,12 @@ public class AppointmentService {
 			participantRepository.save(participant);
 		});
 
-
+		// redis에 만료시간으로 in
+		redisService.saveDataUseTTL(
+			redisTemplateForOthers,
+			ExpiredKeyCategory.LIVE_START.getKey() + appointmentEntity.getId(),
+			"",
+			redisService.getExpirationTime(appointmentEntity.getScheduledAt(), LocalDateTime.now()));
 	}
 
 	public List<AppointmentWithExtraInfoResponse> findMyAllAppointmentList(
@@ -151,6 +160,18 @@ public class AppointmentService {
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
 
+		if (requestDto.scheduledAt().isPresent()) {
+			// redis에 만료시간으로 in
+			redisService.updateDataUseTTL(
+				redisTemplateForOthers,
+				ExpiredKeyCategory.LIVE_START.getKey() + appointmentId,
+				redisService.getExpirationTime(
+					requestDto.scheduledAt().orElseThrow(
+						() -> new IllegalArgumentException("스케쥴이 존재하지 않습니다.")),
+					LocalDateTime.now()
+				)
+			);
+		}
 		if (!appointment.getScheduledAt().isEqual(appointment.getScheduledAt())) {
 			// TODO : 만료시간 갱신
 		}
@@ -168,15 +189,21 @@ public class AppointmentService {
 		Appointment appointment = appointmentRepository.findAppointmentByIdWithParticipant(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
 
+		// redis에서 해당 id를 key 데이터 삭제
+		redisService.deleteData(
+			redisTemplateForOthers,
+			ExpiredKeyCategory.LIVE_START.getKey() + appointmentId);
+
 		List<VoteItem> voteItems = appointmentRepository.findAppointmentByIdWithVoteItems(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."))
 			.getVoteItems();
 
 		voteItemRepository.deleteAll(voteItems);
+		
 		appointmentRepository.delete(appointment);
 	}
 
-	private void validateParticipant(Long memberId, Long appointmentId) {
+	private void  validateParticipant(Long memberId, Long appointmentId) {
 		Participant participant = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("약속에 참여하지 않는 참가자입니다."));
 
