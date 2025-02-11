@@ -16,6 +16,8 @@ export interface Club {
   name: string
   category: string
   teamCode: string
+  img: string
+  createdAt: string
   members: ClubMember[]
 }
 
@@ -47,3 +49,7 @@ export interface SearchMemberByEmailResponse {
   name: string
   photoName: string
 }
+
+//club에서 가져온 데이터는 info를 붙이지 않는다. 대신 앞에 club을 붙인다. .
+
+// Club  / ClubMember  :

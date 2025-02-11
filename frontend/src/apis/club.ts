@@ -1,6 +1,4 @@
-import { Club } from '@/types/club'
-import type { ClubCreateInfo } from '@/types/club'
-import { SearchMemberByEmailResponse } from '@/types/club'
+import type { Club, ClubCreateInfo } from '@/types/club'
 
 import api from './api'
 
