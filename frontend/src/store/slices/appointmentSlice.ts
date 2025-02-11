@@ -3,7 +3,10 @@ import { createSlice } from '@reduxjs/toolkit'
 
 import { AppointmentCreateInfo } from '@/types/appointment'
 
-const initialState: { create: AppointmentCreateInfo } = {
+const initialState: {
+  create: AppointmentCreateInfo
+  currentVoteStatus: string
+} = {
   create: {
     name: '',
     category: '',
@@ -12,6 +15,7 @@ const initialState: { create: AppointmentCreateInfo } = {
     clubId: 1,
     memberIds: [],
   },
+  currentVoteStatus: '',
 }
 
 const appointmentSlice = createSlice({
@@ -41,6 +45,9 @@ const appointmentSlice = createSlice({
     setCreateMemberIds(state, action) {
       state.create.memberIds = action.payload
     },
+    setCurrentVoteStatus(state, action) {
+      state.currentVoteStatus = action.payload
+    },
   },
 })
 
@@ -52,6 +59,6 @@ export const {
   setCreateVoteEndTime,
   setCreateClubId,
   setCreateMemberIds,
-
+  setCurrentVoteStatus,
 } = appointmentSlice.actions
 export default appointmentSlice.reducer

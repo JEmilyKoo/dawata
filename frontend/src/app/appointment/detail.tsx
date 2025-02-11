@@ -82,12 +82,15 @@ import { AppointmentDetailInfo } from '@/types/appointment'
 
 export default function AppointmentDetail() {
   const { t } = useTranslation()
-  const { id, status } = useLocalSearchParams()
+  const { id } = useLocalSearchParams()
   const [appointmentDetail, setAppointmentDetail] =
     useState<AppointmentDetailInfo>()
   const [isKebabMenuVisible, setIsKebabMenuVisible] = useState(false)
 
   const { user } = useSelector((state: RootState) => state.member)
+  const status = useSelector(
+    (state: RootState) => state.appointment.currentVoteStatus,
+  )
   const router = useRouter()
 
   // TODO: 호스트 여부 확인 (호스트 아이디와 유저 아이디 비교하고 싶은데 호스트 아이디가 없음, 참여자 아이디는 pk라 비교 불가)
