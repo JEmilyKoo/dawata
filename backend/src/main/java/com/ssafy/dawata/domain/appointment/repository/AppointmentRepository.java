@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.appointment.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,22 +17,21 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 	@Query("SELECT a FROM Appointment a WHERE a.id = :appointmentId")
 	Appointment findAppointmentWithParticipantsAndClubId(@Param("appointmentId") Long appointmentId);
 
-	@Query(
-		"""
-				SELECT new com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse (
-					a.name,
-					cm.club.name,
-					a.scheduledAt,
-					a.voteEndTime
-				)
-				FROM Member m
+	@Query("""
+			SELECT new com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse (
+				a.name,
+				cm.club.name,
+				a.scheduledAt,
+				a.voteEndTime
+			)
+			FROM Member m
 				JOIN ClubMember cm ON m.id = cm.member.id
 				JOIN Participant p ON cm.id = p.clubMember.id
 				JOIN Appointment a ON p.appointment.id = a.id
-				WHERE m.id = :memberId
-					AND FUNCTION('YEAR', a.scheduledAt) = :year
-					AND FUNCTION('MONTH', a.scheduledAt) = :month
-			"""
+			WHERE m.id = :memberId
+				AND FUNCTION('YEAR', a.scheduledAt) = :year
+				AND FUNCTION('MONTH', a.scheduledAt) = :month
+		"""
 	)
 	List<AppointmentInMonthResponse> findByScheduledAtInDate(
 		@Param("memberId") Long memberId, @Param("year") String year, @Param("month") String month);
@@ -45,4 +45,20 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 		"JOIN FETCH a.voteItems p " +
 		"WHERE a.id = :appointmentId")
 	Optional<Appointment> findAppointmentByIdWithVoteItems(Long appointmentId);
+
+	@Query("""
+		SELECT a.id
+		FROM Member m
+			JOIN ClubMember cm ON m.id = cm.member.id
+			JOIN Participant p ON cm.id = p.clubMember.id
+			JOIN Appointment a ON p.appointment.id = a.id
+		WHERE m.id = :memberId
+			AND a.scheduledAt BETWEEN :now AND :twoHoursLater
+	""")
+	List<Long> findByScheduledAtInTwoHours(
+		@Param("memberId") Long memberId,
+		@Param("now") LocalDateTime now,
+		@Param("twoHoursLater") LocalDateTime twoHoursLater
+	);
+
 }

@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import com.ssafy.dawata.domain.fcm.service.FCMService;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 
-import com.ssafy.dawata.domain.appointment.service.AppointmentService;
-
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -18,11 +16,10 @@ import lombok.RequiredArgsConstructor;
 public class ExpiredEventListener implements MessageListener {
 	private final FCMService fcmService;
 	private final MemberRepository memberRepository;
-	private final AppointmentService appointmentService;
 
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
-		/* TODO : 만료시간이 오면 key값으로 해당 역할로 진행
+		/* TODO(고) : 만료시간이 오면 key값으로 해당 역할로 진행
 		    1. 투표 완료
 		    	1.1. 약속 시간 2시간 전 시간까지로 만료시간 지정
 		    	1.2. 만료 이벤트 발생 시, live 관련 알림 제공
