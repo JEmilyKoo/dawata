@@ -202,13 +202,11 @@ public class AppointmentService {
 			redisTemplateForOthers,
 			ExpiredKeyCategory.LIVE_START.getKey() + appointmentId);
 
-		List<VoteItem> voteItems = appointmentRepository.findAppointmentByIdWithVoteItems(appointmentId)
-			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."))
-			.getVoteItems();
-
-		voteItemRepository.deleteAll(voteItems);
-
-		appointmentRepository.delete(appointment);
+		appointmentRepository.findAppointmentByIdWithVoteItems(appointmentId)
+			.ifPresentOrElse(
+				apt -> voteItemRepository.deleteAll(apt.getVoteItems()),
+				() -> appointmentRepository.delete(appointment)
+			);
 	}
 
 	private void validateParticipant(Long memberId, Long appointmentId) {
