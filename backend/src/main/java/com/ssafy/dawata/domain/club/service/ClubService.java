@@ -126,8 +126,9 @@ public class ClubService {
         validateClubAndMember(clubId, member.getId());
         List<ClubMemberInfoResponse> response = clubMemberRepository.findAllByClubId(clubId)
                 .stream()
-                .map(ClubMemberInfoResponse::from)
+                .map(clubMember -> ClubMemberInfoResponse.from(clubMember, photoRepository))
                 .toList();
+
         return ApiResponse.success(response);
     }
 
@@ -181,7 +182,7 @@ public class ClubService {
         ClubMember clubMember = clubMemberRepository.findById(clubMemberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 클럽 멤버가 존재X"));
 
-        return ApiResponse.success(ClubMemberInfoResponse.from(clubMember));
+        return ApiResponse.success(ClubMemberInfoResponse.from(clubMember, photoRepository));
     }
 
     //클럽 멤버 정보 수정
@@ -337,7 +338,7 @@ public class ClubService {
     //클럽 데이터 + 클럽 멤버 데이터 유틸 메서드
     private List<ClubMemberInfoResponse> getMembersForResponse(Long clubId) {
         return clubMemberRepository.findAllByClubId(clubId).stream()
-                .map(ClubMemberInfoResponse::from)
+                .map(clubMember -> ClubMemberInfoResponse.from(clubMember, photoRepository))
                 .toList();
     }
 
