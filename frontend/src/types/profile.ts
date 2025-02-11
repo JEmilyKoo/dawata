@@ -1,11 +1,11 @@
-export interface Appointment {
+export interface UserAppointment {
   appointmentName: string
-  groupName: string
+  clubName: string
   scheduledAt: string
   voteEndTime: string
 }
 
-export interface AttendanceStatus {
+export interface UserAttendanceStatus {
   clubId: number // 그룹 pk id
   clubName: string // 그룹 이름
   totalCount: number // 총 약속 횟수
@@ -13,3 +13,5 @@ export interface AttendanceStatus {
   lateTotalCount: number // 지각
   onTimeAttendanceTotalCount: number // 노쇼
 }
+// 내 출결 정보는 User를 붙인다.
+// UserAppointment, UserAttendanceStatus

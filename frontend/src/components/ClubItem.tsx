@@ -1,31 +1,21 @@
-import { Image, Text, TouchableOpacity, View } from "react-native"
+import { Image, Text, TouchableOpacity, View } from 'react-native'
 
-import ChevronDownIcon from "@/assets/icons/chevron-down.svg"
+import ChevronDownIcon from '@/assets/icons/chevron-down.svg'
+import ImageThumbnail from '@/components/ImageThumbnail'
+import { Club } from '@/types/club'
 
-interface ClubInfo {
-  clubId: string
-  name: string
-  img: any
-  category: string
-  createdAt: string
-  participantInfo: ParticipantInfo[]
-}
-
-interface ParticipantInfo {
-  email: string
-  name: string
-  img: any
-  createdAt: string
-}
-
-export default function ClubItem({ clubInfo }: { clubInfo: ClubInfo }) {
+export default function ClubItem({ clubInfo }: { clubInfo: Club }) {
+  const defaultImg = require('@/assets/clubs/club3.png')
   return (
     <TouchableOpacity
       key={clubInfo.clubId}
       className="flex-row justify-between items-center pb-4 rounded-xl mb-3">
-      <Image
-        source={clubInfo.img}
-        className="w-6 h-6 rounded-xl mb-2"
+      <ImageThumbnail
+        img={clubInfo.img}
+        defaultImg={defaultImg}
+        width={80}
+        height={80}
+        className="rounded-xl"
       />
       <View className="flex-1 ml-2">
         <View className="flex-row items-center">
@@ -35,13 +25,16 @@ export default function ClubItem({ clubInfo }: { clubInfo: ClubInfo }) {
           </Text>
         </View>
         <View className="flex-row space-x-1">
-          {clubInfo.participantInfo.map((participant, index) => (
+          {clubInfo.members.map((member, index) => (
             <View
               key={index}
               className="w-5 h-5 rounded-full bg-gray-300 pr-2">
-              <Image
-                source={participant.img}
-                style={{ width: 16, height: 16 }}
+              <ImageThumbnail
+                img={member.img}
+                defaultImg={defaultImg}
+                width={16}
+                height={16}
+                className="rounded-full"
               />
             </View>
           ))}
