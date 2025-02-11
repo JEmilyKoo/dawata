@@ -8,14 +8,14 @@ type RouteParams = {
   clubId: string
 }
 
-export const ClubMemberList = () => {
+const ClubMemberList = () => {
   const params = useLocalSearchParams<RouteParams>()
   const clubId = Number(params.clubId)
   const { clubMemberList } = useClubMemberList({ clubId })
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1 bg-white">
       <ScrollView>
-        <Text style={{ fontSize: 20, fontWeight: 'bold', marginVertical: 10 }}>
+        <Text className="flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
           클럽 멤버 목록
         </Text>
         {clubMemberList.map((item, index) => (
@@ -35,3 +35,5 @@ export const ClubMemberList = () => {
     </SafeAreaView>
   )
 }
+
+export default ClubMemberList
