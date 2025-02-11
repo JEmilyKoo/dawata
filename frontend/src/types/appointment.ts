@@ -56,3 +56,6 @@ export interface AppointmentCreateInfo {
   clubId: number
   memberIds: number[]
 }
+
+//약속 조회로 받아온 데이터의 끝에는  Info를 붙인다.
+//clubInfo, appointmentInfo, participantInfo, voteInfo

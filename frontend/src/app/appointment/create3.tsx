@@ -6,6 +6,8 @@ import CheckBox from 'expo-checkbox'
 import { useRouter } from 'expo-router'
 
 import { createAppointment } from '@/apis/appointment'
+import RoundCheckBox from '@/components/RoundCheckBox'
+import SelectMemberItem from '@/components/SelectMemberItem'
 import { RootState } from '@/store/store'
 
 import { setCreateMemberIds } from '../../store/slices/appointmentSlice'
@@ -49,24 +51,24 @@ const AppointmentCreate3 = () => {
   const isUser = (memberId: number) => {
     return memberId === user.id
   }
-  // TODO: 참여자를 불러온다는 가정 하에 UI 작성 필요
 
   return (
-    <View className="flex-1 p-4">
-      <Text className="text-xl font-bold mb-2">참여자를 선택해주세요</Text>
-      {clubMembers &&
-        clubMembers.map((item) => (
-          <View className="flex-row items-center">
-            <CheckBox
+    <View className="flex-1 p-4 bg-white justify-between">
+      <View>
+        <Text className="text-xl font-bold mb-2">참여자를 선택해주세요</Text>
+        {clubMembers &&
+          clubMembers.map((item) => (
+            <SelectMemberItem
+              key={item.memberId}
               disabled={isUser(item.memberId)}
-              value={memberIds.includes(item.memberId)}
-              onValueChange={() => handleCheckboxChange(item.memberId)}
+              img={item.img}
+              name={item.nickname}
+              email={item.email}
+              checked={memberIds.includes(item.memberId)}
+              setChecked={() => handleCheckboxChange(item.memberId)}
             />
-            <Text>{item.nickname}</Text>
-          </View>
-        ))}
-
-      {/* 추가적인 참여자들 */}
+          ))}
+      </View>
       <View className="flex-row justify-between space-x-2">
         <TouchableOpacity
           className="bg-bord p-2 rounded w-1/4"
