@@ -36,7 +36,7 @@ const AttendanceToggle = () => {
           onPress={toggleShowArrived}
           circleColorOff="white"
           backgroundColorOn={Colors.light.green}
-          backgroundColorOff={Colors.border}
+          backgroundColorOff={Colors.bord}
           containerStyle={styles.switchContainer}
           circleStyle={styles.switchCircle}
         />
@@ -49,7 +49,7 @@ const AttendanceToggle = () => {
           onPress={toggleShowNotArrived}
           circleColorOff="white"
           backgroundColorOn={Colors.light.yellow}
-          backgroundColorOff={Colors.border}
+          backgroundColorOff={Colors.bord}
           containerStyle={styles.switchContainer}
           circleStyle={styles.switchCircle}
         />
@@ -62,7 +62,7 @@ const AttendanceToggle = () => {
           onPress={toggleShowAbsent}
           circleColorOff="white"
           backgroundColorOn={Colors.light.red}
-          backgroundColorOff={Colors.border}
+          backgroundColorOff={Colors.bord}
           containerStyle={styles.switchContainer}
           circleStyle={styles.switchCircle}
         />
