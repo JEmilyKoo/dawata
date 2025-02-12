@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
-import ProfileHeader from '@/components/ProfileHeader'
-import ProfileStats from '@/components/ProfileStats'
+import ProfileHeader from '@/app/profile/components/ProfileHeader'
+import ProfileStats from '@/app/profile/components/ProfileStats'
 import {
   AttendanceStatusData,
   profileCalendarData,

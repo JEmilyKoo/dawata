@@ -12,12 +12,12 @@ import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams } from 'expo-router'
 
 import ClubAddModal from '@/app/club/components/ClubAddModal'
+import ClubItem from '@/app/club/components/ClubItem'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
-import ClubItem from '@/components/ClubItem'
 
 import { useClubList } from './hooks/useClubList'
 
