@@ -3,7 +3,6 @@ import { Text, TouchableOpacity, View } from 'react-native'
 
 import ArrowDropDownIcon from '@/assets/icons/arrow-drop-down.svg'
 import ArrowDropUpIcon from '@/assets/icons/arrow-drop-up.svg'
-import ChevronDownIcon from '@/assets/icons/chevron-down.svg'
 
 export default function DropDown({
   title,
@@ -21,12 +20,12 @@ export default function DropDown({
         <Text className="text-base text-text-primary">{title}</Text>
 
         {isDropDownOpen ? (
-          <ArrowDropDownIcon
+          <ArrowDropUpIcon
             height={24}
             width={25}
           />
         ) : (
-          <ArrowDropUpIcon
+          <ArrowDropDownIcon
             height={24}
             width={25}
           />

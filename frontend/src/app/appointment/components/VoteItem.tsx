@@ -3,15 +3,21 @@ import { Switch, Text, View } from 'react-native'
 import Checkbox from 'expo-checkbox'
 import { Link } from 'expo-router'
 
+import RoundCheckBox from '@/components/RoundCheckBox'
 import Colors from '@/constants/Colors'
 import { VoteInfo } from '@/types/appointment'
 
 interface VoteItemProps {
   voteInfo: VoteInfo
   onSelect: (id: number, isSelected: boolean) => void
+  disabled: boolean
 }
 
-export default function VoteItem({ voteInfo, onSelect }: VoteItemProps) {
+export default function VoteItem({
+  voteInfo,
+  onSelect,
+  disabled,
+}: VoteItemProps) {
   return (
     <View className="w-full justify-between border-b-2 border-bord p-4 flex-row mb-4">
       <View>
@@ -32,12 +38,14 @@ export default function VoteItem({ voteInfo, onSelect }: VoteItemProps) {
         </Link>
       </View>
       <View className="w-10 justify-center items-center">
-        <Checkbox
-          value={voteInfo.isSelected}
-          onValueChange={(newValue) => {
-            onSelect(voteInfo.voteItemId, newValue)
+        <RoundCheckBox
+          isChecked={voteInfo.isSelected}
+          setChecked={(newValue) => {
+            if (!disabled) {
+              onSelect(voteInfo.voteItemId, newValue)
+            }
           }}
-          color={voteInfo.isSelected ? Colors.primary : Colors.secondary}
+          disabled={disabled}
         />
       </View>
     </View>
