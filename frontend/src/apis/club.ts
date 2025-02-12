@@ -1,6 +1,7 @@
 import type { Club, ClubCreateInfo } from '@/types/club'
 
 import api from './api'
+import { uploadBinaryToS3 } from './s3Api'
 
 //그룹 생성
 
@@ -277,5 +278,24 @@ export const exchangeAdminRole = async ({
     return response.data
   } catch (error) {
     console.error('⛔ 관리자 권한 위임 실패:')
+  }
+}
+
+// 클럽 대표 이미지 등록/수정
+export const patchClubImg = async (
+  clubId: number,
+  fileName: string,
+  binaryData: Blob,
+) => {
+  try {
+    const response = await api.patch(`/clubs/${clubId}/clubImg`, {
+      fileName,
+    })
+    const presignedUrl = response.data
+    const result = await uploadBinaryToS3(binaryData, presignedUrl)
+    return result.status === 200
+  } catch (error) {
+    console.error('⛔ 클럽 대표 이미지 등록/수정 실패')
+    return null
   }
 }
