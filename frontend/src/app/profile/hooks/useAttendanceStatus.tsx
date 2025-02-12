@@ -7,7 +7,6 @@ export const useAttendanceStatus = () => {
   const [attendanceStatus, setAttendanceStatus] = useState<
     UserAttendanceStatus[]
   >([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getAttendanceStatus()
@@ -19,10 +18,7 @@ export const useAttendanceStatus = () => {
       .catch((error) => {
         console.error('랜더링 중 출석 정보 불러오기 실패', error)
       })
-      .finally(() => {
-        setLoading(false)
-      })
   }, [])
 
-  return { attendanceStatus, loading }
+  return { attendanceStatus }
 }

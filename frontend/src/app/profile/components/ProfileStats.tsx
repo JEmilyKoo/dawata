@@ -8,7 +8,6 @@ interface ProfileStatsProps {
 }
 
 const ProfileStats = ({ attendanceStatus }: ProfileStatsProps) => {
-  console.log(attendanceStatus)
   const totalCount = attendanceStatus.reduce(
     (acc, curr) => acc + curr.totalCount,
     0,
