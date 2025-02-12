@@ -17,8 +17,7 @@ export default function RoundCheckBox({
       {disabled ? (
         <TouchableOpacity
           className={`w-5 h-5 rounded-full border-2
-      ${isChecked ? 'border-secondary' : 'bg-white border-bord'}`}
-          onPress={() => setChecked(!isChecked)}>
+      ${isChecked ? 'border-secondary' : 'bg-white border-bord'}`}>
           {isChecked && <CheckIconDisabled />}
         </TouchableOpacity>
       ) : (
