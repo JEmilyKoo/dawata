@@ -5,8 +5,8 @@ import { useDispatch } from 'react-redux'
 import { useRouter } from 'expo-router'
 
 import { deleteClub } from '@/apis/club'
-import { useClubMember } from '@/app/club/hooks/useClubMember'
 import SlideModalUI from '@/components/SlideModalUI'
+import { useClubMember } from '@/hooks/useClubMember'
 import { setErrorModal } from '@/store/slices/errorModalSlice'
 
 const ClubDeleteModal = ({
