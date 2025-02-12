@@ -12,8 +12,8 @@ import { getAppointments } from '@/apis/appointment'
 import AppointmentItem from '@/components/AppointmentItem'
 import { AppointmentListInfo } from '@/types/appointment'
 
-import { getSelectedDate } from './SelectedDateInitial'
-import { dummyAppointmentList } from './dummyAppointmentList'
+import { dummyAppointmentList } from '../dummyAppointmentList'
+import { getSelectedDate } from '../hooks/SelectedDateInitial'
 
 const AppointmentList: React.FC = () => {
   const [appointments, setAppointments] = useState<AppointmentListInfo[]>([])

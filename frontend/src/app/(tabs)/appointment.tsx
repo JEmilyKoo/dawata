@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
+import { useDispatch } from 'react-redux'
 
 import {
   ActionSheetProps,
@@ -16,12 +17,10 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { router } from 'expo-router'
 
-import { useDispatch } from 'react-redux'
-import AppointmentCalendar from '@/app/appointment/AppointmentCalendar'
-import AppointmentList from '@/app/appointment/AppointmentList'
+import AppointmentCalendar from '@/app/appointment/components/AppointmentCalendar'
+import AppointmentList from '@/app/appointment/components/AppointmentList'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
-
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import AppointmentItem from '@/components/AppointmentItem'
