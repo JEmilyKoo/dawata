@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
+import { useRouter } from 'expo-router'
+
+import { toggleVoteSelection } from '@/apis/votes'
 import VoteItem from '@/app/appointment/components/VoteItem'
 import DropDown from '@/components/DropDown'
 import { AppointmentDetailInfo, VoteInfo } from '@/types/appointment'
@@ -10,6 +13,7 @@ export default function AppointmentNotSelectedDetail({
 }: {
   appointmentDetail: AppointmentDetailInfo
 }) {
+  const router = useRouter()
   // 로컬 상태 관리
   const [selectedVotes, setSelectedVotes] = useState<VoteInfo[]>(
     appointmentDetail.voteInfos,
@@ -25,7 +29,23 @@ export default function AppointmentNotSelectedDetail({
   }
 
   // TODO: 투표하기 버튼 클릭 시 API 요청
-  const handleVoteSubmit = async () => {}
+  const handleVoteSubmit = async () => {
+    console.log('🔍 투표하기 버튼 클릭')
+    try {
+      const response = await toggleVoteSelection(
+        appointmentDetail.appointmentInfo.appointmentId,
+        {
+          voteInfos: selectedVotes.map((vote) => ({
+            voteItemId: vote.voteItemId,
+            isSelected: vote.isSelected,
+          })),
+        },
+      )
+      console.log('🔍 투표 성공:', response)
+    } catch (error) {
+      console.error('🔍 투표 실패:', error)
+    }
+  }
 
   return (
     <View>
@@ -36,6 +56,7 @@ export default function AppointmentNotSelectedDetail({
               key={vote.voteItemId}
               voteInfo={vote}
               onSelect={handleSelect}
+              disabled={false}
             />
           ))}
 
