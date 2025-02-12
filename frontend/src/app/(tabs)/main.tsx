@@ -26,7 +26,7 @@ import { Club } from '@/types/club'
 export default function MainScreen() {
   const dispatch = useDispatch()
   const { clubs } = useSelector((state: RootState) => state.club)
-  const [appoList, setAppoList] = useState<AppointmentListInfo[]>()
+  const [appoList, setAppoList] = useState<AppointmentListInfo[]>([])
   // TODO: 추후 코드가 정돈되면 appoList를 appointmentList로 바꿀 것.
   const [showClubLoading, setShowClubLoading] = useState(false)
 
