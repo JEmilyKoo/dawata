@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import { getAttendanceStatus } from '@/apis/profile'
-import { AttendanceStatus } from '@/types/profile'
+import { UserAttendanceStatus } from '@/types/profile'
 
 export const useAttendanceStatus = () => {
-  const [attendanceStatus, setAttendanceStatus] = useState<AttendanceStatus[]>(
-    [],
-  )
+  const [attendanceStatus, setAttendanceStatus] = useState<
+    UserAttendanceStatus[]
+  >([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

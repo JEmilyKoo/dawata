@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, jest, test } from '@jest/globals'
 
-import { AttendanceStatus } from '@/types/profile'
+import { UserAttendanceStatus } from '@/types/profile'
 
 import api from '../api'
 import { getAttendanceStatus } from '../profile'
@@ -28,7 +28,7 @@ jest.mock('../api', () => ({
 //   }
 
 test('getAttendanceStatus - 출석 상태 조회 요청 성공', async () => {
-  const mockResponse: AttendanceStatus[] = [
+  const mockResponse: UserAttendanceStatus[] = [
     {
       clubId: 1,
       clubName: 'No.1',
@@ -48,7 +48,7 @@ test('getAttendanceStatus - 출석 상태 조회 요청 성공', async () => {
   ]
 
   ;(
-    api.get as jest.Mock<Promise<{ data: AttendanceStatus[] }>, []>
+    api.get as jest.Mock<Promise<{ data: UserAttendanceStatus[] }>, []>
   ).mockResolvedValue({ data: mockResponse })
 
   const result = await getAttendanceStatus()
