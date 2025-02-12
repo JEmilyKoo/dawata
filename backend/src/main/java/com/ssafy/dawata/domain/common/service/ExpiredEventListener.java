@@ -19,18 +19,12 @@ public class ExpiredEventListener implements MessageListener {
 
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
-		/* TODO(고) : 만료시간이 오면 key값으로 해당 역할로 진행
-		    1. 투표 완료
-		    	1.1. 약속 시간 2시간 전 시간까지로 만료시간 지정
-		    	1.2. 만료 이벤트 발생 시, live 관련 알림 제공
-		    		-> 메인갈 때마다 front가 확인한 번씩 해야할 듯?
-		    		-> live관련 정보 제공하는 api 필요
-		*/
 		String expiredKey = message.toString();
 
 		handleExpiredKey(expiredKey);
 	}
 
+	//만료된 Key들로 분기처리
 	private void handleExpiredKey(String expiredKey) {
 		if (expiredKey.contains("live start :")) {
 			liveStart(expiredKey);

@@ -50,10 +50,15 @@ public class SqsService {
 			.maxNumberOfMessages(5)       // 한 번에 최대 5개 메시지 수신
 			.build();
 
-		CompletableFuture<ReceiveMessageResponse> future = sqsAsyncClient.receiveMessage(request);
+		CompletableFuture<ReceiveMessageResponse> future =
+			sqsAsyncClient.receiveMessage(request);
 
 		// 성공 처리
 		future.thenAccept(response -> {
+				if (!running.get()) {
+					return; // running 상태가 false면 종료
+				}
+
 				List<Message> messages = response.messages();
 				if (!messages.isEmpty()) {
 					messages.forEach(this::processMessage);

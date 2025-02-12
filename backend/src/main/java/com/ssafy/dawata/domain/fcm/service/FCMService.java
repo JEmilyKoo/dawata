@@ -62,6 +62,8 @@ public class FCMService {
 					.build())
 				.build();
 
+			// TODO(고) : notice db에 입력
+
 			// 메시지 전송
 			String response = FirebaseMessaging.getInstance().send(message);
 			log.info("Successfully sent message: {}", response);
