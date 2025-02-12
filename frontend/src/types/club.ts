@@ -25,6 +25,7 @@ export interface ClubHeaderProps {
   name: string
   category: string
   teamCode: string
+  img: string
   clubId: number
 }
 

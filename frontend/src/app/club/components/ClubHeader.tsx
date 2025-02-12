@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { Platform, Text, TouchableOpacity, View } from 'react-native'
 import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
 
 import { useRouter } from 'expo-router'
 
+import CameraIcon from '@/assets/icons/camera.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import MenuCustomOptions from '@/components/MenuCustomOptions'
+import UploadThumbnail from '@/components/UploadThumbnail'
 import Colors from '@/constants/Colors'
 import { RootState } from '@/store/store'
 import { ClubHeaderProps } from '@/types/club'
@@ -19,7 +21,13 @@ import { useClubMember } from '../hooks/useClubMember'
 import ClubDeleteModal from './ClubDeleteModal'
 import ClubLeaveModal from './ClubLeaveModal'
 
-const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
+const ClubHeader = ({
+  name,
+  category,
+  teamCode,
+  clubId,
+  img,
+}: ClubHeaderProps) => {
   const { user } = useSelector((state: RootState) => state.member)
   const { t } = useTranslation()
   const router = useRouter()
@@ -88,7 +96,16 @@ const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
   const menu = isAdmin ? adMinMenu : memberMenu
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false)
-
+  const uploadImg = () => {
+    if (Platform.OS === 'web') {
+      router.push({
+        pathname: '/club/uploadClubImg',
+        params: { clubId: clubId },
+      })
+    } else {
+      console.log('uploadImg')
+    }
+  }
   return (
     <View className="flex-row p-4 border-b-2 border-bord">
       <View className="flex-1 w-full">
@@ -121,6 +138,12 @@ const ClubHeader = ({ name, category, teamCode, clubId }: ClubHeaderProps) => {
             </MenuOptions>
           </Menu>
         )}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={uploadImg}>
+        <CameraIcon
+          width={18}
+          height={18}
+        />
       </TouchableOpacity>
       <View>
         <ClubDeleteModal

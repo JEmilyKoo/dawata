@@ -133,6 +133,7 @@ function ClubMain() {
           name={clubInfo.name}
           category={clubInfo.category}
           teamCode={clubInfo.teamCode}
+          img={clubInfo.img}
           clubId={Number(params.clubId)}
         />
       )}
