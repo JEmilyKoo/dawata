@@ -21,13 +21,13 @@ import {
   getAppointmentDetail,
   updateMyAppointmentAttendance,
 } from '@/apis/appointment'
+import AppointmentExpiredDetail from '@/app/appointment/components/AppointmentExpiredDetail'
+import AppointmentNotSelectedDetail from '@/app/appointment/components/AppointmentNotSelectedDetail'
+import AppointmentSelectedDetail from '@/app/appointment/components/AppointmentSelectedDetail'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
-import AppointmentExpiredDetail from '@/components/AppointmentExpiredDetail'
-import AppointmentNotSelectedDetail from '@/components/AppointmentNotSelectedDetail'
-import AppointmentSelectedDetail from '@/components/AppointmentSelectedDetail'
 import BackButton from '@/components/BackButton'
 import DropDown from '@/components/DropDown'
 import MenuCustomOptions from '@/components/MenuCustomOptions'

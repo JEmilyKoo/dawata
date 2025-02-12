@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
+import VoteItem from '@/app/appointment/components/VoteItem'
 import DropDown from '@/components/DropDown'
-import VoteItem from '@/components/VoteItem'
 import { AppointmentDetailInfo, VoteInfo } from '@/types/appointment'
 
 export default function AppointmentNotSelectedDetail({
