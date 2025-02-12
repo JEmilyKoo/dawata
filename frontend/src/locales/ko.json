@@ -44,6 +44,23 @@
     "deleteClub": "그룹 해산",
     "leaveClub": "그룹 탈퇴"
   },
+
+  "createAddress": {
+    "addressName": {
+      "title": "주소 이름을 설정해주세요",
+      "error": "주소 이름은 필수입니다."
+    },
+    "search": {
+      "title": "도로명, 건물명 또는 지번으로 검색",
+      "error": "검색 결과가 없습니다.",
+      "roadAddress": "도로명"
+    },
+    "searchCurrentLocation": {
+      "title": "현재 위치로 주소 찾기",
+      "error": "현재 위치를 찾을 수 없습니다."
+    },
+    "primary": "대표 주소로 설정하기"
+  },
   "prev": "이전",
   "next": "다음",
   "finish": "완료",
