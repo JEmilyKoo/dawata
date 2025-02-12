@@ -15,7 +15,8 @@ export default function ClubLayout() {
           }}
         />
       </Stack>
-      {pathname.indexOf('upload') == -1 && <TabBar />}
+      {(pathname.indexOf('create') == -1 ||
+        pathname.indexOf('upload') == -1) && <TabBar />}
     </>
   )
 }

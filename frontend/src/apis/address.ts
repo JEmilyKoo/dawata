@@ -1,4 +1,6 @@
 // 회원 주소 조회
+import AddressCreate from '@/types/address'
+
 import api from './api'
 
 export const getAddresses = async () => {
@@ -7,6 +9,15 @@ export const getAddresses = async () => {
     return response.data
   } catch (error) {
     console.error('⛔ 전체 주소 조회 실패:')
+    return null
+  }
+}
+
+export const createAddress = async (params: AddressCreate) => {
+  try {
+    const response = await api.post('/addresses', params)
+    return response.data
+  } catch (error) {
     return null
   }
 }

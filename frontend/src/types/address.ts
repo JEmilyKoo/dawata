@@ -9,7 +9,7 @@ export interface AddressCreate {
 export interface Address {
   id?: number
   addressId?: number
-  addressName: string
+  name: string
   roadAddress: string
   latitude: number
   longitude: number

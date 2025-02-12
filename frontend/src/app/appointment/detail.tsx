@@ -239,6 +239,8 @@ export default function AppointmentDetail() {
                               <MapPinIcon
                                 height={24}
                                 width={24}
+                                stroke={Colors.text.primary}
+                                strokeWidth={2}
                               />
                               <Text className="text-text-primary font-bold text-base pt-[1px]">
                                 {topVotes[0].title}

@@ -5,16 +5,16 @@ import { Address, AddressCreate } from '@/types/address'
 
 const initialState: {
   create: AddressCreate
-  address: Address[]
+  addresses: Address[]
 } = {
   create: {
-    addressName: '',
-    roadAddress: '',
-    latitude: 0,
-    longitude: 0,
+    addressName: '역삼역',
+    roadAddress: '서울특별시 강남구 테헤란로 지하156',
+    latitude: 37.500622,
+    longitude: 127.036456,
     isPrimary: true,
   },
-  address: [],
+  addresses: [],
 }
 
 const addressSlice = createSlice({
@@ -39,8 +39,8 @@ const addressSlice = createSlice({
     setCreateIsPrimary(state, action) {
       state.create.isPrimary = action.payload
     },
-    setAddress(state, action) {
-      state.address = action.payload
+    setAddresses(state, action) {
+      state.addresses = action.payload
     },
   },
 })
@@ -52,6 +52,6 @@ export const {
   setCreateLatitude,
   setCreateLongitude,
   setCreateIsPrimary,
-  setAddress,
+  setAddresses,
 } = addressSlice.actions
 export default addressSlice.reducer

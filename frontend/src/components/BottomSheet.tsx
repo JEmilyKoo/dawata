@@ -8,11 +8,12 @@ import { withModalProvider } from '@/components/withModalProvider'
 interface BottomSheetProps {
   handleChange: (index: number) => void
   children: React.ReactNode
+  snaps?: string[]
 }
 
-const BottomSheet = ({ handleChange, children }: BottomSheetProps) => {
+const BottomSheet = ({ handleChange, children, snaps }: BottomSheetProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const snapPoints = useMemo(() => ['10%', '25%', '50%', '90%'], [])
+  const snapPoints = useMemo(() => snaps || ['10%', '25%', '50%', '90%'], [])
 
   useLayoutEffect(() => {
     bottomSheetRef.current?.present()

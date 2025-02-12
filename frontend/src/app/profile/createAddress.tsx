@@ -46,7 +46,9 @@ export default function CreateAddress() {
 
   const dispatch = useDispatch()
   const [inputValue, setInputValue] = useState('')
-  const [addresses, setAddresses] = useState<Coord[] | null>(null)
+  const [searchedAddresses, setSearchedAddresses] = useState<Coord[] | null>(
+    null,
+  )
   const [isEmpty, setIsEmpty] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const selectAddress = (address: Coord) => {
@@ -59,10 +61,13 @@ export default function CreateAddress() {
   const fetchAddressCoord = async (roadAddress: string) => {
     setShowLoading(true)
     const data = await getAddressCoord(roadAddress)
-    if (!data) return
     setShowLoading(false)
+    if (!data) {
+      setIsEmpty(true)
+      return
+    }
     if (data.data.meta.total_count === 0) {
-      setAddresses([])
+      setSearchedAddresses([])
       return
     }
     if (data.data.documents) {
@@ -74,7 +79,7 @@ export default function CreateAddress() {
         }
       })
       if (roadAddress) {
-        setAddresses(roadAddress)
+        setSearchedAddresses(roadAddress)
         setIsEmpty(false)
         return
       }
@@ -138,7 +143,7 @@ export default function CreateAddress() {
             />
           </View>
         )}
-        {!addresses && (
+        {!searchedAddresses && (
           <TouchableOpacity
             onPress={() => {}}
             className="flex-1 flex-row border border-text-secondary rounded-lg py-4 m-4 justify-center items-center">
@@ -148,8 +153,8 @@ export default function CreateAddress() {
             </Text>
           </TouchableOpacity>
         )}
-        {addresses &&
-          addresses.map((address) => (
+        {searchedAddresses &&
+          searchedAddresses.map((address) => (
             <TouchableOpacity
               key={address.address_name}
               className="flex-row items-start px-4 py-4 border-b border-bord"
@@ -158,6 +163,8 @@ export default function CreateAddress() {
                 <MapPinIcon
                   width={24}
                   height={24}
+                  stroke={Colors.text.primary}
+                  strokeWidth={2}
                 />
               </View>
               <View className="flex-1">
