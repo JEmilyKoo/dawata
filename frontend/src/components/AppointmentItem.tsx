@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { Text, TouchableOpacity, View } from 'react-native'
+import { useDispatch } from 'react-redux'
 
 import { useRouter } from 'expo-router'
 
 import ImageThumbnail from '@/components/ImageThumbnail'
+import { setCurrentVoteStatus } from '@/store/slices/appointmentSlice'
 import { AppointmentListInfo } from '@/types/appointment'
 
 export default function AppointmentItem({
@@ -13,11 +15,16 @@ export default function AppointmentItem({
 }) {
   const router = useRouter()
   const { t } = useTranslation()
+  const dispatch = useDispatch()
   const { voteStatus, appointmentInfo } = appointmentListInfo
   const handlePress = () => {
-    router.push(
-      `/appointment/detail?id=${appointmentInfo.appointmentId}&status=${voteStatus}`,
-    )
+    dispatch(setCurrentVoteStatus(voteStatus))
+    router.push({
+      pathname: '/appointment/detail',
+      params: {
+        id: appointmentInfo.appointmentId,
+      },
+    })
   }
   return (
     <TouchableOpacity
@@ -55,7 +62,8 @@ export default function AppointmentItem({
             {t(`category.${appointmentListInfo.appointmentInfo.category}`)}
           </Text>
           <Text className="text-xs">
-            {t(`voteStatus.${appointmentListInfo.voteStatus}`)}</Text>
+            {t(`voteStatus.${appointmentListInfo.voteStatus}`)}
+          </Text>
           {/* 나중에 db 연결 확인하고 수정 예정 (voteStatus에 따라 투표 상태 보여주기) */}
         </View>
         <View className="flex-row space-x-1">
