@@ -10,11 +10,12 @@ const initialState = {
   },
   clubs: [
     {
-      id: 1,
+      clubId: 1,
       name: '테스트 클럽',
-      img: '',
       category: 'FRIEND',
       teamCode: 'H9UKRI',
+      img: '',
+      createdAt: '',
       appointment: [
         {
           appointmentId: 1,
