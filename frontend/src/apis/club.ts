@@ -274,7 +274,7 @@ export const exchangeAdminRole = async ({
     const response = await api.patch(`/clubs/${clubId}/admin`, {
       newAdminId,
     })
-    return response
+    return response.data
   } catch (error) {
     console.error('⛔ 관리자 권한 위임 실패:')
   }
