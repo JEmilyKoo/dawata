@@ -11,12 +11,12 @@ import { Calendar, LocaleConfig } from 'react-native-calendars'
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams } from 'expo-router'
 
+import ClubAddModal from '@/app/club/components/ClubAddModal'
 import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
-import ClubAddModal from '@/app/club/components/ClubAddModal'
 import ClubItem from '@/components/ClubItem'
 
 LocaleConfig.locales['kr'] = {

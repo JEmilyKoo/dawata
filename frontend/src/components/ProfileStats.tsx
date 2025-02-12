@@ -1,10 +1,10 @@
 import { Dimensions, Text, View } from 'react-native'
 import { PieChart } from 'react-native-chart-kit'
 
-import { AttendanceStatus } from '@/types/profile'
+import { UserAttendanceStatus } from '@/types/profile'
 
 interface ProfileStatsProps {
-  attendanceStatus: AttendanceStatus[]
+  attendanceStatus: UserAttendanceStatus[]
 }
 
 const ProfileStats = ({ attendanceStatus }: ProfileStatsProps) => {
