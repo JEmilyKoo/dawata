@@ -13,5 +13,15 @@ export interface UserAttendanceStatus {
   lateTotalCount: number // 지각
   onTimeAttendanceTotalCount: number // 노쇼
 }
+
+export interface MarkedDate {
+  marked: boolean
+  dotColor: string
+}
+
+export interface MarkedDates {
+  [date: string]: MarkedDate
+}
+
 // 내 출결 정보는 User를 붙인다.
 // UserAppointment, UserAttendanceStatus
