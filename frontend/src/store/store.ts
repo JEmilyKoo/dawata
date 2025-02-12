@@ -1,6 +1,7 @@
 // /src/store/store.ts
 import { configureStore } from '@reduxjs/toolkit'
 
+import addressReducer from './slices/addressSlice'
 import appointmentReducer from './slices/appointmentSlice'
 import clubReducer from './slices/clubSlice'
 import liveReducer from './slices/liveSlice'
@@ -14,6 +15,7 @@ export const store = configureStore({
     member: memberReducer,
     live: liveReducer,
     errorModal: errorModalReducer,
+    address: addressReducer,
   },
 })
 
