@@ -9,10 +9,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dawata.domain.address.entity.MemberAddressMapping;
+import com.ssafy.dawata.domain.address.repository.MemberAddressMappingRepository;
 import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipantsRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentHostRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
+import com.ssafy.dawata.domain.appointment.dto.response.AppointmentPlaceResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
@@ -21,6 +24,7 @@ import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.common.enums.Role;
 import com.ssafy.dawata.domain.common.service.RedisService;
+import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.live.enums.ExpiredKeyCategory;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
@@ -35,6 +39,7 @@ import com.ssafy.dawata.domain.vote.entity.Voter;
 import com.ssafy.dawata.domain.vote.enums.VoteStatus;
 import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 import com.ssafy.dawata.domain.vote.repository.VoterRepository;
+import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,9 +55,11 @@ public class AppointmentService {
 	private final VoteItemRepository voteItemRepository;
 	private final VoterRepository voterRepository;
 	private final PhotoRepository photoRepository;
+	private final MemberAddressMappingRepository memberAddressMappingRepository;
 
 	private final RedisTemplate<String, String> redisTemplateForOthers;
 	private final RedisService redisService;
+	private final S3Service s3Service;
 
 	@Transactional
 	public void createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
@@ -69,8 +76,14 @@ public class AppointmentService {
 
 			boolean isHostMember = mId.equals(hostMemberEntity.getId());
 
+			MemberAddressMapping memberAddressMapping = memberAddressMappingRepository.findByMemberId(mId)
+				.stream()
+				.filter(MemberAddressMapping::isPrimary)
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("대표 주소가 없는 멤버입니다."));
+
 			Participant participant = Participant.of(
-				appointmentEntity, clubMemberEntity, isHostMember, DailyStatus.UNKNOWN,
+				appointmentEntity, clubMemberEntity, memberAddressMapping, isHostMember, DailyStatus.UNKNOWN,
 				isHostMember ? Role.HOST : Role.GUEST
 			);
 
@@ -255,6 +268,40 @@ public class AppointmentService {
 		if (participant.getRole() != Role.HOST) {
 			throw new IllegalArgumentException("약속의 모임장이 아닙니다.");
 		}
+	}
+
+	public AppointmentPlaceResponse recommendPlace(Long appointmentId) {
+		List<Participant> participants = participantRepository.findParticipantsByAppointmentId(appointmentId);
+
+		// TODO: 추천 알고리즘 구현하기
+		double[] point = GeoMidpointUtil.getMidpoint();
+
+		List<AppointmentPlaceResponse.ParticipantInfo> participantInfos = participants.stream()
+			.map(participant -> {
+				ClubMember clubMember = participant.getClubMember();
+				Photo photo = photoRepository
+					.findByEntityIdAndEntityCategory(
+						clubMember.getMember().getId(), EntityCategory.MEMBER
+					)
+					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+
+				return AppointmentPlaceResponse.ParticipantInfo.of(
+					clubMember.getMember().getId(),
+					participant.getId(),
+					clubMember.getNickname(),
+					photo.getPhotoName(),
+					s3Service.generatePresignedUrl(
+						photo.getPhotoName(),
+						"get",
+						EntityCategory.MEMBER,
+						clubMember.getMember().getId()
+					),
+					(int)(Math.random() * 11) + 30
+				);
+			})
+			.toList();
+
+		return AppointmentPlaceResponse.of(point[0], point[1], participantInfos);
 	}
 
 	private List<AppointmentWithExtraInfoResponse> makeAppointmentWithExtraInfoResponses(Long memberId,

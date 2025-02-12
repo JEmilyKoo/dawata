@@ -39,9 +39,16 @@ public class VoteService {
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 ID의 약속이 존재하지 않습니다."));
 
-		VoteItem voteItem = VoteItem.of(addressEntity, appointment, requestDto.title(), requestDto.category(),
-			requestDto.detail(),
-			requestDto.linkUrl());
+		// TODO(준): 투표 항목의 평균 소요 시간 계산
+		Integer avgDuration = 30;
+		VoteItem voteItem = VoteItem.of(
+			addressEntity,
+			appointment,
+			requestDto.title(),
+			requestDto.category(),
+			avgDuration,
+			requestDto.linkUrl()
+		);
 
 		voteItemRepository.save(voteItem);
 	}

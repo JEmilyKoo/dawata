@@ -20,12 +20,14 @@ import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipan
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentHostRequest;
 import com.ssafy.dawata.domain.appointment.dto.request.UpdateAppointmentRequest;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentDetailResponse;
+import com.ssafy.dawata.domain.appointment.dto.response.AppointmentPlaceResponse;
 import com.ssafy.dawata.domain.appointment.dto.response.AppointmentWithExtraInfoResponse;
 import com.ssafy.dawata.domain.appointment.service.AppointmentService;
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantAttendingRequest;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantDailyStatusRequest;
+import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -147,6 +149,16 @@ public class AppointmentController {
 		appointmentService.updateAppointmentHost(requestDto, memberDetails.member().getId(), appointmentId);
 		return ResponseEntity.ok(
 			ApiResponse.success()
+		);
+	}
+
+	@Operation(summary = "약속 장소 추천", description = "약속 참가자의 위치를 기반으로 약속 장소를 추천합니다.")
+	@GetMapping("/{appointmentId}/place")
+	public ResponseEntity<ApiResponse<AppointmentPlaceResponse>> recommendPlace(
+		@PathVariable Long appointmentId
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.success(appointmentService.recommendPlace(appointmentId))
 		);
 	}
 }

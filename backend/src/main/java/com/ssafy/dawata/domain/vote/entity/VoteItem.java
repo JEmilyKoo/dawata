@@ -54,19 +54,19 @@ public class VoteItem {
 	private String category;
 
 	@Column
-	private String detail;
+	private Integer avgDuration;
 
 	@Column
 	private String linkUrl;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	private VoteItem(Address address, Appointment appointment, String title, String category, String detail,
+	private VoteItem(Address address, Appointment appointment, String title, String category, Integer avgDuration,
 		String linkUrl) {
 		this.address = address;
 		this.appointment = appointment;
 		this.title = title;
 		this.category = category;
-		this.detail = detail;
+		this.avgDuration = avgDuration;
 		this.linkUrl = linkUrl;
 	}
 
@@ -75,9 +75,9 @@ public class VoteItem {
 		Appointment appointment,
 		String title,
 		String category,
-		String detail,
+		Integer avgDuration,
 		String linkUrl
 	) {
-		return new VoteItem(address, appointment, title, category, detail, linkUrl);
+		return new VoteItem(address, appointment, title, category, avgDuration, linkUrl);
 	}
 }

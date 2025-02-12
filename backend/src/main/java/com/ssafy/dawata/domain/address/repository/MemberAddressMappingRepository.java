@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.address.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,7 @@ public interface MemberAddressMappingRepository extends JpaRepository<MemberAddr
 
 	@Query("SELECT mam FROM MemberAddressMapping mam JOIN FETCH mam.address WHERE mam.member.id = :memberId")
 	List<MemberAddressMapping> findAllWithAddressByMemberId(@Param("memberId") Long memberId);
+
+	@Query("SELECT mam FROM MemberAddressMapping mam JOIN FETCH mam.address WHERE mam.address.id = :addressId")
+	Optional<MemberAddressMapping> findByAddressId(@Param("addressId") Long addressId);
 }
