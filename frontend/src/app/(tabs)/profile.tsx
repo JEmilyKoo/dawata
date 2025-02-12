@@ -1,16 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, View } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
 import ProfileHeader from '@/app/profile/components/ProfileHeader'
 import ProfileStats from '@/app/profile/components/ProfileStats'
-import {
-  AttendanceStatusData,
-  profileCalendarData,
-} from '@/constants/profileData'
+import { AttendanceStatusData } from '@/constants/profileData'
 
 import { useAttendanceStatus } from '../profile/hooks/useAttendanceStatus'
+import { useMarkedDates } from '../profile/hooks/useMarkedDates'
+import { useUserAppointment } from '../profile/hooks/useUserAppointment'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -55,17 +54,19 @@ LocaleConfig.locales['kr'] = {
 
 LocaleConfig.defaultLocale = 'kr'
 export default function Profile() {
-  // const { attendanceStatus, loading } = useAttendanceStatus()
+  const today = new Date()
+  const [currentMonth, setCurrentMonth] = useState(
+    today.getFullYear() + '-' + (today.getMonth() + 1),
+  )
+  const { userAppointment } = useUserAppointment({ currentMonth: currentMonth })
+  const { markedDates } = useMarkedDates({ userAppointment })
 
-  const markedDates = {
-    '2025-01-21': { marked: true, dotColor: '#ff8339' },
-    '2025-01-22': { marked: true, dotColor: '#ff8339' },
-
-    '2025-01-23': { marked: true, dotColor: '#ff8339' },
-    '2025-01-24': { marked: true, dotColor: '#ff8339' },
-    '2025-01-25': { marked: true, dotColor: '#ff8339' },
+  const handleMonthChange = (changedMonth: { year: number; month: number }) => {
+    const formattedMonth = `${changedMonth.year}-${String(changedMonth.month).padStart(2, '0')}`
+    setCurrentMonth(formattedMonth)
   }
 
+  const { attendanceStatus } = useAttendanceStatus()
   const { t } = useTranslation()
   return (
     <ScrollView>
@@ -93,7 +94,9 @@ export default function Profile() {
           markedDates={markedDates}
           markingType={'dot'}
           enableSwipeMonths={true}
-          current={'2025-01-21'}
+          current={currentMonth}
+          initialDate={currentMonth}
+          onMonthChange={handleMonthChange}
         />
       </View>
       <ProfileStats attendanceStatus={AttendanceStatusData} />
