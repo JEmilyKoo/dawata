@@ -17,7 +17,7 @@ import { RootState } from '@/store/store'
 import { ClubHeaderProps } from '@/types/club'
 import { MenuItem } from '@/types/menu'
 
-import { useClubMember } from '../hooks/useClubMember'
+import { useClubMember } from '../../../hooks/useClubMember'
 import ClubDeleteModal from './ClubDeleteModal'
 import ClubLeaveModal from './ClubLeaveModal'
 
