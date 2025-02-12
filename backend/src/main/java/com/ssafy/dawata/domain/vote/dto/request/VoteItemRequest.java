@@ -22,9 +22,6 @@ public record VoteItemRequest(
 	@Schema(description = "투표 항목 카테고리", example = "찌개, 전골")
 	String category,
 
-	@Schema(description = "투표 항목 상세 보기", example = "대우부대찌개는 맛있어요")
-	String detail,
-
 	@Schema(description = "링크 URL", example = "http://example.com")
 	String linkUrl
 ) {

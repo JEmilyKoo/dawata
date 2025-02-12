@@ -3,6 +3,7 @@ package com.ssafy.dawata.domain.participant.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ssafy.dawata.domain.address.entity.MemberAddressMapping;
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.common.enums.Role;
@@ -53,11 +54,18 @@ public class Participant {
 	)
 	private ClubMember clubMember;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+		name = "member_address_id",
+		referencedColumnName = "id"
+	)
+	private MemberAddressMapping memberAddressMapping;
+
 	@OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Voter> voters = new ArrayList<>();
 
 	@Column
-	private Boolean isAttending = false;
+	private Boolean isAttending = true;
 
 	@Convert(converter = DailyStatusConverter.class)
 	@Column
@@ -68,10 +76,12 @@ public class Participant {
 
 	// -- 생성자 -- //
 	@Builder(access = AccessLevel.PRIVATE)
-	private Participant(Appointment appointment, ClubMember clubMember, Boolean isAttending, DailyStatus dailyStatus,
+	private Participant(Appointment appointment, ClubMember clubMember, MemberAddressMapping memberAddressMapping,
+		Boolean isAttending, DailyStatus dailyStatus,
 		Role role) {
 		this.appointment = appointment;
 		this.clubMember = clubMember;
+		this.memberAddressMapping = memberAddressMapping;
 		this.isAttending = isAttending;
 		this.dailyStatus = dailyStatus;
 		this.role = role;
@@ -80,6 +90,7 @@ public class Participant {
 	public static Participant of(
 		Appointment appointment,
 		ClubMember clubMember,
+		MemberAddressMapping memberAddressMapping,
 		boolean isAttending,
 		DailyStatus dailyStatus,
 		Role role
@@ -88,6 +99,7 @@ public class Participant {
 		return Participant.builder()
 			.appointment(appointment)
 			.clubMember(clubMember)
+			.memberAddressMapping(memberAddressMapping)
 			.isAttending(isAttending)
 			.dailyStatus(dailyStatus)
 			.role(role)

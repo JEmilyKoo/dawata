@@ -99,8 +99,8 @@ public record AppointmentDetailResponse(
 		@Schema(description = "카테고리", example = "카테고리")
 		String category,
 
-		@Schema(description = "상세 내용", example = "상세 내용")
-		String detail,
+		@Schema(description = "평균 소요 시간", example = "33")
+		Integer avgDuration,
 
 		@Schema(description = "링크 URL", example = "http://example.com")
 		String linkUrl,
@@ -126,7 +126,7 @@ public record AppointmentDetailResponse(
 				.voteItemId(entity.getId())
 				.title(entity.getTitle())
 				.category(entity.getCategory())
-				.detail(entity.getDetail())
+				.avgDuration(entity.getAvgDuration())
 				.linkUrl(entity.getLinkUrl())
 				.roadAddress(entity.getAddress().getRoadAddress())
 				.latitude(entity.getAddress().getLatitude())
