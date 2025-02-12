@@ -228,21 +228,16 @@ export const deleteClubMember = async ({
 
 interface BanMemberParams {
   clubId: number
-  adminId: number
   memberId: number
 }
 
 // 특정 회원 강퇴
-export const banMember = async ({
-  clubId,
-  adminId,
-  memberId,
-}: BanMemberParams) => {
+export const banMember = async ({ clubId, memberId }: BanMemberParams) => {
   try {
     const response = await api.delete(`/clubs/${clubId}/members/ban`, {
-      params: { adminId, memberId },
+      data: { memberId },
     })
-    return response
+    return response.data
   } catch (error) {
     console.error('⛔ 특정 회원 강퇴 실패:')
     return false
@@ -273,7 +268,7 @@ export const exchangeAdminRole = async ({
 }: ExchangeAdminRoleParams) => {
   try {
     const response = await api.patch(`/clubs/${clubId}/admin`, {
-      newAdminId,
+      data: { newAdminId },
     })
     return response.data
   } catch (error) {
