@@ -42,6 +42,11 @@ const addressSlice = createSlice({
     setAddresses(state, action) {
       state.addresses = action.payload
     },
+    filterOutAddress(state, action) {
+      state.addresses = state.addresses.filter(
+        (item) => item.id != action.payload,
+      )
+    },
   },
 })
 
@@ -53,5 +58,6 @@ export const {
   setCreateLongitude,
   setCreateIsPrimary,
   setAddresses,
+  filterOutAddress,
 } = addressSlice.actions
 export default addressSlice.reducer
