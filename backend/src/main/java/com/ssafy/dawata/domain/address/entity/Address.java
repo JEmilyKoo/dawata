@@ -1,5 +1,7 @@
 package com.ssafy.dawata.domain.address.entity;
 
+import java.util.Optional;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +39,15 @@ public class Address {
 
 	public static Address of(String roadAddress, Double longitude, Double latitude) {
 		return new Address(roadAddress, longitude, latitude);
+	}
+
+	public static Address of(Address existingAddress, Optional<String> roadAddress, Optional<Double> longitude,
+		Optional<Double> latitude) {
+		return new Address(
+			roadAddress.orElse(existingAddress.getRoadAddress()),
+			longitude.orElse(existingAddress.getLongitude()),
+			latitude.orElse(existingAddress.getLatitude())
+		);
 	}
 
 	public void updateRoadAddress(String roadAddress) {
