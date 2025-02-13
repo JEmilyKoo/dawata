@@ -1,5 +1,11 @@
 package com.ssafy.dawata.domain.address.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ssafy.dawata.domain.address.dto.request.CreateAddressRequest;
 import com.ssafy.dawata.domain.address.dto.request.UpdateAddressRequest;
 import com.ssafy.dawata.domain.address.dto.response.AddressResponseInfo;
 import com.ssafy.dawata.domain.address.entity.Address;
@@ -12,11 +18,6 @@ import com.ssafy.dawata.domain.member.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -27,18 +28,29 @@ public class AddressService {
 
 	//주소 등록
 	@Transactional
-	public ApiResponse<AddressResponseInfo> createAddress(UpdateAddressRequest request, Member member) {
+	public ApiResponse<AddressResponseInfo> createAddress(CreateAddressRequest request, Member member) {
 		//주소 저장하고
 		Address address = Address.of(request.roadAddress(), request.longitude(), request.latitude());
 		addressRepository.save(address);
 
-		//기존 주소가 없었으면 isPrimary true 저장.
 		boolean hasAddress = memberAddressMappingRepository.existsByMemberId(member.getId());
+
+		if (request.isPrimary() && hasAddress) {
+			List<MemberAddressMapping> existingAddresses = memberAddressMappingRepository.findByMemberId(
+				member.getId());
+
+			for (MemberAddressMapping mapping : existingAddresses) {
+				if (mapping.isPrimary()) {
+					mapping.updateIsPrimary(false);
+				}
+			}
+		}
+
 		MemberAddressMapping mapping = MemberAddressMapping.createMemberAddressMapping(
 			address,
 			member,
 			request.addressName(),
-			!hasAddress
+			request.isPrimary() || !hasAddress
 		);
 		memberAddressMappingRepository.save(mapping);
 		return ApiResponse.success(AddressResponseInfo.from(mapping));
@@ -59,41 +71,42 @@ public class AddressService {
 	//주소 수정 (부분 수정 가능) . null값 체크는 validator로 분리 예정
 	public ApiResponse<AddressResponseInfo> updateAddress(Long addressId, UpdateAddressRequest request, Member member) {
 		//수정 요청 들어온 addressId에 맞는 정보 있는지 체크
-		MemberAddressMapping mapping = memberAddressMappingRepository.findById(addressId)
+		MemberAddressMapping mapping = memberAddressMappingRepository.findByAddressId(addressId)
 			.orElseThrow(() -> new IllegalArgumentException("요청 주소 없음"));
 
 		//그 주소가 요청보낸 클라이언트의 주소가 맞는지 체크
-		if (!mapping.getMember().getId().equals(member.getId())) {
-			throw new IllegalArgumentException("클라이언트의 주소 정보 아님");
-		}
+		// if (!mapping.getMember().getId().equals(member.getId())) {
+		// 	throw new IllegalArgumentException("클라이언트의 주소 정보 아님");
+		// }
 
 		Address address = mapping.getAddress();
-		address.updateRoadAddress(request.roadAddress());
-		address.updateLongitude(request.longitude());
-		address.updateLatitude(request.latitude());
-		mapping.updateName(request.addressName());
+		request.roadAddress().ifPresent(address::updateRoadAddress);
+		request.longitude().ifPresent(address::updateLongitude);
+		request.latitude().ifPresent(address::updateLatitude);
+		request.addressName().ifPresent(name -> {
+			mapping.updateName(name);
+		});
 		List<MemberAddressMapping> mappings = memberAddressMappingRepository.findByMemberId(member.getId());
 		//대표주소로 설정하겠다는 요청일 경우 나머지 주소들 비대표주소로 변경
-		if (Boolean.TRUE.equals(request.isPrimary())) { //request.isPrimary()로 하면 해당 값이 null일 경우 nullpointExcpetion뜸.
-			for (MemberAddressMapping last : mappings) {
-				if (!last.getId().equals(mapping.getId())) {
-					last.updateIsPrimary(false);
+		request.isPrimary().ifPresent(isPrimary -> {
+			if (isPrimary) {
+				for (MemberAddressMapping last : mappings) {
+					if (!last.getId().equals(mapping.getId())) {
+						last.updateIsPrimary(false);
+					}
+				}
+				mapping.updateIsPrimary(true);
+			} else {
+				boolean checkPrimary = mappings.stream()
+					.anyMatch(m -> !m.getId().equals(mapping.getId()) && m.isPrimary());
+
+				if (!checkPrimary || mappings.size() == 1) {
+					throw new IllegalStateException("다른 대표주소값이 없음");
 				}
 			}
-			mapping.updateIsPrimary(true);
-		}
-		//대표주소 취소 요청 혹시 들어오면 .. 취소 요청 자체가 안들어와야 할 것 같긴한데 ..
-		if (Boolean.FALSE.equals(request.isPrimary())) {
-			boolean checkPrimary = mappings.stream()
-				.anyMatch(m -> !m.getId().equals(mapping.getId()) && m.isPrimary());
-
-			if (!checkPrimary || mappings.size() == 1) {
-				throw new IllegalStateException("다른 대표주소값이 없음");
-			}
-		}
+		});
 
 		return ApiResponse.success(AddressResponseInfo.from(mapping));
-
 	}
 
 	//주소 하나 조회
