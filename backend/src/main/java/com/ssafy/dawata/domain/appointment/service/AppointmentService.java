@@ -143,7 +143,7 @@ public class AppointmentService {
 		ClubMember clubMember = participant.getClubMember();
 		Club club = clubMember.getClub();
 		Photo clubPhoto = photoRepository.findByEntityIdAndEntityCategory(club.getId(), EntityCategory.CLUB)
-			.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+			.orElse(Photo.createDefaultPhoto(club.getId(), EntityCategory.CLUB));
 
 		List<VoteItem> voteItems = voteItemRepository.findVoteItemsWithAddressByAppointmentId(appointmentId);
 		List<Voter> voters = voterRepository.findVotersByParticipantIds(
@@ -155,11 +155,22 @@ public class AppointmentService {
 		List<AppointmentDetailResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
 			.stream()
 			.map(p -> {
-				Photo photo = photoRepository.findByEntityIdAndEntityCategory(p.getClubMember().getMember().getId(),
+				ClubMember cm = p.getClubMember();
+				Photo photo = photoRepository.findByEntityIdAndEntityCategory(cm.getMember().getId(),
 						EntityCategory.MEMBER)
-					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
-				return AppointmentDetailResponse.ParticipantResponse.of(p, p.getClubMember().getMember().getId(),
-					p.getClubMember().getNickname(), photo.getPhotoName());
+					.orElse(Photo.createDefaultPhoto(cm.getMember().getId(), EntityCategory.MEMBER));
+				return AppointmentDetailResponse.ParticipantResponse.of(
+					p,
+					cm.getMember().getId(),
+					cm.getNickname(),
+					photo.getPhotoName(),
+					s3Service.generatePresignedUrl(
+						photo.getPhotoName(),
+						"get",
+						EntityCategory.MEMBER,
+						cm.getMember().getId()
+					)
+				);
 			})
 			.toList();
 
@@ -167,6 +178,12 @@ public class AppointmentService {
 			clubMember.getClub().getId(),
 			clubMember.getClubName(),
 			clubPhoto.getPhotoName(),
+			s3Service.generatePresignedUrl(
+				clubPhoto.getPhotoName(),
+				"get",
+				EntityCategory.CLUB,
+				club.getId()
+			),
 			appointment,
 			participantResponses,
 			makeVoteResponses(voteItems, voters, participant.getId())
@@ -283,7 +300,7 @@ public class AppointmentService {
 					.findByEntityIdAndEntityCategory(
 						clubMember.getMember().getId(), EntityCategory.MEMBER
 					)
-					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+					.orElse(Photo.createDefaultPhoto(clubMember.getMember().getId(), EntityCategory.MEMBER));
 
 				return AppointmentPlaceResponse.ParticipantInfo.of(
 					clubMember.getMember().getId(),
@@ -326,15 +343,27 @@ public class AppointmentService {
 
 				Photo clubPhoto = photoRepository.findByEntityIdAndEntityCategory(targetClub.getId(),
 						EntityCategory.CLUB)
-					.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
+					.orElse(Photo.createDefaultPhoto(targetClub.getId(), EntityCategory.CLUB));
 
 				List<AppointmentWithExtraInfoResponse.ParticipantResponse> participantResponses = appointment.getParticipants()
 					.stream()
 					.map(p -> {
+						ClubMember cm = p.getClubMember();
 						Photo photo = photoRepository.findByEntityIdAndEntityCategory(
-								p.getClubMember().getMember().getId(), EntityCategory.MEMBER)
-							.orElseThrow(() -> new IllegalArgumentException("해당하는 사진이 없습니다."));
-						return AppointmentWithExtraInfoResponse.ParticipantResponse.of(p, photo.getPhotoName());
+								cm.getMember().getId(),
+								EntityCategory.MEMBER
+							)
+							.orElse(Photo.createDefaultPhoto(cm.getMember().getId(), EntityCategory.MEMBER));
+						return AppointmentWithExtraInfoResponse.ParticipantResponse.of(
+							p,
+							photo.getPhotoName(),
+							s3Service.generatePresignedUrl(
+								photo.getPhotoName(),
+								"get",
+								EntityCategory.MEMBER,
+								cm.getMember().getId()
+							)
+						);
 					})
 					.toList();
 
@@ -353,6 +382,12 @@ public class AppointmentService {
 					targetClub.getId(),
 					clubName,
 					clubPhoto.getPhotoName(),
+					s3Service.generatePresignedUrl(
+						clubPhoto.getPhotoName(),
+						"get",
+						EntityCategory.CLUB,
+						targetClub.getId()
+					),
 					appointment,
 					participantResponses,
 					voteStatus

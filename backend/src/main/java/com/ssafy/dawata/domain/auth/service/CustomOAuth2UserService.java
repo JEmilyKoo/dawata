@@ -2,6 +2,8 @@ package com.ssafy.dawata.domain.auth.service;
 
 import java.util.Map;
 
+import javax.swing.text.html.parser.Entity;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,9 @@ import com.ssafy.dawata.domain.auth.dto.response.OAuth2Response;
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
+import com.ssafy.dawata.domain.photo.entity.Photo;
+import com.ssafy.dawata.domain.photo.enums.EntityCategory;
+import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final MemberRepository memberRepository;
+	private final PhotoRepository photoRepository;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

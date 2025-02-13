@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.appointment.dto.response;
 
+import java.net.URL;
 import java.util.List;
 
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
@@ -36,15 +37,19 @@ public record AppointmentDetailResponse(
 		@Schema(description = "클럽 이름", example = "스터디 클럽")
 		String name,
 
-		@Schema(description = "클럽 이미지 파일명", example = "image.jpg")
-		String img
+		@Schema(description = "클럽 이미지 파일명", example = "image.png")
+		String imageName,
+
+		@Schema(description = "이미지 pre-signed url", example = "http://example.com")
+		URL imageURL
 	) {
 
-		public static ClubResponse of(Long clubId, String name, String img) {
+		public static ClubResponse of(Long clubId, String name, String imageName, URL imageURL) {
 			return ClubResponse.builder()
 				.clubId(clubId)
 				.name(name)
-				.img(img)
+				.imageName(imageName)
+				.imageURL(imageURL)
 				.build();
 		}
 	}
@@ -70,11 +75,15 @@ public record AppointmentDetailResponse(
 		@Schema(description = "역할", example = "HOST")
 		Role role,
 
-		@Schema(description = "이미지 파일명", example = "image.jpg")
-		String img
+		@Schema(description = "참여자 이미지 파일명", example = "image.png")
+		String imageName,
+
+		@Schema(description = "이미지 pre-signed url", example = "http://example.com")
+		URL imageURL
 	) {
 
-		public static ParticipantResponse of(Participant entity, Long memberId, String name, String img) {
+		public static ParticipantResponse of(Participant entity, Long memberId, String name, String imageName,
+			URL imageURL) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
 				.memberId(memberId)
@@ -82,7 +91,8 @@ public record AppointmentDetailResponse(
 				.dailyStatus(entity.getDailyStatus())
 				.name(name)
 				.role(entity.getRole())
-				.img(img)
+				.imageName(imageName)
+				.imageURL(imageURL)
 				.build();
 		}
 	}
@@ -140,13 +150,14 @@ public record AppointmentDetailResponse(
 	public static AppointmentDetailResponse of(
 		Long clubId,
 		String clubName,
-		String img,
+		String imageName,
+		URL imageURL,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
 		List<VoteResponse> voteInfos
 	) {
 		return AppointmentDetailResponse.builder()
-			.clubInfo(ClubResponse.of(clubId, clubName, img))
+			.clubInfo(ClubResponse.of(clubId, clubName, imageName, imageURL))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteInfos(voteInfos)
