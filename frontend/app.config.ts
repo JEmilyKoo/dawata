@@ -23,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
+    package: 'com.ssafy.dawata',
   },
   web: {
     bundler: 'metro',
