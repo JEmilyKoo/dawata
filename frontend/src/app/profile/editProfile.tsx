@@ -1,7 +1,8 @@
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
 import { router } from 'expo-router'
+
+import BackButton from '@/components/BackButton'
 
 export default function EditProfile() {
   return (
@@ -39,7 +40,13 @@ export default function EditProfile() {
         </TouchableOpacity>
 
         {/* 내 루틴 목록 */}
-        <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">
+        <TouchableOpacity
+          className="flex-row items-center px-4 py-4 border-b border-gray-100"
+          onPress={() => {
+            router.push({
+              pathname: '/routine/routineList',
+            })
+          }}>
           <View className="flex-1">
             <Text className="text-xl text-medium text-text-primary">
               내 루틴 목록
