@@ -19,6 +19,7 @@ import { useLocalSearchParams } from 'expo-router'
 import {
   deleteAppointment,
   getAppointmentDetail,
+  updateAppointmentHost,
   updateMyAppointmentAttendance,
 } from '@/apis/appointment'
 import { toggleVoteSelection } from '@/apis/votes'
@@ -36,7 +37,11 @@ import DropDown from '@/components/DropDown'
 import MenuCustomOptions from '@/components/MenuCustomOptions'
 import Colors from '@/constants/Colors'
 import { RootState } from '@/store/store'
-import { AppointmentDetailInfo, VoteInfo } from '@/types/appointment'
+import {
+  AppointmentDetailInfo,
+  ParticipantInfo,
+  VoteInfo,
+} from '@/types/appointment'
 import { MenuItem } from '@/types/menu'
 
 export default function AppointmentDetail() {
@@ -195,6 +200,26 @@ export default function AppointmentDetail() {
     setStatus('NOT_SELECTED')
   }
 
+  // 약속장 변경
+  const handleHostChange = async (participant: ParticipantInfo) => {
+    const data = await updateAppointmentHost(Number(id), {
+      clubId: appointmentDetail?.clubInfo.clubId ?? 0,
+      oriHost: {
+        memberId:
+          appointmentDetail?.participantInfos.find((p) => p.role === 'HOST')
+            ?.memberId ?? 0,
+        participantId:
+          appointmentDetail?.participantInfos.find((p) => p.role === 'HOST')
+            ?.participantId ?? 0,
+      },
+      newHost: {
+        memberId: participant.memberId,
+        participantId: participant.participantId,
+      },
+    })
+    setIsHost(false)
+  }
+
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <Text>{isAttending ? '참' : '불'}</Text>
@@ -340,7 +365,19 @@ export default function AppointmentDetail() {
               {appointmentDetail?.participantInfos
                 .filter((participant) => participant.isAttending)
                 .map((participant) => (
-                  <Text key={participant.participantId}>{participant.img}</Text>
+                  <View>
+                    <View key={participant.participantId}>
+                      <Text>{participant.img}</Text>
+                      <Text>{participant.name}</Text>
+                    </View>
+                    {/* TODO: 이미지 클릭 시 약속장 변경하는 팝업 띄우기 (지금은 약속장 변경 버튼이 보이게 되어있음) */}
+                    {isHost && (
+                      <TouchableOpacity
+                        onPress={() => handleHostChange(participant)}>
+                        <Text>약속장 변경</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 ))}
             </View>
           </DropDown>

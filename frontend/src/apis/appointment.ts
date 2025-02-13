@@ -11,6 +11,17 @@ interface GetAppointmentsParams {
 interface UpdateMyAppointmentAttendanceParams {
   isAttending: boolean
 }
+interface UpdateAppointmentHostParams {
+  clubId: number
+  oriHost: {
+    memberId: number
+    participantId: number
+  }
+  newHost: {
+    memberId: number
+    participantId: number
+  }
+}
 
 // 약속 리스트 조회
 export const getAppointments = async ({
@@ -84,6 +95,22 @@ export const updateMyAppointmentAttendance = async (
   }
 }
 
+// 약속 모임장 업데이트
+export const updateAppointmentHost = async (
+  appointmentId: number,
+  params: UpdateAppointmentHostParams,
+) => {
+  try {
+    const response = await api.patch(
+      `/appointments/${appointmentId}/host`,
+      params,
+    )
+    return response.data
+  } catch (error) {
+    console.error('⛔ 약속 모임장 업데이트 실패:')
+    return null
+  }
+}
 // 투표 방의 투표 항목 조회
 
 // 투표 방의 투표 항목 생성
