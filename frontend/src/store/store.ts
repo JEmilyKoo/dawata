@@ -4,9 +4,10 @@ import { configureStore } from '@reduxjs/toolkit'
 import addressReducer from './slices/addressSlice'
 import appointmentReducer from './slices/appointmentSlice'
 import clubReducer from './slices/clubSlice'
+import errorModalReducer from './slices/errorModalSlice'
 import liveReducer from './slices/liveSlice'
 import memberReducer from './slices/memberSlice'
-import errorModalReducer from './slices/errorModalSlice'
+import routineReducer from './slices/routineSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     live: liveReducer,
     errorModal: errorModalReducer,
     address: addressReducer,
+    routine: routineReducer,
   },
 })
 
