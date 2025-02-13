@@ -17,44 +17,44 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoutineElement {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 
-	@Column(nullable = false)
-	private String play;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private Long spendTime;
+    @Column(nullable = false)
+    private String play;
 
-	@Column(nullable = false)
-	private Integer sequence;
+    @Column(nullable = false)
+    private Long spendTime;
 
-	@Column(nullable = false)
-	private boolean state = true;
+    @Column(nullable = false)
+    private Integer sequence;
+	
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "routine_template_id")
-	private RoutineTemplate routineTemplate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "routine_template_id")
+    private RoutineTemplate routineTemplate;
 
-	@Builder(access = AccessLevel.PRIVATE)
-	public RoutineElement(String play, Long spendTime, Integer sequence, RoutineTemplate routineTemplate) {
-		this.play = play;
-		this.spendTime = spendTime;
-		this.sequence = sequence;
-		this.routineTemplate = routineTemplate;
-	}
+    @Builder(access = AccessLevel.PRIVATE)
+    public RoutineElement(String play, Long spendTime, Integer sequence,
+        RoutineTemplate routineTemplate) {
+        this.play = play;
+        this.spendTime = spendTime;
+        this.sequence = sequence;
+        this.routineTemplate = routineTemplate;
+    }
 
-	public static RoutineElement createRoutineElement(
-		String play,
-		Long spendTime,
-		Integer sequence,
-		RoutineTemplate routineTemplate) {
-		return RoutineElement.builder()
-			.play(play)
-			.spendTime(spendTime)
-			.sequence(sequence)
-			.routineTemplate(routineTemplate)
-			.build();
-	}
+    public static RoutineElement createRoutineElement(
+        String play,
+        Long spendTime,
+        Integer sequence,
+        RoutineTemplate routineTemplate) {
+        return RoutineElement.builder()
+            .play(play)
+            .spendTime(spendTime)
+            .sequence(sequence)
+            .routineTemplate(routineTemplate)
+            .build();
+    }
 }
