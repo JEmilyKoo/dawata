@@ -5,6 +5,7 @@ import com.ssafy.dawata.domain.common.enums.Category;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,20 +19,24 @@ public record ClubInfoResponse(
 	@Schema(description = "클럽 가입시 사용할 팀코드")
 	String teamCode,
 	@Schema(description = "클럽 대표이미지 파일명")
-	String img,
+	String imageName,
+	@Schema(description = "이미지 pre-signed url")
+	URL imageURL,
 	@Schema(description = "클럽 생성날짜")
 	LocalDateTime createDate,
 	@Schema(description = "클럽에 가입한 사람들")
 	List<ClubMemberInfoResponse> members
 ) {
 
-	public static ClubInfoResponse from(Club club, String img, List<ClubMemberInfoResponse> members) {
+	public static ClubInfoResponse from(Club club, String imageName, URL imageURL,
+		List<ClubMemberInfoResponse> members) {
 		return new ClubInfoResponse(
 			club.getId(),
 			club.getName(),
 			club.getCategory(),
 			club.getTeamCode(),
-			img,
+			imageName,
+			imageURL,
 			club.getCreatedAt(),
 			members
 		);

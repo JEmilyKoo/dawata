@@ -29,7 +29,7 @@ public class ClubController {
 	@Operation(summary = "클럽 생성",
 		description = "클럽을 생성하는 역할을 합니다.")
 	@PostMapping
-	public ResponseEntity<ApiResponse<ClubInfoResponse>> createClub(
+	public ResponseEntity<ApiResponse<?>> createClub(
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
 		@RequestBody CreateClubRequest request) {
 		return ResponseEntity.ok(clubService.createClub(request, memberDetails.member()));

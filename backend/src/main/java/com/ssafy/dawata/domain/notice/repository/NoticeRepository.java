@@ -21,6 +21,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 		            m.email, 
 		            m.name, 
 		            '',
+					null,
 		            m.createdAt
 		        ), 
 		        n.read, 

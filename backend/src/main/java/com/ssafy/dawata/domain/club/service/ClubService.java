@@ -38,20 +38,14 @@ public class ClubService {
 
 	//클럽 생성
 	@Transactional
-	public ApiResponse<ClubInfoResponse> createClub(CreateClubRequest request, Member member) {
-		//추후에 SecurityContextHolder에서 가져오도록 하겠습니다.
-		List<ClubMember> clubMembers = clubMemberRepository.findAllWithClubByMemberId(
-			member.getId());
+	public ApiResponse<?> createClub(CreateClubRequest request, Member member) {
 		String teamCode = generateTeamCode();
-		Club club = Club.createClub(request.name(), request.category(), teamCode);
 
-		clubRepository.save(club);
+		Club club = clubRepository.save(Club.createClub(request.name(), request.category(), teamCode));
 
 		ClubMember clubMember = ClubMember.createClubMember(member, club, 0);
 		clubMemberRepository.save(clubMember);
-		List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
-
-		return ApiResponse.success(ClubInfoResponse.from(club, null, members));
+		return ApiResponse.success();
 	}
 
 	//멤버가 속해있는 특정 클럽 id로 데이터 조회하기
@@ -61,9 +55,16 @@ public class ClubService {
 		List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
 
 		Photo photo = photoRepository.findByEntityIdAndEntityCategory(clubId, EntityCategory.CLUB)
-			.orElseThrow(() -> new IllegalArgumentException("해당 클럽의 사진 없음"));
+			.orElse(Photo.createDefaultPhoto(clubId, EntityCategory.CLUB));
 
-		return ApiResponse.success(ClubInfoResponse.from(club, photo.getPhotoName(), members));
+		return ApiResponse.success(
+			ClubInfoResponse.from(
+				club,
+				photo.getPhotoName(),
+				s3Service.generatePresignedUrl(photo.getPhotoName(), "get", EntityCategory.CLUB, club.getId()),
+				members
+			)
+		);
 	}
 
 	//클라이언트의 멤버 정보 가져와서 -> 해당 유저가 속한 모든 그룹의 정보 가져오기
@@ -77,8 +78,13 @@ public class ClubService {
 				Club club = clubMember.getClub();
 				List<ClubMemberInfoResponse> members = getMembersForResponse(club.getId());
 				Photo photo = photoRepository.findByEntityIdAndEntityCategory(club.getId(), EntityCategory.CLUB)
-					.orElseThrow(() -> new IllegalArgumentException("해당 클럽의 사진 없음"));
-				return ClubInfoResponse.from(club, photo.getPhotoName(), members);
+					.orElse(Photo.createDefaultPhoto(club.getId(), EntityCategory.CLUB));
+				return ClubInfoResponse.from(
+					club,
+					photo.getPhotoName(),
+					s3Service.generatePresignedUrl(photo.getPhotoName(), "get", EntityCategory.CLUB, club.getId()),
+					members
+				);
 			})
 			.collect(Collectors.toList());
 		return ApiResponse.success(response);
@@ -134,10 +140,7 @@ public class ClubService {
 	public ApiResponse<List<ClubMemberInfoResponse>> getClubMembers(Long clubId, Member member) {
 		//요청자 정보 갖고오기
 		validateClubAndMember(clubId, member.getId());
-		List<ClubMemberInfoResponse> response = clubMemberRepository.findAllByClubId(clubId)
-			.stream()
-			.map(clubMember -> ClubMemberInfoResponse.from(clubMember, photoRepository))
-			.toList();
+		List<ClubMemberInfoResponse> response = getMembersForResponse(clubId);
 
 		return ApiResponse.success(response);
 	}
@@ -192,7 +195,23 @@ public class ClubService {
 		ClubMember clubMember = clubMemberRepository.findById(clubMemberId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 클럽 멤버가 존재X"));
 
-		return ApiResponse.success(ClubMemberInfoResponse.from(clubMember, photoRepository));
+		Photo photo = photoRepository.findByEntityIdAndEntityCategory(
+				clubMember.getMember().getId(),
+				EntityCategory.MEMBER
+			)
+			.orElse(Photo.createDefaultPhoto(clubMember.getMember().getId(), EntityCategory.MEMBER));
+
+		return ApiResponse.success(ClubMemberInfoResponse.from(
+				clubMember,
+				photo.getPhotoName(),
+				s3Service.generatePresignedUrl(
+					photo.getPhotoName(),
+					"get",
+					EntityCategory.MEMBER,
+					clubMember.getMember().getId()
+				)
+			)
+		);
 	}
 
 	//클럽 멤버 정보 수정
@@ -342,8 +361,26 @@ public class ClubService {
 
 	//클럽 데이터 + 클럽 멤버 데이터 유틸 메서드
 	private List<ClubMemberInfoResponse> getMembersForResponse(Long clubId) {
-		return clubMemberRepository.findAllByClubId(clubId).stream()
-			.map(clubMember -> ClubMemberInfoResponse.from(clubMember, photoRepository))
+		return clubMemberRepository
+			.findAllByClubId(clubId)
+			.stream()
+			.map(clubMember -> {
+				Photo photo = photoRepository.findByEntityIdAndEntityCategory(
+						clubMember.getMember().getId(),
+						EntityCategory.MEMBER
+					)
+					.orElse(Photo.createDefaultPhoto(clubMember.getMember().getId(), EntityCategory.MEMBER));
+				return ClubMemberInfoResponse.from(
+					clubMember,
+					photo.getPhotoName(),
+					s3Service.generatePresignedUrl(
+						photo.getPhotoName(),
+						"get",
+						EntityCategory.MEMBER,
+						clubMember.getMember().getId()
+					)
+				);
+			})
 			.toList();
 	}
 

@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.appointment.dto.response;
 
+import java.net.URL;
 import java.util.List;
 
 import com.ssafy.dawata.domain.appointment.entity.Appointment;
@@ -37,14 +38,18 @@ public record AppointmentWithExtraInfoResponse(
 		String name,
 
 		@Schema(description = "클럽 이미지 파일명", example = "image.jpg")
-		String img
+		String imageName,
+
+		@Schema(description = "클럽 이미지 URL", example = "https://dawata.s3.ap-northeast-2.amazonaws.com/1_image.jpg")
+		URL imageURL
 	) {
 
-		public static ClubResponse of(Long clubId, String name, String img) {
+		public static ClubResponse of(Long clubId, String name, String imageName, URL imageURL) {
 			return ClubResponse.builder()
 				.clubId(clubId)
 				.name(name)
-				.img(img)
+				.imageName(imageName)
+				.imageURL(imageURL)
 				.build();
 		}
 	}
@@ -61,16 +66,20 @@ public record AppointmentWithExtraInfoResponse(
 		@Schema(description = "출결 상태", example = "PRESENT")
 		DailyStatus dailyStatus,
 
-		@Schema(description = "이미지 파일명", example = "image.jpg")
-		String img
+		@Schema(description = "참가자 이미지 파일명", example = "image.png")
+		String imageName,
+
+		@Schema(description = "참가자 이미지 URL", example = "https://dawata.s3.ap-northeast-2.amazonaws.com/1_image.png")
+		URL imageURL
 	) {
 
-		public static ParticipantResponse of(Participant entity, String img) {
+		public static ParticipantResponse of(Participant entity, String imageName, URL imageURL) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
 				.isAttending(entity.getIsAttending())
 				.dailyStatus(entity.getDailyStatus())
-				.img(img)
+				.imageName(imageName)
+				.imageURL(imageURL)
 				.build();
 		}
 	}
@@ -78,13 +87,14 @@ public record AppointmentWithExtraInfoResponse(
 	public static AppointmentWithExtraInfoResponse of(
 		Long clubId,
 		String clubName,
-		String img,
+		String imageName,
+		URL imageURL,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
 		VoteStatus voteStatus
 	) {
 		return AppointmentWithExtraInfoResponse.builder()
-			.clubInfo(ClubResponse.of(clubId, clubName, img))
+			.clubInfo(ClubResponse.of(clubId, clubName, imageName, imageURL))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteStatus(voteStatus)
