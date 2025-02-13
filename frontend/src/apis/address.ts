@@ -22,6 +22,15 @@ export const createAddress = async (params: AddressCreate) => {
   }
 }
 
+export const deleteAddress = async (addressId: number) => {
+  try {
+    const response = await api.delete(`/addresses/${addressId}`)
+    return response.status
+  } catch (error) {
+    return null
+  }
+}
+
 // 회원 주소 상세조회
 // 회원 주소 변경
 // 회원 주소 삭제
