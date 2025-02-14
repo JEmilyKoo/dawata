@@ -49,7 +49,6 @@ export default function MainScreen() {
         prevRange: 0,
       })
       if (result) {
-        console.log('✅✅✅✅result✅✅✅✅', result)
         setAppoList(result.data)
       }
     } catch (error) {
