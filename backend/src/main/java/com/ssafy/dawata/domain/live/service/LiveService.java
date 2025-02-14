@@ -2,6 +2,7 @@ package com.ssafy.dawata.domain.live.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -11,21 +12,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.common.service.RedisService;
 import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.fcm.service.FCMService;
+import com.ssafy.dawata.domain.live.dto.MemberLocationDto;
 import com.ssafy.dawata.domain.live.dto.ParticipantDto;
 import com.ssafy.dawata.domain.live.dto.TMapResponse;
 import com.ssafy.dawata.domain.live.dto.request.UrgentRequest;
 import com.ssafy.dawata.domain.live.dto.response.LiveDetailResponse;
 import com.ssafy.dawata.domain.live.dto.response.LiveParticipantResponse;
-import com.ssafy.dawata.domain.live.dto.response.LiveResponse;
+import com.ssafy.dawata.domain.live.dto.response.LiveRoutineResponse;
 import com.ssafy.dawata.domain.live.enums.ArrivalState;
 import com.ssafy.dawata.domain.live.enums.RedisKeyCategory;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
+import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 import com.ssafy.dawata.domain.photo.enums.EntityCategory;
+import com.ssafy.dawata.domain.routine.entity.RoutineElement;
+import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
+import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
+import com.ssafy.dawata.domain.vote.entity.VoteItem;
+import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +45,8 @@ public class LiveService {
 	private final ClubMemberRepository clubMemberRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final MemberRepository memberRepository;
+	private final VoteItemRepository voteItemRepository;
+
 	private final FCMService fcmService;
 	private final S3Service s3Service;
 
@@ -46,18 +57,22 @@ public class LiveService {
 	private final SkOpenApiService skOpenApiService;
 
 	private final ObjectMapper objectMapper;
+	private final ParticipantRepository participantRepository;
+	private final RoutineTemplateRepository routineTemplateRepository;
 
-	public List<Long> findLives(Long memberId) {
+	public Long findLives(Long memberId) {
 		LocalDateTime now = LocalDateTime.now();
 
 		/**
 		 * 지금부터 2시간 후까지 존재여부 Check
 		 * */
-		return appointmentRepository.findByScheduledAtInTwoHours(
+		List<Long> liveList = appointmentRepository.findByScheduledAtInTwoHours(
 			memberId,
 			now,
 			now.plusHours(2)
 		);
+
+		return liveList.isEmpty() ? 0 : liveList.get(0);
 	}
 
 	/**
@@ -164,5 +179,66 @@ public class LiveService {
 			.longitude(Double.parseDouble(latLnt[2]))
 			.participants(participantResponseList)
 			.build();
+	}
+
+	// TODO(고) : 테스트 필요
+	public LiveRoutineResponse findMyRoutineInLive(Long memberId) {
+		Long appointmentId = findLives(memberId);
+
+		VoteItem maxVoteItem =
+			voteItemRepository.findMaxCountByAppointmentId(appointmentId)
+				.stream()
+				.max(Comparator.comparingInt(v -> v.getVoters().size()))
+				.orElse(null);
+
+		Appointment appointment = appointmentRepository.findById(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("참가하는 약속이 없습니다."));
+
+		MemberLocationDto memberLocationDto =
+			memberRepository.customFindByAppointmentIdAndMemberId(appointmentId, memberId)
+				.orElseThrow(() -> new IllegalArgumentException("해당하는 참여자의 위치가 없"));
+
+		try {
+			Map<String, Object> walkingRoute = skOpenApiService.getWalkingRoute(
+				memberLocationDto.latitude(),
+				memberLocationDto.longitude(),
+				maxVoteItem.getAddress().getLatitude(),
+				maxVoteItem.getAddress().getLongitude()
+			);
+
+			TMapResponse tMapResponse =
+				objectMapper.convertValue(walkingRoute, TMapResponse.class);
+			Long routineTemplateId = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+				.orElseThrow(() -> new IllegalArgumentException("조건에 맞는 참여자가 없습니다."))
+				.getRoutineTemplateId();
+
+			List<RoutineTemplate> routineTemplateList = routineTemplateRepository.findAllByMember(
+				memberRepository.findById(memberId)
+					.orElseThrow(() -> new IllegalArgumentException("멤버 없음")));
+			RoutineTemplate routineTemplate = routineTemplateList.stream()
+				.filter(x -> x.getId() == routineTemplateId)
+				.findFirst().orElseThrow(() -> new IllegalArgumentException("routine 없음"));
+
+			LocalDateTime l = appointment.getScheduledAt()
+				.minusSeconds(
+					tMapResponse.getFeatures().get(0).getProperties().getTotalTime())
+				.minusMinutes(
+					routineTemplate.getRoutineElements()
+						.stream()
+						.map(RoutineElement::getSpendTime)
+						.mapToLong(x -> x).sum()
+				);
+
+			return LiveRoutineResponse.builder()
+				.routineId(memberId)
+				.routineStartTime(
+					LocalDateTime.of(
+						l.getYear(), l.getMonth(), l.getDayOfMonth(),
+						l.getHour(), l.getMinute(), 00)
+				)
+				.build();
+		} catch (Exception e) {
+			throw new IllegalArgumentException("T map error");
+		}
 	}
 }

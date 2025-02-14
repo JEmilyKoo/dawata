@@ -16,9 +16,9 @@ public interface VoteItemRepository extends JpaRepository<VoteItem, Long> {
 	@Query("""
 			SELECT v
 			FROM VoteItem v
-			JOIN FETCH v.voters voter
+			LEFT JOIN FETCH v.voters voter
 			JOIN FETCH v.address a
 			WHERE v.appointment.id = :appointmentId
 		""")
-	List<VoteItem> findMaxCountByAppointmentId(Long appointmentId);
+	List<VoteItem> findMaxCountByAppointmentId(@Param("appointmentId") Long appointmentId);
 }

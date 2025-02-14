@@ -95,4 +95,6 @@ public class RoutineController {
 		routineService.deleteRoutine(memberDetails.member().getId(), routineId);
 		return ResponseEntity.ok(ApiResponse.success());
 	}
+
+	//TODO(고) : 루틴 알람 설정 on / off
 }

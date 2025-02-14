@@ -8,7 +8,8 @@ public enum RedisKeyCategory {
 	LIVE_LOCATION("appointmentId : %d | participantId : %d", Integer.MAX_VALUE),
 	LIVE_PARTICIPANT_LIST("total participant id List : ", 28),
 	APPOINTMENT_VOTE("appointment vote :", 18),
-	VOTE_RESULT("vote result :", 13);
+	VOTE_RESULT("vote result :", 13),
+	ROUTINE("routine :", 9);
 
 	final String key;
 	final int len;

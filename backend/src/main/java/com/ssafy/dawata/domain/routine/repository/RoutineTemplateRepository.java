@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.routine.repository;
 
+import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
 import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
@@ -40,4 +41,5 @@ public interface RoutineTemplateRepository extends JpaRepository<RoutineTemplate
 
     RoutineTemplate save(RoutineTemplate routineTemplate);
 
+    List<RoutineTemplate> findAllByMember(Member member);
 }

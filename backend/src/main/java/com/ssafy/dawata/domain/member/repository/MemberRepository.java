@@ -42,6 +42,18 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	List<MemberLocationDto> customFindAllByAppointmentId(@Param("appointmentId") Long appointmentId);
 
 	@Query("""
+			SELECT new com.ssafy.dawata.domain.live.dto.MemberLocationDto(
+				m.id, p.memberAddressMapping.address.latitude, p.memberAddressMapping.address.longitude
+			)
+			FROM Member m
+				JOIN ClubMember cm ON m.id = cm.member.id
+				JOIN Participant p ON cm.id = p.clubMember.id
+				JOIN Appointment a ON p.appointment.id = a.id
+			WHERE a.id = :appointmentId AND m.id = :memberId
+		""")
+	Optional<MemberLocationDto> customFindByAppointmentIdAndMemberId(@Param("appointmentId") Long appointmentId, @Param("memberId") Long memberId);
+
+	@Query("""
 			SELECT m.id
 			FROM Member m
 				JOIN ClubMember cm ON m.id = cm.member.id

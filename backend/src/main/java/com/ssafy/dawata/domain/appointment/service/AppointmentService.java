@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.appointment.service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +29,15 @@ import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.live.enums.RedisKeyCategory;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
+import com.ssafy.dawata.domain.participant.dto.request.ParticipantRoutineRequest;
 import com.ssafy.dawata.domain.participant.entity.Participant;
 import com.ssafy.dawata.domain.participant.enums.DailyStatus;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 import com.ssafy.dawata.domain.photo.entity.Photo;
 import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
+import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
+import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
 import com.ssafy.dawata.domain.vote.entity.VoteItem;
 import com.ssafy.dawata.domain.vote.entity.Voter;
 import com.ssafy.dawata.domain.vote.enums.VoteStatus;
@@ -56,6 +60,7 @@ public class AppointmentService {
 	private final VoterRepository voterRepository;
 	private final PhotoRepository photoRepository;
 	private final MemberAddressMappingRepository memberAddressMappingRepository;
+	private final RoutineTemplateRepository routineTemplateRepository;
 	private final ClubRepository clubRepository;
 
 	private final RedisTemplate<String, String> redisTemplateForOthers;
@@ -197,7 +202,10 @@ public class AppointmentService {
 			),
 			appointment,
 			participantResponses,
-			makeVoteResponses(voteItems, voters, participant.getId())
+			makeVoteResponses(voteItems, voters, participant.getId()),
+			participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
+				.orElseThrow(() -> new IllegalArgumentException("조건에 맞는 참가자 정보가 없습니다."))
+				.getRoutineTemplateId()
 		);
 	}
 
@@ -385,6 +393,17 @@ public class AppointmentService {
 					voteStatus = VoteStatus.SELECTED;
 				}
 
+				VoteItem maxVoteItem = voteItemRepository.findMaxCountByAppointmentId(appointment.getId())
+					.stream()
+					.max(Comparator.comparingInt(v -> v.getVoters().size()))
+					.orElse(null);
+
+				String voteTitle = "장소 투표 중";
+
+				if(voteStatus == VoteStatus.EXPIRED && maxVoteItem != null) {
+					voteTitle = maxVoteItem.getTitle();
+				}
+
 				return AppointmentWithExtraInfoResponse.of(
 					targetClub.getId(),
 					clubName,
@@ -396,7 +415,8 @@ public class AppointmentService {
 					),
 					appointment,
 					participantResponses,
-					voteStatus
+					voteStatus,
+					voteTitle
 				);
 			})
 			.toList();
@@ -427,5 +447,20 @@ public class AppointmentService {
 				return AppointmentDetailResponse.VoteResponse.of(vi, isSelected, percentage);
 			})
 			.toList();
+	}
+
+	@Transactional
+	public void updateParticipantRoutine(Long memberId, Long appointmentId, ParticipantRoutineRequest requestDto) {
+		Participant participant = participantRepository.findByMemberIdAndAppointmentIdAndDateCheck(memberId, appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("조건에 해당하는 참여자가 없습니다."));
+
+		RoutineTemplate routineTemplate = routineTemplateRepository.findById(participant.getRoutineTemplateId())
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 루틴이 존재하지 않습니다."));
+
+		if (routineTemplate.getMember().getId() != memberId) {
+			throw new IllegalArgumentException("현재 회원의 루틴이 아닙니다.");
+		}
+
+		participant.updateRoutineId(participant.getRoutineTemplateId());
 	}
 }
