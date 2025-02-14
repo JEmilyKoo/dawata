@@ -4,10 +4,12 @@ import { AppointmentCreateInfo } from '@/types/appointment'
 import api from './api'
 
 interface GetAppointmentsParams {
-  clubId: number
+  clubId?: number
   nextRange?: number
   prevRange?: number
+  date: string
 }
+
 interface UpdateMyAppointmentAttendanceParams {
   isAttending: boolean
 }
@@ -28,12 +30,23 @@ export const getAppointments = async ({
   clubId,
   nextRange = 4,
   prevRange = 4,
+  date,
 }: GetAppointmentsParams) => {
   try {
     const response = await api.get(`/appointments`, {
-      params: { clubId, nextRange, prevRange },
+      params: { clubId, nextRange, prevRange, date },
     })
-    return response.data
+    console.log(
+      '✅✅✅✅API REQUEST✅✅✅✅',
+      clubId,
+      nextRange,
+      prevRange,
+      date,
+    )
+    if (response) {
+      console.log('✅✅✅✅response✅✅✅✅', response)
+    }
+    return response
   } catch (error) {
     console.error('⛔ 약속 리스트 조회 실패:')
     return null
