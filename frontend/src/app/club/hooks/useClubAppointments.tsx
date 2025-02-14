@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react'
 
 import { getAppointments } from '@/apis/appointment'
-import { AppointmentListInfo } from '@/types/clubAppointment'
+import { AppointmentListInfo } from '@/types/appointment'
 
-export const useClubAppointments = ({ clubId }: { clubId: number }) => {
+export const useClubAppointments = ({
+  clubId,
+  date,
+}: {
+  clubId: number
+  date: string
+}) => {
   const [appointments, setAppointments] = useState<AppointmentListInfo[]>([])
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     const clubAppointmentsListWithRange = async () => {
       try {
-        const data = await getAppointments({
+        const result = await getAppointments({
           clubId,
-          nextRange: 4,
-          prevRange: 4,
+          date: date,
         })
-        setAppointments(data || [])
-        console.log(data)
+        if (result) {
+          setAppointments(result.data)
+        } else {
+          console.log('🚫🚫🚫🚫result is null🚫🚫🚫🚫')
+        }
+        console.log(result)
       } catch (error) {
         console.error('Failed to fetch appointments', error)
       } finally {
@@ -25,7 +34,7 @@ export const useClubAppointments = ({ clubId }: { clubId: number }) => {
 
     clubAppointmentsListWithRange()
     // cleanup 함수가 필요하다면 여기서 반환
-  }, [clubId])
+  }, [clubId, date])
   return {
     appointments,
     loading,
