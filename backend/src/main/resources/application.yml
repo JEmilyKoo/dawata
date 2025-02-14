@@ -77,7 +77,7 @@ firebase:
 
 jwt:
   secret: ${SECRET}
-  access_expiration: 1000000
+  access_expiration: 100000000000
   refresh_expiration: 1000000
 
 logging.level:

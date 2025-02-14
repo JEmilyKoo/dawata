@@ -25,7 +25,7 @@ import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.common.enums.Role;
 import com.ssafy.dawata.domain.common.service.RedisService;
 import com.ssafy.dawata.domain.common.service.S3Service;
-import com.ssafy.dawata.domain.live.enums.ExpiredKeyCategory;
+import com.ssafy.dawata.domain.live.enums.RedisKeyCategory;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
 import com.ssafy.dawata.domain.participant.entity.Participant;
@@ -90,12 +90,14 @@ public class AppointmentService {
 			participantRepository.save(participant);
 		});
 
-		// redis에 만료시간으로 in
+		// redis에 vote 만료시간으로 in
+		System.out.println(redisService.getExpirationTime(appointmentEntity.getVoteEndTime(), LocalDateTime.now()));
 		redisService.saveDataUseTTL(
 			redisTemplateForOthers,
-			ExpiredKeyCategory.LIVE_START.getKey() + appointmentEntity.getId(),
+			RedisKeyCategory.APPOINTMENT_VOTE.getKey() + appointmentEntity.getId(),
 			"",
-			redisService.getExpirationTime(appointmentEntity.getScheduledAt(), LocalDateTime.now()));
+			redisService.getExpirationTime(appointmentEntity.getVoteEndTime(), LocalDateTime.now())
+		);
 	}
 
 	public List<AppointmentWithExtraInfoResponse> findMyAllAppointmentList(
@@ -199,21 +201,17 @@ public class AppointmentService {
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
 
-		if (requestDto.scheduledAt().isPresent()) {
+		if (requestDto.voteEndTime().isPresent()) {
 			// redis에 만료시간으로 in
 			redisService.updateDataUseTTL(
 				redisTemplateForOthers,
-				ExpiredKeyCategory.LIVE_START.getKey() + appointmentId,
+				RedisKeyCategory.APPOINTMENT_VOTE.getKey() + appointmentId,
 				redisService.getExpirationTime(
-					requestDto.scheduledAt().orElseThrow(
-						() -> new IllegalArgumentException("스케쥴이 존재하지 않습니다.")),
+					requestDto.voteEndTime().orElseThrow(
+						() -> new IllegalArgumentException("투표 수정 데이터가 존재하지 않습니다.")),
 					LocalDateTime.now()
 				)
 			);
-		}
-
-		if (!appointment.getScheduledAt().isEqual(appointment.getScheduledAt())) {
-			// TODO : 만료시간 갱신
 		}
 
 		requestDto.name().ifPresent(appointment::updateName);
@@ -232,7 +230,7 @@ public class AppointmentService {
 		// redis에서 해당 id를 key 데이터 삭제
 		redisService.deleteData(
 			redisTemplateForOthers,
-			ExpiredKeyCategory.LIVE_START.getKey() + appointmentId);
+			RedisKeyCategory.APPOINTMENT_VOTE.getKey() + appointmentId);
 
 		appointmentRepository.findAppointmentByIdWithVoteItems(appointmentId)
 			.ifPresentOrElse(

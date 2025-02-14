@@ -18,9 +18,9 @@ public class RedisService {
 	/**
 	 * redis 저장 (만료시간 0)
 	 * */
-	public void saveDataUseTTL(
-		RedisTemplate<String, String> redisTemplate,
-		String key, String value,
+	public <T> void saveDataUseTTL(
+		RedisTemplate<String, T> redisTemplate,
+		String key, T value,
 		long expirationTime
 	) {
 		try {
@@ -33,9 +33,9 @@ public class RedisService {
 	/**
 	 * redis 저장 (만료시간 X)
 	 * */
-	public void saveData(
-		RedisTemplate<String, String> redisTemplate,
-		String key, String value
+	public <T>  void saveData(
+		RedisTemplate<String, T> redisTemplate,
+		String key, T value
 	) {
 		try {
 			redisTemplate.opsForValue().set(key, value);
@@ -47,8 +47,8 @@ public class RedisService {
 	/**
 	 * redis 값 조회
 	 * */
-	public String getData(
-		RedisTemplate<String, String> redisTemplate,
+	public <T> T getData(
+		RedisTemplate<String, T> redisTemplate,
 		String key
 	) {
 		try {
@@ -62,8 +62,8 @@ public class RedisService {
 	/**
 	 * redis 값 수정 (만료시간 0)
 	 * */
-	public void updateDataUseTTL(
-		RedisTemplate<String, String> redisTemplate,
+	public <T> void updateDataUseTTL(
+		RedisTemplate<String, T> redisTemplate,
 		String key, long expirationTime
 	) {
 		try {
@@ -80,7 +80,7 @@ public class RedisService {
 	/**
 	 * redis 값 삭제
 	 * */
-	public void deleteData(RedisTemplate<String, String> redisTemplate, String key) {
+	public <T> void deleteData(RedisTemplate<String, T> redisTemplate, String key) {
 		if (key != null && !key.isEmpty()) {
 			redisTemplate.delete(key);
 		} else {
@@ -91,8 +91,8 @@ public class RedisService {
 	/**
 	 * redis 값 전체삭제 (Pattern으로 찾아서)
 	 * */
-	public void deleteReserveUsePatternInRedis(
-		RedisTemplate<String, String> redisTemplate,
+	public <T> void deleteReserveUsePatternInRedis(
+		RedisTemplate<String, T> redisTemplate,
 		String pattern
 	) {
 		Set<String> keys = redisTemplate.keys(pattern);
@@ -107,15 +107,15 @@ public class RedisService {
 	/**
 	 * 존재여부 check
 	 * */
-	public boolean isExists(RedisTemplate<String, String> redisTemplate, String key) {
+	public <T> boolean isExists(RedisTemplate<String, T> redisTemplate, String key) {
 		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
 	}
 
 	/**
 	 * 만료시간 계산기
-	 * 설정 - 현재시간 - 2시간
+	 * 설정 - 현재시간
 	 * */
 	public Long getExpirationTime(LocalDateTime settingDateTime, LocalDateTime nowDateTime) {
-		return ChronoUnit.SECONDS.between(nowDateTime, settingDateTime) - TWO_HOURS;
+		return ChronoUnit.SECONDS.between(nowDateTime, settingDateTime);
 	}
 }
