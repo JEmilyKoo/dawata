@@ -1,6 +1,5 @@
 package com.ssafy.dawata.domain.appointment.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +21,7 @@ import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.club.entity.Club;
 import com.ssafy.dawata.domain.club.entity.ClubMember;
 import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
+import com.ssafy.dawata.domain.club.repository.ClubRepository;
 import com.ssafy.dawata.domain.common.enums.Role;
 import com.ssafy.dawata.domain.common.service.RedisService;
 import com.ssafy.dawata.domain.common.service.S3Service;
@@ -56,6 +56,7 @@ public class AppointmentService {
 	private final VoterRepository voterRepository;
 	private final PhotoRepository photoRepository;
 	private final MemberAddressMappingRepository memberAddressMappingRepository;
+	private final ClubRepository clubRepository;
 
 	private final RedisTemplate<String, String> redisTemplateForOthers;
 	private final RedisService redisService;
@@ -104,13 +105,19 @@ public class AppointmentService {
 		Integer prevRange,
 		int currentYear,
 		int currentMonth
+
 	) {
-		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberId(
-			memberId,
-			prevRange,
-			nextRange,
-			currentYear,
-			currentMonth
+
+		List<Long> clubIds = clubRepository.findClubIdsByMemberId(memberId);
+
+		LocalDateTime firstDayOfMonth = LocalDateTime.of(currentYear, currentMonth, 15, 0, 0);
+
+		LocalDateTime startDate = firstDayOfMonth.minusWeeks(prevRange);
+		LocalDateTime endDate = firstDayOfMonth.plusWeeks(nextRange);
+		List<Appointment> appointments = appointmentRepository.findAppointmentsByClubIds(
+			clubIds,
+			startDate,
+			endDate
 		);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
