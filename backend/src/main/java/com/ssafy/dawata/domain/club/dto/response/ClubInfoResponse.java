@@ -18,10 +18,8 @@ public record ClubInfoResponse(
 	Category category,
 	@Schema(description = "클럽 가입시 사용할 팀코드")
 	String teamCode,
-	@Schema(description = "클럽 대표이미지 파일명")
-	String imageName,
 	@Schema(description = "이미지 pre-signed url")
-	URL imageURL,
+	URL img,
 	@Schema(description = "클럽 생성날짜")
 	LocalDateTime createDate,
 	@Schema(description = "클럽에 가입한 사람들")
@@ -35,7 +33,6 @@ public record ClubInfoResponse(
 			club.getName(),
 			club.getCategory(),
 			club.getTeamCode(),
-			imageName,
 			imageURL,
 			club.getCreatedAt(),
 			members

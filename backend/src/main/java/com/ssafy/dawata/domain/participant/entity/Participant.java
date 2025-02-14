@@ -65,7 +65,7 @@ public class Participant {
 	private List<Voter> voters = new ArrayList<>();
 
 	@Column
-	private Boolean isAttending = true;
+	private Boolean isAttending;
 
 	@Convert(converter = DailyStatusConverter.class)
 	@Column
@@ -95,7 +95,6 @@ public class Participant {
 		DailyStatus dailyStatus,
 		Role role
 	) {
-		// TODO: 양방향 연관관계가 필요한 경우 여기서 처리 해주기
 		return Participant.builder()
 			.appointment(appointment)
 			.clubMember(clubMember)

@@ -1,12 +1,10 @@
 package com.ssafy.dawata.domain.member.service;
 
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
-import com.ssafy.dawata.domain.club.dto.request.ClubJoinSearchRequest;
 import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInMonthResponse;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
-import com.ssafy.dawata.domain.member.dto.response.ClubJoinSearchResponse;
 import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 import com.ssafy.dawata.domain.member.repository.MemberRepository;
@@ -55,8 +53,7 @@ public class MemberService {
 		return MemberInfoResponse.builder()
 			.email(member.getEmail())
 			.name(member.getName())
-			.imageName(photo.getPhotoName())
-			.imageURL(
+			.img(
 				s3Service.generatePresignedUrl(
 					photo.getPhotoName(),
 					"GET",

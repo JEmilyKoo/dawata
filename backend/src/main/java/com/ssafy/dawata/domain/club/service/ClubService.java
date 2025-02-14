@@ -203,7 +203,6 @@ public class ClubService {
 
 		return ApiResponse.success(ClubMemberInfoResponse.from(
 				clubMember,
-				photo.getPhotoName(),
 				s3Service.generatePresignedUrl(
 					photo.getPhotoName(),
 					"get",
@@ -372,7 +371,6 @@ public class ClubService {
 					.orElse(Photo.createDefaultPhoto(clubMember.getMember().getId(), EntityCategory.MEMBER));
 				return ClubMemberInfoResponse.from(
 					clubMember,
-					photo.getPhotoName(),
 					s3Service.generatePresignedUrl(
 						photo.getPhotoName(),
 						"get",

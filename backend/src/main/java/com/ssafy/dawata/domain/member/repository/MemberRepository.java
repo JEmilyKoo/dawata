@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.ssafy.dawata.domain.member.dto.response.ClubJoinSearchResponse;
-import com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse;
 import com.ssafy.dawata.domain.member.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {

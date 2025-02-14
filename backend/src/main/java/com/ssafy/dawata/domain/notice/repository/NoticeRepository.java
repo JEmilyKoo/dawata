@@ -19,8 +19,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 		        CONCAT(n.noticeType, '', n.messageType), 
 		        new com.ssafy.dawata.domain.member.dto.response.MemberInfoResponse(
 		            m.email, 
-		            m.name, 
-		            '',
+		            m.name,
 					null,
 		            m.createdAt
 		        ), 

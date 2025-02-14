@@ -32,14 +32,11 @@ public record ClubMemberInfoResponse(
 	@Schema(description = "사용자의 그룹 가입일")
 	LocalDateTime createdAt,
 
-	@Schema(description = "사용자의 이미지 파일명")
-	String imageName,
-
 	@Schema(description = "사용자의 이미지 URL")
-	URL imageURL
+	URL img
 
 ) {
-	public static ClubMemberInfoResponse from(ClubMember clubMember, String imageName, URL imageURL) {
+	public static ClubMemberInfoResponse from(ClubMember clubMember, URL imageURL) {
 		return new ClubMemberInfoResponse(
 			clubMember.getId(),
 			clubMember.getMember().getId(),
@@ -50,7 +47,6 @@ public record ClubMemberInfoResponse(
 			clubMember.getRole(),
 			clubMember.getMember().getEmail(),
 			clubMember.getCreatedAt(),
-			imageName,
 			imageURL
 		);
 	}

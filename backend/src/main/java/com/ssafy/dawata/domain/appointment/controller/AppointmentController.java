@@ -63,16 +63,18 @@ public class AppointmentController {
 		@RequestParam(required = false) Optional<Long> clubId,
 		@RequestParam(defaultValue = "4") Integer nextRange,
 		@RequestParam(defaultValue = "4") Integer prevRange,
-		@RequestParam(required = false) Optional<Integer> currentMonth
+		@RequestParam String date
 	) {
+		int currentYear = Integer.parseInt(date.split("-")[0]);
+		int currentMonth = Integer.parseInt(date.split("-")[1]);
 		return clubId.map(cId -> ResponseEntity.ok(
 				ApiResponse.success(
 					appointmentService.findMyAppointmentListByClubId(memberDetails.member().getId(), cId, nextRange,
-						prevRange, currentMonth))))
+						prevRange, currentYear, currentMonth))))
 			.orElseGet(() -> ResponseEntity.ok(
 				ApiResponse.success(
 					appointmentService.findMyAllAppointmentList(memberDetails.member().getId(), nextRange,
-						prevRange, currentMonth))));
+						prevRange, currentYear, currentMonth))));
 	}
 
 	@Operation(summary = "약속 상세 조회", description = "특정 약속의 상세 정보를 조회합니다.")
