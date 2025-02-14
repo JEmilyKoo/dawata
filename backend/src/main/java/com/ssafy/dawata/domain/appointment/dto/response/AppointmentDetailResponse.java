@@ -25,7 +25,10 @@ public record AppointmentDetailResponse(
 	List<ParticipantResponse> participantInfos,
 
 	@Schema(description = "투표 정보 리스트")
-	List<VoteResponse> voteInfos
+	List<VoteResponse> voteInfos,
+
+	@Schema(description = "나의 루틴 id")
+	Long routineId
 ) {
 
 	@Schema(description = "클럽 응답 스키마")
@@ -145,13 +148,15 @@ public record AppointmentDetailResponse(
 		URL img,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
-		List<VoteResponse> voteInfos
+		List<VoteResponse> voteInfos,
+		Long routineId
 	) {
 		return AppointmentDetailResponse.builder()
 			.clubInfo(ClubResponse.of(clubId, clubName, img))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteInfos(voteInfos)
+			.routineId(routineId)
 			.build();
 	}
 }

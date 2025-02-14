@@ -71,6 +71,10 @@ public class Participant {
 	@Column
 	private DailyStatus dailyStatus;
 
+	// 기본 세팅은 0 -> 루틴이 없다는 뜻!
+	// 설정 시, 설정한 routineTemplateId로 출력
+	private Long routineTemplateId = 0L;
+
 	@Enumerated(EnumType.ORDINAL)
 	private Role role;
 
@@ -113,6 +117,8 @@ public class Participant {
 	public void updateDailyStatus(DailyStatus dailyStatus) {
 		this.dailyStatus = dailyStatus;
 	}
+
+	public void updateRoutineId(Long routineTemplateId) { this.routineTemplateId = routineTemplateId;}
 
 	public void updateRole(Role role) {
 		this.role = role;

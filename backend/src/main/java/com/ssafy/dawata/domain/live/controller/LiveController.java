@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class LiveController {
 	private final LiveService liveService;
 
+	//TODO(고) : list -> 가장 최신 appointmentId로 수정
 	@Operation(summary = "현재 나의 live 조회",
 		description = "현재 나의 live 조회하는 작업을 수행합니다.")
 	@GetMapping
@@ -41,6 +42,16 @@ public class LiveController {
 		@PathVariable("appointmentId") Long appointmentId) {
 		return ResponseEntity.ok(
 			ApiResponse.success(liveService.findLiveDetail(memberDetails.member().getId(), appointmentId)));
+	}
+
+	@Operation(summary = "현재 실행중인 내 루틴 조회",
+		description = "현재 실행중인 내 루틴 조회를 수행합니다.")
+	@GetMapping("/routine")
+	public ResponseEntity<ApiResponse<?>> findMyRoutineInLive(
+		@AuthenticationPrincipal SecurityMemberDetails memberDetails
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.success(liveService.findMyRoutineInLive(memberDetails.member().getId())));
 	}
 
 	@Operation(summary = "특정 멤버에게 재촉알림 보내기",

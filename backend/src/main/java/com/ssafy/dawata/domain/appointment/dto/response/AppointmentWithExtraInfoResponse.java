@@ -25,7 +25,10 @@ public record AppointmentWithExtraInfoResponse(
 	List<ParticipantResponse> participantInfos,
 
 	@Schema(description = "투표 상태")
-	VoteStatus voteStatus
+	VoteStatus voteStatus,
+
+	@Schema(description = "가장 많이 투표한 투표 장소명")
+	String votePlace
 ) {
 
 	@Schema(description = "클럽 응답 스키마")
@@ -82,13 +85,15 @@ public record AppointmentWithExtraInfoResponse(
 		URL img,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
-		VoteStatus voteStatus
+		VoteStatus voteStatus,
+		String votePlace
 	) {
 		return AppointmentWithExtraInfoResponse.builder()
 			.clubInfo(ClubResponse.of(clubId, clubName, img))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteStatus(voteStatus)
+			.votePlace(votePlace)
 			.build();
 	}
 }

@@ -27,6 +27,8 @@ import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantAttendingRequest;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantDailyStatusRequest;
+import com.ssafy.dawata.domain.participant.dto.request.ParticipantRoutineRequest;
+import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -126,7 +128,7 @@ public class AppointmentController {
 		);
 	}
 
-	@Operation(summary = "참여자 출결 상태 업데이트", description = "약속 참여자의 출결 상태를 업데이트합니다.")
+	@Operation(summary = "참여자 출결 상태 업데이트", description = "약속 참여자의 출결 상태를 업데이트합니다. (front 사용 X)")
 	@PatchMapping("/{appointmentId}/participants/daily-status")
 	public ResponseEntity<ApiResponse<?>> updateDailyStatus(
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
@@ -135,6 +137,24 @@ public class AppointmentController {
 	) {
 		appointmentService.updateParticipantDailyStatus(memberDetails.member().getId(), appointmentId,
 			requestDto.dailyStatus());
+		return ResponseEntity.ok(
+			ApiResponse.success()
+		);
+	}
+
+	@Operation(summary = "참여자 루틴 설정", description = "약속 참여자 루틴 설정을 업데이트합니다.")
+	@PatchMapping("/{appointmentId}/participants/routine")
+	public ResponseEntity<ApiResponse<?>> updateRoutine(
+		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
+		@PathVariable Long appointmentId,
+		@RequestBody ParticipantRoutineRequest requestDto
+	) {
+		appointmentService.updateParticipantRoutine(
+			memberDetails.member().getId(),
+			appointmentId,
+			requestDto
+		);
+
 		return ResponseEntity.ok(
 			ApiResponse.success()
 		);

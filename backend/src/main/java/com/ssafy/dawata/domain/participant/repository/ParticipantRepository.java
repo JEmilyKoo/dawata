@@ -57,4 +57,17 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 		"JOIN p.appointment a " +
 		"WHERE p.appointment.id = :appointmentId")
 	List<Participant> findParticipantsByAppointmentId(Long appointmentId);
+
+	@Query("SELECT p " +
+		"FROM Participant p " +
+		"JOIN p.clubMember cm " +
+		"JOIN cm.member m " +
+		"JOIN p.appointment a " +
+		"WHERE m.id = :memberId "
+		+ "AND a.id = :appointmentId "
+		+ "AND a.voteEndTime > CURRENT_TIMESTAMP")
+	Optional<Participant> findByMemberIdAndAppointmentIdAndDateCheck(
+		@Param("memberId") Long memberId,
+		@Param("appointmentId") Long appointmentId
+	);
 }
