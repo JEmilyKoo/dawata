@@ -33,16 +33,24 @@ export default function MainScreen() {
   const [isClubEmpty, setIsClubEmpty] = useState(false)
   const [isAppoEmpty, setIsAppoEmpty] = useState(false)
 
+  const today = new Date()
+  const [currentMonth, setCurrentMonth] = useState(
+    today.getFullYear() +
+      '-' +
+      (today.getMonth() + 1).toString().padStart(2, '0'),
+  )
+  //
   const fetchAppointments = async () => {
     try {
       setShowAppoLoading(true)
-      const result: AppointmentListInfo[] = await getAppointments({
-        clubId: 1,
-        nextRange: 4,
-        prevRange: 4,
+      const result = await getAppointments({
+        date: currentMonth,
+        nextRange: 99,
+        prevRange: 0,
       })
       if (result) {
-        setAppoList(result)
+        console.log('✅✅✅✅result✅✅✅✅', result)
+        setAppoList(result.data)
       }
     } catch (error) {
       console.error('약속 목록을 가져오는 중 오류 발생:', error)
