@@ -9,6 +9,16 @@
     "title": "다와따",
     "lookArround": "둘러볼래요"
   },
+  "mainPage": {
+    "appointment": {
+      "title": "다가오는 약속",
+      "empty": "현재 다가올 약속이 없습니다. 그룹을 추가하고 약속을 생성해보세요."
+    },
+    "club": {
+      "title": "내 그룹",
+      "empty": "현재 그룹이 없습니다. 그룹을 추가해보세요."
+    }
+  },
   "createAppointment": {
     "name": {
       "title": "약속 이름을 설정해주세요",
