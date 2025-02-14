@@ -3,6 +3,7 @@ package com.ssafy.dawata.domain.live.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,16 @@ public class LiveController {
 	) {
 		return ResponseEntity.ok(
 			ApiResponse.success(liveService.findLives(memberDetails.member().getId())));
+	}
+
+	@Operation(summary = "현재 내 live 상세조회",
+		description = "현재 내 live 상세조회하는 작업을 수행합니다.")
+	@GetMapping("/{appointmentId}")
+	public ResponseEntity<ApiResponse<?>> findLiveDetail(
+		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
+		@PathVariable("appointmentId") Long appointmentId) {
+		return ResponseEntity.ok(
+			ApiResponse.success(liveService.findLiveDetail(memberDetails.member().getId(), appointmentId)));
 	}
 
 	@Operation(summary = "특정 멤버에게 재촉알림 보내기",

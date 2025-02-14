@@ -37,7 +37,6 @@ public class Voter {
 		referencedColumnName = "id"
 	)
 	private VoteItem voteItem;
-
 	private Voter(Participant participant, VoteItem voteItem) {
 		this.participant = participant;
 		this.voteItem = voteItem;

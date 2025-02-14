@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ssafy.dawata.domain.club.entity.ClubMember;
+import com.ssafy.dawata.domain.live.dto.ParticipantDto;
 
 public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 
@@ -34,4 +35,16 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 	@Query("SELECT clubMember FROM ClubMember clubMember JOIN FETCH clubMember.club WHERE clubMember.member.id = :memberId")
 	List<ClubMember> findAllWithClubByMemberId(@Param("memberId") Long memberId);
 
+	@Query("""
+		SELECT new com.ssafy.dawata.domain.live.dto.ParticipantDto (
+			cm,
+			ph.photoName
+		)
+		FROM ClubMember cm
+			JOIN FETCH cm.member m
+			JOIN Photo ph
+				ON ph.entityCategory = 4 AND ph.entityId = cm.id
+		WHERE m.id = :memberId
+		""")
+	Optional<ParticipantDto> findByMemberIdToParticipantDto(@Param("memberId") Long memberId);
 }

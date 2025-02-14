@@ -1,5 +1,6 @@
 package com.ssafy.dawata.domain.participant.repository;
 
+import com.ssafy.dawata.domain.live.dto.ParticipantDto;
 import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
 import com.ssafy.dawata.domain.participant.entity.Participant;
 
