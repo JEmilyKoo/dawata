@@ -27,7 +27,6 @@ import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantAttendingRequest;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantDailyStatusRequest;
-import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -65,8 +64,8 @@ public class AppointmentController {
 		@RequestParam(defaultValue = "4") Integer prevRange,
 		@RequestParam String date
 	) {
-		int currentYear = Integer.parseInt(date.split("-")[0]);
-		int currentMonth = Integer.parseInt(date.split("-")[1]);
+		int currentYear = Integer.parseInt(date.trim().split("-")[0]);
+		int currentMonth = Integer.parseInt(date.trim().split("-")[1]);
 		return clubId.map(cId -> ResponseEntity.ok(
 				ApiResponse.success(
 					appointmentService.findMyAppointmentListByClubId(memberDetails.member().getId(), cId, nextRange,

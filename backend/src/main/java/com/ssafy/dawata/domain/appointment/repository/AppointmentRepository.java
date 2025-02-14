@@ -47,18 +47,27 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 	Optional<Appointment> findAppointmentByIdWithVoteItems(Long appointmentId);
 
 	@Query("""
-		SELECT a.id
-		FROM Member m
-			JOIN ClubMember cm ON m.id = cm.member.id
-			JOIN Participant p ON cm.id = p.clubMember.id
-			JOIN Appointment a ON p.appointment.id = a.id
-		WHERE m.id = :memberId
-			AND a.scheduledAt BETWEEN :now AND :twoHoursLater
-	""")
+			SELECT a.id
+			FROM Member m
+				JOIN ClubMember cm ON m.id = cm.member.id
+				JOIN Participant p ON cm.id = p.clubMember.id
+				JOIN Appointment a ON p.appointment.id = a.id
+			WHERE m.id = :memberId
+				AND a.scheduledAt BETWEEN :now AND :twoHoursLater
+		""")
 	List<Long> findByScheduledAtInTwoHours(
 		@Param("memberId") Long memberId,
 		@Param("now") LocalDateTime now,
 		@Param("twoHoursLater") LocalDateTime twoHoursLater
+	);
+
+	@Query("SELECT DISTINCT p.appointment FROM Participant p " +
+		"WHERE p.clubMember.club.id IN :clubIds " +
+		"AND p.appointment.scheduledAt BETWEEN :startDate AND :endDate")
+	List<Appointment> findAppointmentsByClubIds(
+		@Param("clubIds") List<Long> clubIds,
+		@Param("startDate") LocalDateTime startDate,
+		@Param("endDate") LocalDateTime endDate
 	);
 
 }

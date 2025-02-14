@@ -29,7 +29,7 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 		QClubMember clubMember = QClubMember.clubMember;
 
 		LocalDateTime now = DateUtil.get15thDayOfMonth(currentYear, currentMonth);
-		LocalDateTime startDate = now.minusDays(prevRange * 7L);
+		LocalDateTime startDate = now;
 		LocalDateTime endDate = now.plusDays(nextRange * 7L);
 
 		return queryFactory
