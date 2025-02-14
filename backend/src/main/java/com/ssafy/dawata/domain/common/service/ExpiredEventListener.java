@@ -55,7 +55,7 @@ public class ExpiredEventListener implements MessageListener {
 		} else if (expiredKey.contains(RedisKeyCategory.APPOINTMENT_VOTE.getKey())) {
 			voteFinish(expiredKey);
 		} else {
-			throw new IllegalArgumentException("정해진 키가 아님둥~");
+			throw new IllegalArgumentException("정해진 키가 아닙니다.");
 		}
 	}
 
@@ -95,7 +95,7 @@ public class ExpiredEventListener implements MessageListener {
 			appointment.getScheduledAt() + "," +
 				maxVoteItem.getAddress().getLatitude() + "," +
 				maxVoteItem.getAddress().getLongitude(),
-			A_DAY * 2
+			A_DAY
 		);
 	}
 
@@ -139,7 +139,7 @@ public class ExpiredEventListener implements MessageListener {
 			redisTemplateForLiveLocation,
 			RedisKeyCategory.LIVE_PARTICIPANT_LIST.getKey() + id,
 			totalParticipantIdList,
-			A_DAY
+			A_DAY * 2
 		);
 	}
 }

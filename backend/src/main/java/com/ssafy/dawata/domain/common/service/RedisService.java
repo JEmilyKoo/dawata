@@ -64,11 +64,11 @@ public class RedisService {
 	 * */
 	public <T> void updateDataUseTTL(
 		RedisTemplate<String, T> redisTemplate,
-		String key, long expirationTime
+		String key, T value, long expirationTime
 	) {
 		try {
 			if (isExists(redisTemplate, key)) {
-				redisTemplate.expire(key, expirationTime, TimeUnit.SECONDS);
+				redisTemplate.opsForValue().set(key, value, expirationTime, TimeUnit.SECONDS);
 			}
 
 			// TODO : 없으면 에러처리
