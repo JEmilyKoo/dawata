@@ -29,33 +29,39 @@ export default function MainScreen() {
   const [appoList, setAppoList] = useState<AppointmentListInfo[]>([])
   // TODO: 추후 코드가 정돈되면 appoList를 appointmentList로 바꿀 것.
   const [showClubLoading, setShowClubLoading] = useState(false)
+  const [showAppoLoading, setShowAppoLoading] = useState(false)
+  const [isClubEmpty, setIsClubEmpty] = useState(false)
+  const [isAppoEmpty, setIsAppoEmpty] = useState(false)
 
   const fetchAppointments = async () => {
     try {
-      console.log('페이지 처음 마운트 될 때 실행')
+      setShowAppoLoading(true)
       const result: AppointmentListInfo[] = await getAppointments({
         clubId: 1,
         nextRange: 4,
         prevRange: 4,
       })
-
-      console.log('🔍 약속 리스트 조회 결과:', result)
       if (result) {
         setAppoList(result)
       }
     } catch (error) {
       console.error('약속 목록을 가져오는 중 오류 발생:', error)
+    } finally {
+      setShowAppoLoading(false)
     }
   }
 
   const fetchClubs = async () => {
     try {
-      setShowClubLoading(false)
-      const result: Club[] | null = await getClubs()
-      dispatch(setClubs(result))
       setShowClubLoading(true)
+      const result = await getClubs()
+      if (result) {
+        dispatch(setClubs(result))
+      }
     } catch (error) {
       console.error('클럽 목록을 가져오는 중 오류 발생:', error)
+    } finally {
+      setShowClubLoading(false)
     }
   }
 
@@ -63,6 +69,14 @@ export default function MainScreen() {
     fetchAppointments()
     fetchClubs()
   }, [])
+
+  useEffect(() => {
+    setIsClubEmpty(!showClubLoading && clubs.length == 0)
+  }, [showClubLoading, clubs])
+
+  useEffect(() => {
+    setIsAppoEmpty(!showAppoLoading && appoList.length == 0)
+  }, [showAppoLoading])
 
   const { t } = useTranslation()
   const router = useRouter()
@@ -115,7 +129,11 @@ export default function MainScreen() {
               />
             </Link>
           </View>
-          {!showClubLoading && (
+
+          {isClubEmpty && (
+            <Text>{isClubEmpty && t('mainPage.club.empty')}</Text>
+          )}
+          {showClubLoading && (
             <View className="inset-0 items-center justify-center">
               <ActivityIndicator
                 size="small"
@@ -127,14 +145,14 @@ export default function MainScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             className="space-x-4">
-            {showClubLoading &&
+            {!showClubLoading &&
               clubs.map((club) => (
                 <TouchableOpacity
                   key={club.clubId}
                   className=" relativeitems-center p-2 w-[100px]"
                   onPress={() => handleClubPress(club.clubId)}>
                   <ImageThumbnail
-                    img={'https://picsum.photos/80'}
+                    img={club.img}
                     defaultImg={require('@/assets/clubs/club1.png')}
                     width={80}
                     height={80}
@@ -163,14 +181,22 @@ export default function MainScreen() {
               </Link>
             </TouchableOpacity>
           </View>
+          {showAppoLoading && (
+            <View className="inset-0 items-center justify-center">
+              <ActivityIndicator
+                size="small"
+                color={Colors.primary}
+              />
+            </View>
+          )}
           {appoList &&
             appoList.map((appoListItem) => (
               <AppointmentItem
                 key={appoListItem.appointmentInfo.appointmentId}
                 appointmentListInfo={appoListItem}
-                userImages={userImages}
               />
             ))}
+          {isAppoEmpty && <Text>{t('mainPage.appointment.empty')}</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>
