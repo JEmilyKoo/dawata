@@ -17,16 +17,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	Optional<Member> findByEmail(String email);
 
 	@Query("""
-			SELECT m.id
-			FROM Member m
-				JOIN ClubMember cm ON m.id = cm.member.id
-				JOIN Participant p ON cm.id = p.clubMember.id
-				JOIN Appointment a ON p.appointment.id = a.id
-			WHERE a.id = :appointmentId
-		""")
-	Optional<MemberInfoResponse> customFindById(@Param("memberId") Long id);
-
-	@Query("""
 		    SELECT new com.ssafy.dawata.domain.member.dto.response.ClubJoinSearchResponse(
 		    	m.id,
 		        m.email,

@@ -213,6 +213,7 @@ public class AppointmentService {
 			redisService.updateDataUseTTL(
 				redisTemplateForOthers,
 				RedisKeyCategory.APPOINTMENT_VOTE.getKey() + appointmentId,
+				"",
 				redisService.getExpirationTime(
 					requestDto.voteEndTime().orElseThrow(
 						() -> new IllegalArgumentException("투표 수정 데이터가 존재하지 않습니다.")),

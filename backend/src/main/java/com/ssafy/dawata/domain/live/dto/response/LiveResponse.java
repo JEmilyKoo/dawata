@@ -11,13 +11,13 @@ public record LiveResponse(
 	Double latitude,
 	Double longitude,
 	ArrivalState arrivalState,
-	String estimatedTime
+	int estimatedTime
 ) {
 
 	public static LiveResponse of(
 		LiveRequest liveRequest,
 		ArrivalState arrivalState,
-		String estimatedTime
+		int estimatedTime
 	) {
 		return LiveResponse.builder()
 			.memberId(liveRequest.memberId())
