@@ -1,6 +1,9 @@
 import React from 'react'
 import { Image, Text, TouchableOpacity, View } from 'react-native'
 
+import ImageThumbnail from '@/components/ImageThumbnail'
+import { ClubInfo } from '@/types/clubAppointment'
+
 interface Appointment {
   appointmentInfo: {
     appointmentId: number
@@ -18,14 +21,12 @@ interface Appointment {
 
 interface AppointmentListProps {
   appointments: Appointment[]
-  myClubs: {
-    image: any
-  }[]
+  clubImg: string
 }
 
 const AppointmentList: React.FC<AppointmentListProps> = ({
   appointments,
-  myClubs,
+  clubImg,
 }) => {
   return (
     <View className="p-4 space-y-4">
@@ -38,9 +39,12 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
           <TouchableOpacity
             key={index}
             className="flex-row p-4 border border-bord rounded-lg">
-            <Image
-              source={myClubs[0]?.image}
-              className="w-12 h-12 rounded-lg bg-gray-200 mr-4"
+            <ImageThumbnail
+              img={clubImg}
+              defaultImg={require('@/assets/clubs/club1.png')}
+              width={80}
+              height={80}
+              className="rounded-xl"
             />
             <View className="flex-1">
               <Text className="font-bold">
