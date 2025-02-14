@@ -83,7 +83,7 @@ public class AppointmentService {
 				.orElseThrow(() -> new IllegalArgumentException("대표 주소가 없는 멤버입니다."));
 
 			Participant participant = Participant.of(
-				appointmentEntity, clubMemberEntity, memberAddressMapping, isHostMember, DailyStatus.UNKNOWN,
+				appointmentEntity, clubMemberEntity, memberAddressMapping, true, DailyStatus.UNKNOWN,
 				isHostMember ? Role.HOST : Role.GUEST
 			);
 
@@ -102,13 +102,15 @@ public class AppointmentService {
 		Long memberId,
 		Integer nextRange,
 		Integer prevRange,
-		Optional<Integer> currentMonth
+		int currentYear,
+		int currentMonth
 	) {
 		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberId(
 			memberId,
 			prevRange,
 			nextRange,
-			currentMonth.orElseGet(() -> LocalDate.now().getMonthValue())
+			currentYear,
+			currentMonth
 		);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
@@ -119,13 +121,15 @@ public class AppointmentService {
 		Long clubId,
 		Integer nextRange,
 		Integer prevRange,
-		Optional<Integer> currentMonth
+		int currentYear,
+		int currentMonth
 	) {
 		List<Appointment> appointments = appointmentRepository.findAppointmentsByClubId(
 			clubId,
 			prevRange,
 			nextRange,
-			currentMonth.orElseGet(() -> LocalDate.now().getMonthValue())
+			currentYear,
+			currentMonth
 		);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
@@ -163,7 +167,6 @@ public class AppointmentService {
 					p,
 					cm.getMember().getId(),
 					cm.getNickname(),
-					photo.getPhotoName(),
 					s3Service.generatePresignedUrl(
 						photo.getPhotoName(),
 						"get",
@@ -177,7 +180,6 @@ public class AppointmentService {
 		return AppointmentDetailResponse.of(
 			clubMember.getClub().getId(),
 			clubMember.getClubName(),
-			clubPhoto.getPhotoName(),
 			s3Service.generatePresignedUrl(
 				clubPhoto.getPhotoName(),
 				"get",
@@ -306,7 +308,6 @@ public class AppointmentService {
 					clubMember.getMember().getId(),
 					participant.getId(),
 					clubMember.getNickname(),
-					photo.getPhotoName(),
 					s3Service.generatePresignedUrl(
 						photo.getPhotoName(),
 						"get",
@@ -381,7 +382,6 @@ public class AppointmentService {
 				return AppointmentWithExtraInfoResponse.of(
 					targetClub.getId(),
 					clubName,
-					clubPhoto.getPhotoName(),
 					s3Service.generatePresignedUrl(
 						clubPhoto.getPhotoName(),
 						"get",

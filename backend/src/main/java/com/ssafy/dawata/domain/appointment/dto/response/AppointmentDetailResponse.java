@@ -37,19 +37,15 @@ public record AppointmentDetailResponse(
 		@Schema(description = "클럽 이름", example = "스터디 클럽")
 		String name,
 
-		@Schema(description = "클럽 이미지 파일명", example = "image.png")
-		String imageName,
-
 		@Schema(description = "이미지 pre-signed url", example = "http://example.com")
-		URL imageURL
+		URL img
 	) {
 
-		public static ClubResponse of(Long clubId, String name, String imageName, URL imageURL) {
+		public static ClubResponse of(Long clubId, String name, URL imageURL) {
 			return ClubResponse.builder()
 				.clubId(clubId)
 				.name(name)
-				.imageName(imageName)
-				.imageURL(imageURL)
+				.img(imageURL)
 				.build();
 		}
 	}
@@ -75,14 +71,11 @@ public record AppointmentDetailResponse(
 		@Schema(description = "역할", example = "HOST")
 		Role role,
 
-		@Schema(description = "참여자 이미지 파일명", example = "image.png")
-		String imageName,
-
 		@Schema(description = "이미지 pre-signed url", example = "http://example.com")
-		URL imageURL
+		URL img
 	) {
 
-		public static ParticipantResponse of(Participant entity, Long memberId, String name, String imageName,
+		public static ParticipantResponse of(Participant entity, Long memberId, String name,
 			URL imageURL) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
@@ -91,8 +84,7 @@ public record AppointmentDetailResponse(
 				.dailyStatus(entity.getDailyStatus())
 				.name(name)
 				.role(entity.getRole())
-				.imageName(imageName)
-				.imageURL(imageURL)
+				.img(imageURL)
 				.build();
 		}
 	}
@@ -150,14 +142,13 @@ public record AppointmentDetailResponse(
 	public static AppointmentDetailResponse of(
 		Long clubId,
 		String clubName,
-		String imageName,
-		URL imageURL,
+		URL img,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
 		List<VoteResponse> voteInfos
 	) {
 		return AppointmentDetailResponse.builder()
-			.clubInfo(ClubResponse.of(clubId, clubName, imageName, imageURL))
+			.clubInfo(ClubResponse.of(clubId, clubName, img))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteInfos(voteInfos)

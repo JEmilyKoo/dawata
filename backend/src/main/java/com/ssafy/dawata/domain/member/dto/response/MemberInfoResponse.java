@@ -13,10 +13,8 @@ public record MemberInfoResponse(
 	String email,
 	@Schema(description = "이름", example = "userName")
 	String name,
-	@Schema(description = "이미지 파일명", example = "test.png")
-	String imageName,
 	@Schema(description = "이미지 pre-signed url", example = "http://test.com/test.png")
-	URL imageURL,
+	URL img,
 	@Schema(description = "생성 날짜", example = "2025-02-01T01:23:45")
 	LocalDateTime createdAt
 ) {

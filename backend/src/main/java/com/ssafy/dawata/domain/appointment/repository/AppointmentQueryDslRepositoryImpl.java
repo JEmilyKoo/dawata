@@ -22,12 +22,13 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 	}
 
 	@Override
-	public List<Appointment> findAppointmentsByMemberId(Long memberId, int prevRange, int nextRange, int currentMonth) {
+	public List<Appointment> findAppointmentsByMemberId(Long memberId, int prevRange, int nextRange, int currentYear,
+		int currentMonth) {
 		QAppointment appointment = QAppointment.appointment;
 		QParticipant participant = QParticipant.participant;
 		QClubMember clubMember = QClubMember.clubMember;
 
-		LocalDateTime now = DateUtil.get15thDayOfMonth(currentMonth);
+		LocalDateTime now = DateUtil.get15thDayOfMonth(currentYear, currentMonth);
 		LocalDateTime startDate = now.minusDays(prevRange * 7L);
 		LocalDateTime endDate = now.plusDays(nextRange * 7L);
 
@@ -43,13 +44,14 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 	}
 
 	@Override
-	public List<Appointment> findAppointmentsByClubId(Long clubId, int prevRange, int nextRange, int currentMonth) {
+	public List<Appointment> findAppointmentsByClubId(Long clubId, int prevRange, int nextRange, int currentYear,
+		int currentMonth) {
 		QAppointment appointment = QAppointment.appointment;
 		QParticipant participant = QParticipant.participant;
 		QClubMember clubMember = QClubMember.clubMember;
 		QClub club = QClub.club;
 
-		LocalDateTime now = DateUtil.get15thDayOfMonth(currentMonth);
+		LocalDateTime now = DateUtil.get15thDayOfMonth(currentYear, currentMonth);
 		LocalDateTime startDate = now.minusDays(prevRange * 7L);
 		LocalDateTime endDate = now.plusDays(nextRange * 7L);
 

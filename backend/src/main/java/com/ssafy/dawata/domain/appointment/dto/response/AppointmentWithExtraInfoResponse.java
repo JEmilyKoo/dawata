@@ -37,19 +37,15 @@ public record AppointmentWithExtraInfoResponse(
 		@Schema(description = "클럽 이름", example = "스터디 클럽")
 		String name,
 
-		@Schema(description = "클럽 이미지 파일명", example = "image.jpg")
-		String imageName,
-
 		@Schema(description = "클럽 이미지 URL", example = "https://dawata.s3.ap-northeast-2.amazonaws.com/1_image.jpg")
-		URL imageURL
+		URL img
 	) {
 
-		public static ClubResponse of(Long clubId, String name, String imageName, URL imageURL) {
+		public static ClubResponse of(Long clubId, String name, URL img) {
 			return ClubResponse.builder()
 				.clubId(clubId)
 				.name(name)
-				.imageName(imageName)
-				.imageURL(imageURL)
+				.img(img)
 				.build();
 		}
 	}
@@ -66,20 +62,16 @@ public record AppointmentWithExtraInfoResponse(
 		@Schema(description = "출결 상태", example = "PRESENT")
 		DailyStatus dailyStatus,
 
-		@Schema(description = "참가자 이미지 파일명", example = "image.png")
-		String imageName,
-
 		@Schema(description = "참가자 이미지 URL", example = "https://dawata.s3.ap-northeast-2.amazonaws.com/1_image.png")
-		URL imageURL
+		URL img
 	) {
 
-		public static ParticipantResponse of(Participant entity, String imageName, URL imageURL) {
+		public static ParticipantResponse of(Participant entity, String imageName, URL img) {
 			return ParticipantResponse.builder()
 				.participantId(entity.getId())
 				.isAttending(entity.getIsAttending())
 				.dailyStatus(entity.getDailyStatus())
-				.imageName(imageName)
-				.imageURL(imageURL)
+				.img(img)
 				.build();
 		}
 	}
@@ -87,14 +79,13 @@ public record AppointmentWithExtraInfoResponse(
 	public static AppointmentWithExtraInfoResponse of(
 		Long clubId,
 		String clubName,
-		String imageName,
-		URL imageURL,
+		URL img,
 		Appointment appointment,
 		List<ParticipantResponse> participantResponses,
 		VoteStatus voteStatus
 	) {
 		return AppointmentWithExtraInfoResponse.builder()
-			.clubInfo(ClubResponse.of(clubId, clubName, imageName, imageURL))
+			.clubInfo(ClubResponse.of(clubId, clubName, img))
 			.appointmentInfo(AppointmentResponse.of(appointment))
 			.participantInfos(participantResponses)
 			.voteStatus(voteStatus)

@@ -13,8 +13,7 @@ public record AppointmentPlaceResponse(
 		Long memberId,
 		Long participantId,
 		String nickname,
-		String imageName,
-		URL imageUrl,
+		URL img,
 		Integer duration
 	) {
 
@@ -22,11 +21,10 @@ public record AppointmentPlaceResponse(
 			Long memberId,
 			Long participantId,
 			String nickname,
-			String imageName,
-			URL imageUrl,
+			URL img,
 			Integer duration
 		) {
-			return new ParticipantInfo(memberId, participantId, nickname, imageName, imageUrl, duration);
+			return new ParticipantInfo(memberId, participantId, nickname, img, duration);
 		}
 	}
 
