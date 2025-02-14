@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "dawata",
+    "slug": "dawata",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -33,6 +33,15 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "kakaoApiKey": "49cbb38f80c95bb1992816e24798f649",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ff7cb7b0-6a29-4f0c-a746-9350a2b54a54"
+      }
     }
   }
 }

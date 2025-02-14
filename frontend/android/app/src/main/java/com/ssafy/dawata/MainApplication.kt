@@ -1,4 +1,4 @@
-package com.ssafy.dawata
+package com.dawata.app
 
 import android.app.Application
 import android.content.res.Configuration

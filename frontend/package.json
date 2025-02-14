@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "dawata",
   "main": "expo-router/entry",
   "license": "0BSD",
   "version": "1.0.0",
@@ -20,6 +20,7 @@
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "8.2.0",
     "@react-native-kakao/core": "^2.2.6",
+    "@react-native-kakao/user": "^2.2.6",
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/native": "^7.0.14",
     "@reduxjs/toolkit": "^2.5.0",
