@@ -1,4 +1,4 @@
-package com.ssafy.dawata
+package com.dawata.app
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

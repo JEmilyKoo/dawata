@@ -28,7 +28,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="dawata"/>
-        <data android:scheme="com.ssafy.dawata"/>
+        <data android:scheme="com.dawata.app"/>
         <data android:scheme="exp+dawata"/>
       </intent-filter>
     </activity>

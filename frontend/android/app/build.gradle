@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.ssafy.dawata'
+    namespace 'com.dawata.app'
     defaultConfig {
-        applicationId 'com.ssafy.dawata'
+        applicationId 'com.dawata.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -17,13 +17,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   ios: {
     supportsTablet: true,
+    bundleIdentifier: 'com.dawata.app',
   },
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
-    package: 'com.ssafy.dawata',
+    package: 'com.dawata.app',
   },
   web: {
     bundler: 'metro',
@@ -40,13 +41,23 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           extraMavenRepos: [
             'https://devrepo.kakao.com/nexus/content/groups/public/',
           ],
+          newArchEnabled: true,
+        },
+        ios: {
+          newArchEnabled: true,
         },
       },
     ],
     [
       '@react-native-kakao/core',
       {
-        nativeAppKey: process.env.EXPO_PUBLIC_KAKAO_MAP_JS_API_KEY || '',
+        nativeAppKey: '652d77a471c85e5f7e31db12c3fde710',
+        android: {
+          authCodeHandlerActivity: true,
+        },
+        ios: {
+          handleKakaoOpenUrl: true,
+        },
       },
     ],
   ],
@@ -54,6 +65,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   extra: {
-    kakaoApiKey: process.env.EXPO_PUBLIC_KAKAO_MAP_JS_API_KEY || '',
+    kakaoApiKey: '49cbb38f80c95bb1992816e24798f649',
+    eas: {
+      projectId: 'ff7cb7b0-6a29-4f0c-a746-9350a2b54a54',
+    },
   },
 })
