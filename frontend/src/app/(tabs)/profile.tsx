@@ -99,7 +99,7 @@ export default function Profile() {
           onMonthChange={handleMonthChange}
         />
       </View>
-      <ProfileStats attendanceStatus={AttendanceStatusData} />
+      <ProfileStats attendanceStatus={attendanceStatus} />
     </ScrollView>
   )
 }

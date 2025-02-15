@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Image,
   SafeAreaView,
@@ -31,6 +31,7 @@ import ClubMemberList from './components/ClubMemberList'
 import { useClubAppointments } from './hooks/useClubAppointments'
 import { useClub } from './hooks/useClubInfo'
 import { useClubMemberList } from './hooks/useClubMemberList'
+import { useMarkedDates } from './hooks/useMarkedDates'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -79,9 +80,16 @@ export type RouteParams = {
 }
 
 function ClubMain() {
+  const today = new Date()
+  const [currentMonth, setCurrentMonth] = useState(
+    today.getFullYear() +
+      '-' +
+      (today.getMonth() + 1).toString().padStart(2, '0'),
+  )
   const params = useLocalSearchParams<RouteParams>()
   const { appointments, loading } = useClubAppointments({
     clubId: Number(params.clubId),
+    date: currentMonth,
   })
   const { clubInfo, loading: clubInfoLoading } = useClub({
     clubId: Number(params.clubId),
@@ -90,12 +98,10 @@ function ClubMain() {
     clubId: Number(params.clubId),
   })
 
-  const markedDates = {
-    '2025-01-21': { marked: true, dotColor: '#ff8339' },
-    '2025-01-22': { marked: true, dotColor: '#ff8339' },
-    '2025-01-23': { marked: true, dotColor: '#ff8339' },
-    '2025-01-24': { marked: true, dotColor: '#ff8339' },
-    '2025-01-25': { marked: true, dotColor: '#ff8339' },
+  const { markedDates } = useMarkedDates({ appointments })
+  const handleMonthChange = (changedMonth: { year: number; month: number }) => {
+    const formattedMonth = `${changedMonth.year}-${String(changedMonth.month).padStart(2, '0')}`
+    setCurrentMonth(formattedMonth)
   }
 
   interface Club {
@@ -164,12 +170,13 @@ function ClubMain() {
             markingType={'dot'}
             enableSwipeMonths={true}
             current={'2025-01-21'}
+            onMonthChange={handleMonthChange}
           />
         </View>
 
         <AppointmentList
           appointments={appointments}
-          myClubs={myClubs}
+          clubImg={clubInfo?.img}
         />
       </ScrollView>
 
