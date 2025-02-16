@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import store from '@/store/store'
+import { RootState } from '@/store/store'
 import { handleDefaultError } from '@/utils/error/handleDefaultError'
 
 const api = axios.create({
@@ -12,7 +14,16 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    console.log('📤 요청 보냄:', config.url)
+    const state: RootState = store.getState()
+    const accessToken = state.auth.socialLogin.accessToken
+
+    if (accessToken) {
+      config.headers = config.headers || {}
+      config.headers.accessToken = `Bearer ${accessToken}`
+    } else {
+      delete config.headers.accessToken
+    }
+
     return config
   },
   (error) => {
