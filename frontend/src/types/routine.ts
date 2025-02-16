@@ -1,23 +1,42 @@
 export interface Routines {
-    content: Routine[]
-    pageable: string
-    size: number
-    number: number
-    sort: {
-        empty: boolean
-        sorted: boolean
-        unsorted: boolean
-    }
-    numberOfElements: number
-    first: boolean
-    last: boolean
+  content: Routine[]
+  pageable: string
+  size: number
+  number: number
+  sort: {
     empty: boolean
+    sorted: boolean
+    unsorted: boolean
+  }
+  numberOfElements: number
+  first: boolean
+  last: boolean
+  empty: boolean
 }
 
 export interface Routine {
-    id: number
-    name: string
-    description: string
-    createdAt: string
-    updatedAt: string
+  routineId: number
+  routineName: string
+  totalTime: number
+}
+
+export interface RoutineDetailInfo {
+  routineName: string
+  playList: Play[]
+}
+
+export interface Play {
+  playId: number
+  playName: string
+  spendTime: number
+}
+
+export interface CreatePlay {
+  playName: string
+  spendTime: number
+}
+
+export interface RoutineCreate {
+  routineName: string
+  playList: CreatePlay[]
 }

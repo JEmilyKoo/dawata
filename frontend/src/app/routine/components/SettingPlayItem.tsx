@@ -10,7 +10,7 @@ interface SettingPlayItemProps {
   playName: string
   spendTime: number
   editPlay: (id: number) => void
-  deltePlay: (id: number) => void
+  deletePlay: (id: number) => void
   onLongPressPlayItem: (id: number) => void
 }
 
@@ -19,7 +19,7 @@ export default function SettingPlayItem({
   playName,
   spendTime,
   editPlay,
-  deltePlay,
+  deletePlay,
   onLongPressPlayItem,
 }: SettingPlayItemProps) {
   return (
@@ -35,7 +35,7 @@ export default function SettingPlayItem({
           <TouchableOpacity onPress={() => editPlay(playId)}>
             <EditIcon />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => deltePlay(playId)}>
+          <TouchableOpacity onPress={() => deletePlay(playId)}>
             <TrashIcon />
           </TouchableOpacity>
           <TouchableOpacity onLongPress={() => onLongPressPlayItem(playId)}>

@@ -1,14 +1,12 @@
 // /src/store/slices/appointmentSlice.ts
 import { createSlice } from '@reduxjs/toolkit'
 
-interface CreatePlay {
-  playName: string
-  spendTime: number
-}
+import { Play } from '@/types/routine'
+
 const initialState: {
   create: {
     routineName: string
-    playList: CreatePlay[]
+    playList: Play[]
   }
   currentVoteStatus: string
 } = {
