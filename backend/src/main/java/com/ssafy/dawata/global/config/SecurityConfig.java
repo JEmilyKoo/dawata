@@ -52,20 +52,20 @@ public class SecurityConfig {
 				jwtAuthenticationFilter,
 				UsernamePasswordAuthenticationFilter.class
 			)
-			.oauth2Login(oauth2 -> oauth2
-				.authorizationEndpoint(authorization -> authorization
-					.baseUri("/auth/social")
-					.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-				)
-				.redirectionEndpoint(redirect -> redirect
-					.baseUri("/oauth2/callback/*")
-				)
-				.userInfoEndpoint(userInfo -> userInfo
-					.userService(customOAuth2UserService)
-				)
-				.failureHandler(oauth2FailureHandler)
-				.successHandler(oauth2SuccessHandler)
-			)
+			// .oauth2Login(oauth2 -> oauth2
+			// 	.authorizationEndpoint(authorization -> authorization
+			// 		.baseUri("/auth/social")
+			// 		.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+			// 	)
+			// 	.redirectionEndpoint(redirect -> redirect
+			// 		.baseUri("/oauth2/callback/*")
+			// 	)
+			// 	.userInfoEndpoint(userInfo -> userInfo
+			// 		.userService(customOAuth2UserService)
+			// 	)
+			// 	.failureHandler(oauth2FailureHandler)
+			// 	.successHandler(oauth2SuccessHandler)
+			// )
 			.build();
 	}
 

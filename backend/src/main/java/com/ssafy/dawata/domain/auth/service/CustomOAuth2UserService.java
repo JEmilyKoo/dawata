@@ -30,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final MemberRepository memberRepository;
-	private final PhotoRepository photoRepository;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
