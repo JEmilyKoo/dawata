@@ -10,7 +10,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'dawata',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  splash: {},
+  splash: {
+    image: './src/assets/images/splash-icon.png',
+    resizeMode: 'contain',
+    backgroundColor: '#ffffff',
+  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.dawata.app',
