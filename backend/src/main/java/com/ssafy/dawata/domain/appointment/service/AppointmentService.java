@@ -3,12 +3,14 @@ package com.ssafy.dawata.domain.appointment.service;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dawata.domain.address.entity.Address;
 import com.ssafy.dawata.domain.address.entity.MemberAddressMapping;
 import com.ssafy.dawata.domain.address.repository.MemberAddressMappingRepository;
 import com.ssafy.dawata.domain.appointment.dto.request.AppointmentWithParticipantsRequest;
@@ -36,6 +38,7 @@ import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
 import com.ssafy.dawata.domain.photo.entity.Photo;
 import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
+import com.ssafy.dawata.domain.recommend.service.RecommendService;
 import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
 import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
 import com.ssafy.dawata.domain.vote.entity.VoteItem;
@@ -46,7 +49,9 @@ import com.ssafy.dawata.domain.vote.repository.VoterRepository;
 import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -66,6 +71,7 @@ public class AppointmentService {
 	private final RedisTemplate<String, String> redisTemplateForOthers;
 	private final RedisService redisService;
 	private final S3Service s3Service;
+	private final RecommendService recommendService;
 
 	@Transactional
 	public void createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
@@ -112,9 +118,7 @@ public class AppointmentService {
 		Integer prevRange,
 		int currentYear,
 		int currentMonth
-
 	) {
-
 		List<Long> clubIds = clubRepository.findClubIdsByMemberId(memberId);
 
 		LocalDateTime firstDayOfMonth = LocalDateTime.of(currentYear, currentMonth, 15, 0, 0);
@@ -304,10 +308,21 @@ public class AppointmentService {
 	}
 
 	public AppointmentPlaceResponse recommendPlace(Long appointmentId) {
+		Appointment appointment = appointmentRepository.findById(appointmentId)
+			.orElseThrow(() -> new IllegalArgumentException("해당하는 약속이 없습니다."));
+
 		List<Participant> participants = participantRepository.findParticipantsByAppointmentId(appointmentId);
 
 		// TODO: 추천 알고리즘 구현하기
-		double[] point = GeoMidpointUtil.getMidpoint();
+		List<double[]> coordinates = participants.stream()
+			.map(p -> {
+				Address address = p.getMemberAddressMapping().getAddress();
+				log.info("주소: {}", p.getMemberAddressMapping().getAddress().getRoadAddress());
+				return new double[] {address.getLatitude(), address.getLongitude()};
+			})
+			.toList();
+		// TODO: searchDttm을 appointment의 scheduledAt으로 변경
+		double[] point = recommendService.getRecommendPlace(coordinates, "202502211200");
 
 		List<AppointmentPlaceResponse.ParticipantInfo> participantInfos = participants.stream()
 			.map(participant -> {
@@ -400,7 +415,7 @@ public class AppointmentService {
 
 				String voteTitle = "장소 투표 중";
 
-				if(voteStatus == VoteStatus.EXPIRED && maxVoteItem != null) {
+				if (voteStatus == VoteStatus.EXPIRED && maxVoteItem != null) {
 					voteTitle = maxVoteItem.getTitle();
 				}
 
@@ -451,13 +466,14 @@ public class AppointmentService {
 
 	@Transactional
 	public void updateParticipantRoutine(Long memberId, Long appointmentId, ParticipantRoutineRequest requestDto) {
-		Participant participant = participantRepository.findByMemberIdAndAppointmentIdAndDateCheck(memberId, appointmentId)
+		Participant participant = participantRepository.findByMemberIdAndAppointmentIdAndDateCheck(memberId,
+				appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("조건에 해당하는 참여자가 없습니다."));
 
 		RoutineTemplate routineTemplate = routineTemplateRepository.findById(participant.getRoutineTemplateId())
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 루틴이 존재하지 않습니다."));
 
-		if (routineTemplate.getMember().getId() != memberId) {
+		if (!Objects.equals(routineTemplate.getMember().getId(), memberId)) {
 			throw new IllegalArgumentException("현재 회원의 루틴이 아닙니다.");
 		}
 
