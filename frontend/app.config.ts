@@ -4,24 +4,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'dawata',
   slug: 'dawata',
-  version: '1.0.0',
+  version: '1.0.1',
   orientation: 'portrait',
-  icon: './assets/images/icon.png',
+  icon: './src/assets/images/icon.png',
   scheme: 'dawata',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  splash: {
-    image: './assets/images/splash-icon.png',
-    resizeMode: 'contain',
-    backgroundColor: '#ffffff',
-  },
+  splash: {},
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.dawata.app',
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/images/adaptive-icon.png',
+      foregroundImage: './src/assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
     package: 'com.dawata.app',
@@ -29,7 +25,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   web: {
     bundler: 'metro',
     output: 'static',
-    favicon: './assets/images/favicon.png',
+    favicon: './src/assets/images/favicon.png',
   },
   plugins: [
     'expo-router',
@@ -51,7 +47,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       '@react-native-kakao/core',
       {
-        nativeAppKey: '652d77a471c85e5f7e31db12c3fde710',
+        nativeAppKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_API_KEY,
         android: {
           authCodeHandlerActivity: true,
         },
