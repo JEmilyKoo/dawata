@@ -65,9 +65,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   extra: {
-    kakaoApiKey: '49cbb38f80c95bb1992816e24798f649',
+    kakaoApiKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_API_KEY,
+    router: {
+      origin: false,
+    },
     eas: {
-      projectId: 'ff7cb7b0-6a29-4f0c-a746-9350a2b54a54',
+      projectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID,
+    },
+    firebase: {
+      apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+      projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.EXPO_PUBLIC_FIREBASE_API_ID,
     },
   },
 })
