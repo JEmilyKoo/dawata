@@ -28,8 +28,7 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 		QParticipant participant = QParticipant.participant;
 		QClubMember clubMember = QClubMember.clubMember;
 
-		LocalDateTime now = DateUtil.get15thDayOfMonth(currentYear, currentMonth);
-		LocalDateTime startDate = now;
+		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime endDate = now.plusDays(nextRange * 7L);
 
 		return queryFactory
@@ -38,7 +37,7 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 			.join(participant.clubMember, clubMember)
 			.where(
 				clubMember.member.id.eq(memberId),
-				appointment.scheduledAt.between(startDate, endDate)
+				appointment.scheduledAt.between(now, endDate)
 			)
 			.fetch();
 	}
