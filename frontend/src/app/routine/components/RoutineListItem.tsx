@@ -2,12 +2,7 @@
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
 import TrashIcon from '@/assets/icons/trash.svg'
-
-interface Routine {
-  routineId: number
-  routineName: string
-  totalTime: number
-}
+import { Routine } from '@/types/routine'
 
 interface RoutineListItemProps {
   routine: Routine

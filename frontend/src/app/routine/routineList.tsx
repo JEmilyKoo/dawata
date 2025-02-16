@@ -1,5 +1,5 @@
 // 루틴 리스트
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   FlatList,
   ScrollView,
@@ -10,23 +10,12 @@ import {
 
 import { useRouter } from 'expo-router'
 
+import { getRoutines, removeRoutine } from '@/apis/routine'
 import RoutineListItem from '@/app/routine/components/RoutineListItem'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
 import SlideModalUI from '@/components/SlideModalUI'
-
-interface Routine {
-  routineId: number
-  routineName: string
-  totalTime: number
-}
-
-const routineTemplateList: Routine[] = [
-  { routineId: 1, routineName: '밥먹기', totalTime: 20 },
-  { routineId: 2, routineName: '준비 10분 컷', totalTime: 10 },
-  { routineId: 3, routineName: '여유롭게 준비', totalTime: 30 },
-  { routineId: 4, routineName: '풀 메이크업', totalTime: 60 },
-]
+import { Routine } from '@/types/routine'
 
 export default function RoutineList() {
   const router = useRouter()
@@ -37,10 +26,25 @@ export default function RoutineList() {
     setIsVisible(true)
   }
 
-  const onPressDelete = () => {
-    console.log('삭제해야 하는 id', deleteRoutineId)
-  }
+  const [routines, setRoutines] = useState<Routine[]>([])
 
+  useEffect(() => {
+    const fetchRoutines = async () => {
+      const data = await getRoutines()
+      setRoutines(data?.content || [])
+    }
+    fetchRoutines()
+  }, [])
+
+  const onPressDelete = async () => {
+    console.log('삭제해야 하는 id', deleteRoutineId)
+    const response = await removeRoutine(deleteRoutineId)
+    console.log('response', response)
+    setIsVisible(false)
+    router.replace({
+      pathname: '/routine/routineList',
+    })
+  }
   return (
     <View className="flex-1 bg-white p-4">
       <View className="flex-row pb-2 border-b border-bord">
@@ -50,7 +54,7 @@ export default function RoutineList() {
         </View>
       </View>
       <FlatList
-        data={routineTemplateList}
+        data={routines}
         keyExtractor={(item) => item.routineId.toString()}
         renderItem={({ item }) => (
           <RoutineListItem
@@ -70,12 +74,13 @@ export default function RoutineList() {
         isVisible={isVisible}
         setVisible={setIsVisible}
         modalTitle="루틴 삭제"
-        modalContent={`${routineTemplateList.find((item) => item.routineId == deleteRoutineId)?.routineName} 루틴을 삭제하시겠습니까?`}
+        modalContent={`${routines.find((item) => item.routineId == deleteRoutineId)?.routineName} 루틴을 삭제하시겠습니까?`}
         primaryButtonText="삭제"
         primaryButtonOnPress={onPressDelete}
         secondaryButtonText="취소"
         secondaryButtonOnPress={() => {
           console.log('취소')
+          setIsVisible(false)
         }}
       />
 

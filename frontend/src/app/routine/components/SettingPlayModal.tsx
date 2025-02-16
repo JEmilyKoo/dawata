@@ -12,17 +12,30 @@ import Modal from 'react-native-modal'
 
 import PlayMinusIcon from '@/assets/icons/play-minus.svg'
 import PlayPlusIcon from '@/assets/icons/play-plus.svg'
+import { Play } from '@/types/routine'
 
 interface SettingPlayModalProps {
   isVisible: boolean
   playId: number
   setIsVisible: (isVisible: boolean) => void
+  playList: Play[]
+  setPlayList: (playList: Play[]) => void
+  isCreate: boolean
+  setIsCreate: (isCreate: boolean) => void
+  totalTime: number
+  setTotalTime: (totalTime: number) => void
 }
 
 export default function SettingPlayModal({
+  playList,
+  setPlayList,
   isVisible,
   playId,
   setIsVisible,
+  isCreate,
+  setIsCreate,
+  totalTime,
+  setTotalTime,
 }: SettingPlayModalProps) {
   const {
     control,
@@ -41,31 +54,32 @@ export default function SettingPlayModal({
   const [primaryButtonText, setPrimaryButtonText] = useState(
     primaryButtonTextList[0],
   )
-  const [isCreate, setIsCreate] = useState(true)
-  useEffect(() => {
-    setIsCreate(playId == 0)
-  }, [playId])
+
+  // useEffect(() => {
+  //   setIsCreate(playId == 0)
+  // }, [playId])
 
   useEffect(() => {
-    if (!isCreate) {
-      const selectedPlay = playList.find((play) => play.playId === playId)
-      if (selectedPlay) {
-        setValue('playName', selectedPlay.playName)
+    if (isVisible) {
+      // 모달이 열릴 때
+      resetSettingPlayModal() // 먼저 초기화
+
+      if (!isCreate) {
+        // 수정 모드일 경우에만
+        const selectedPlay = playList.find((play) => play.playId === playId)
+        if (selectedPlay) {
+          setValue('playName', selectedPlay.playName)
+          setValue('spendTime', selectedPlay.spendTime)
+        }
+        setPrimaryButtonText(primaryButtonTextList[1])
+      } else {
+        setPrimaryButtonText(primaryButtonTextList[0])
       }
-      setPrimaryButtonText(primaryButtonTextList[1])
-    } else {
-      setValue('playName', '')
-      setPrimaryButtonText(primaryButtonTextList[0])
     }
-  }, [isCreate, playId, setValue])
+  }, [isVisible, isCreate, playId, setValue])
   const toggleModal = () => {
     setIsVisible(!isVisible)
   }
-  const playList = [
-    { playId: 1, playName: '머리만 감기', spendTime: 5 },
-    { playId: 2, playName: '샤워', spendTime: 20 },
-    { playId: 3, playName: '옷 갈아입기', spendTime: 5 },
-  ]
   const spendTime = watch('spendTime')
 
   const adjustTime = (amount: number) => {
@@ -78,18 +92,28 @@ export default function SettingPlayModal({
   }
   const onSubmit = (data: { playName: string; spendTime: number }) => {
     if (isCreate) {
+      const newPlay: Play = {
+        playId: playList.length + 1,
+        playName: data.playName,
+        spendTime: data.spendTime,
+      }
+      setPlayList([...playList, newPlay])
       console.log('행동 추가하는 playName ', data.playName)
       console.log('행동 추가하는 spendTime ', data.spendTime)
     } else {
+      const updatedPlayList = playList.map((play) =>
+        play.playId === playId
+          ? { ...play, playName: data.playName, spendTime: data.spendTime }
+          : play,
+      )
+      setPlayList(updatedPlayList)
       console.log('행동 수정하는 playName ', data.playName)
       console.log('행동 수정하는 spendTime ', data.spendTime)
       console.log('행동 수정하는 playId ', playId)
     }
-    resetSettingPlayModal()
     setIsVisible(false)
   }
   const secondaryButtonOnPress = () => {
-    resetSettingPlayModal()
     setIsVisible(false)
   }
   return (

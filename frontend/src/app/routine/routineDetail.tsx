@@ -1,34 +1,55 @@
 // 루틴 상세
+import { useEffect, useState } from 'react'
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { useDispatch } from 'react-redux'
 
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
+import { getRoutine } from '@/apis/routine'
 import EditIcon from '@/assets/icons/edit.svg'
 import BackButton from '@/components/BackButton'
-
-const playList = [
-  { playId: 1, playName: '머리만 감기', spendTime: 5 },
-  { playId: 2, playName: '샤워', spendTime: 20 },
-  { playId: 3, playName: '옷 갈아입기', spendTime: 5 },
-]
+import { setCreatePlayList } from '@/store/slices/routineSlice'
+import { setCreateRoutineName } from '@/store/slices/routineSlice'
+import { Play, RoutineDetailInfo } from '@/types/routine'
 
 export default function RoutineDetail() {
-  const totalTime = 30
+  const [totalTime, setTotalTime] = useState(0)
+  const [playList, setPlayList] = useState<Play[]>([])
 
   const router = useRouter()
   const { routineId } = useLocalSearchParams()
+  const dispatch = useDispatch()
+
+  const [routine, setRoutine] = useState<RoutineDetailInfo>()
+  useEffect(() => {
+    const fetchRoutine = async () => {
+      const response = await getRoutine(Number(routineId))
+      setRoutine(response)
+      console.log('response', response)
+      setPlayList(response.playList)
+      setTotalTime(
+        response.playList.reduce(
+          (acc: number, cur: Play) => acc + cur.spendTime,
+          0,
+        ),
+      )
+    }
+    fetchRoutine()
+  }, [])
   return (
     <View className="flex-1 bg-white p-4">
       <View className="flex-row justify-between pb-2 border-b border-bord">
         <View className="flex-row">
           <BackButton />
           <View className="flex-1 mt-2">
-            <Text className="text-xl font-bold">준비 10분 컷</Text>
+            <Text className="text-xl font-bold">{routine?.routineName}</Text>
           </View>
         </View>
         <TouchableOpacity
           className="mt-3"
           onPress={() => {
+            dispatch(setCreateRoutineName(routine?.routineName))
+            dispatch(setCreatePlayList(playList))
             router.push({
               pathname: '/routine/updateRoutine',
               params: { routineId },

@@ -1,16 +1,20 @@
 // 루틴 상세
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { pl } from 'date-fns/locale'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
+import { updateRoutine } from '@/apis/routine'
 import SettingPlayItem from '@/app/routine/components/SettingPlayItem'
 import BackButton from '@/components/BackButton'
 import SlideModalUI from '@/components/SlideModalUI'
 import { RootState } from '@/store/store'
+import { Play, RoutineCreate } from '@/types/routine'
+import { CreatePlay } from '@/types/routine'
 
 import {
   setCreatePlayList,
@@ -18,25 +22,16 @@ import {
 } from '../../store/slices/routineSlice'
 import SettingPlayModal from './components/SettingPlayModal'
 
-const playList = [
-  { playId: 1, playName: '머리만 감기', spendTime: 5 },
-  { playId: 2, playName: '샤워', spendTime: 20 },
-  { playId: 3, playName: '옷 갈아입기', spendTime: 5 },
-]
-
 export default function UpdateRoutine() {
-  const totalTime = 30
+  const [isCreate, setIsCreate] = useState(true)
+  const [playList, setPlayList] = useState<Play[]>([])
+  const [totalTime, setTotalTime] = useState(0)
 
   const [isVisible, setIsVisible] = useState(false)
   const { t } = useTranslation()
   const router = useRouter()
   const { routineId } = useLocalSearchParams()
-
   const { create } = useSelector((state: RootState) => state.routine)
-  interface CreatePlay {
-    playName: string
-    spendTime: number
-  }
   const {
     control,
     handleSubmit,
@@ -48,13 +43,38 @@ export default function UpdateRoutine() {
     },
   })
 
+  useEffect(() => {
+    setPlayList(
+      create.playList.map((item) => ({
+        playId: item.playId,
+        playName: item.playName,
+        spendTime: item.spendTime,
+      })),
+    )
+  }, [create])
+
+  useEffect(() => {
+    setTotalTime(
+      playList.reduce((acc: number, cur: Play) => acc + cur.spendTime, 0),
+    )
+  }, [playList])
+
   const [isSettingVisible, setIsSettingVisible] = useState(false)
   const [deletePlayId, setDeletePlayId] = useState(0)
   const [settingPlayId, setSettingPlayId] = useState(0)
-  const onSubmit = (data: { routineName: string; playList: CreatePlay[] }) => {
-    dispatch(setCreateRoutineName(data.routineName))
-    dispatch(setCreatePlayList(data.playList))
+
+  const onSubmit = async (data: {
+    routineName: string
+    playList: CreatePlay[]
+  }) => {
+    // dispatch(setCreateRoutineName(data.routineName))
+    // dispatch(setCreatePlayList(data.playList))
     // playlist 수정하는 것은 별도로 구현할 것
+    const routine: RoutineCreate = {
+      routineName: data.routineName,
+      playList: playList,
+    }
+    const response = await updateRoutine(Number(routineId), routine)
     router.push({
       pathname: '/routine/routineList',
     })
@@ -63,6 +83,7 @@ export default function UpdateRoutine() {
   const editPlay = (playId: number) => {
     console.log('수정해야 할 playId', playId)
     setSettingPlayId(playId)
+    setIsCreate(false)
     setIsSettingVisible(true)
   }
   const deletePlay = (playId: number) => {
@@ -71,12 +92,16 @@ export default function UpdateRoutine() {
   }
   const onPressDelete = () => {
     console.log('삭제해야 하는 id', deletePlayId)
+    const updatedPlayList = playList.filter(
+      (play) => play.playId !== deletePlayId,
+    )
+    setPlayList(updatedPlayList)
+    setIsVisible(false)
   }
   const onLongPressPlayItem = (playId: number) => {
     console.log('꾹 눌러서 움직여야 할 playd', playId)
   }
 
-  const dispatch = useDispatch()
   return (
     <View className="flex-1 bg-white p-4 justify-between">
       <View>
@@ -120,7 +145,7 @@ export default function UpdateRoutine() {
             playName={item.playName}
             spendTime={item.spendTime}
             editPlay={editPlay}
-            deltePlay={deletePlay}
+            deletePlay={deletePlay}
             onLongPressPlayItem={onLongPressPlayItem}
             key={item.playId}
           />
@@ -129,6 +154,7 @@ export default function UpdateRoutine() {
         <TouchableOpacity
           onPress={() => {
             setSettingPlayId(0)
+            setIsCreate(true)
             setIsSettingVisible(true)
           }}
           className="border border-primary p-2 rounded-xl">
@@ -159,6 +185,12 @@ export default function UpdateRoutine() {
         isVisible={isSettingVisible}
         playId={settingPlayId}
         setIsVisible={setIsSettingVisible}
+        playList={playList}
+        setPlayList={setPlayList}
+        isCreate={isCreate}
+        setIsCreate={setIsCreate}
+        totalTime={totalTime}
+        setTotalTime={setTotalTime}
       />
       <TouchableOpacity
         className="bg-primary p-2 rounded"
