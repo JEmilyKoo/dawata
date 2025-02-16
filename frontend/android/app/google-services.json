@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "384341033074",
+    "project_id": "dawata-ea544",
+    "storage_bucket": "dawata-ea544.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384341033074:android:ea357da32d1609a47002eb",
+        "android_client_info": {
+          "package_name": "com.dawata.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSZlAQFzFBIr5p0otVdfn3w-KDLRKhau4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
