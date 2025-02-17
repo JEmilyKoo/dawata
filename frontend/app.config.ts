@@ -66,6 +66,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   extra: {
     kakaoApiKey: process.env.EXPO_PUBLIC_KAKAO_NATIVE_API_KEY,
+    kakaoJsApiKey: process.env.EXPO_PUBLIC_KAKAO_MAP_JS_API_KEY,
     router: {
       origin: false,
     },

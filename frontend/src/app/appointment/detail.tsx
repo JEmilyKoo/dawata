@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   SafeAreaView,
@@ -9,10 +8,17 @@ import {
   View,
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
-import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+} from 'react-native-popup-menu'
+import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 
 import { useRoute } from '@react-navigation/native'
+import Constants from 'expo-constants'
 import { Link, useRouter } from 'expo-router'
 import { useLocalSearchParams } from 'expo-router'
 
@@ -32,8 +38,10 @@ import CopyIcon from '@/assets/icons/copy.svg'
 import MapPinIcon from '@/assets/icons/map-pin.svg'
 import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
+import VoteIcon from '@/assets/icons/vote.svg'
 import BackButton from '@/components/BackButton'
 import DropDown from '@/components/DropDown'
+import ImageThumbnail from '@/components/ImageThumbnail'
 import MenuCustomOptions from '@/components/MenuCustomOptions'
 import Colors from '@/constants/Colors'
 import { RootState } from '@/store/store'
@@ -79,6 +87,8 @@ export default function AppointmentDetail() {
     }
     fetchAppointmentDetail()
   }, [isAttending, isHost, status])
+
+  const webViewRef = React.useRef<WebView>(null)
 
   useEffect(() => {
     if (appointmentDetail) {
@@ -200,6 +210,56 @@ export default function AppointmentDetail() {
     setStatus('NOT_SELECTED')
   }
 
+  const markerLocation = {
+    latitude: 0,
+    longitude: 0,
+  }
+  const kakaoJsApiKey = Constants.expoConfig?.extra?.kakaoJsApiKey
+  const htmlContent = `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
+    <script type="text/javascript">
+      function initTmap() {
+        var mapContainer = document.getElementById('map'); // ID 수정
+        var options = {
+          center: new kakao.maps.LatLng(${markerLocation.latitude}, ${markerLocation.longitude}),
+          level: 3
+        };
+
+        var map = new kakao.maps.Map(mapContainer, options);
+
+
+      // 마커가 표시될 위치입니다 
+      var markerPosition  = new kakao.maps.LatLng(${markerLocation.latitude}, ${markerLocation.longitude}); 
+
+      // 마커를 생성합니다
+      var marker = new kakao.maps.Marker({
+          position: markerPosition
+      });
+
+      // 마커가 지도 위에 표시되도록 설정합니다
+      marker.setMap(map);
+      }
+    </script>
+    <style>
+      html, body, #map {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body onload="initTmap()">
+    <div id="map"></div>
+  </body>
+</html>
+
+  `
   // 약속장 변경
   const handleHostChange = async (participant: ParticipantInfo) => {
     const data = await updateAppointmentHost(Number(id), {
@@ -221,28 +281,79 @@ export default function AppointmentDetail() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text>{isAttending ? '참' : '불'}</Text>
-      <View className="absolute top-0 right-0 p-4">
-        <Menu>
-          <MenuTrigger>
-            <MoreIcon
-              height={24}
-              width={24}
+    <SafeAreaView className="flex-1 items-center justify-start bg-white items-center">
+      {appointmentDetail && (
+        <View className="flex-col w-full mt-5">
+          <View className="flex-row flex-1">
+            <ImageThumbnail
+              img={appointmentDetail.clubInfo.img}
+              defaultImg={require('@/assets/clubs/club1.png')}
+              width={64}
+              height={54}
+              className="rounded-xl mx-5"
             />
-          </MenuTrigger>
-          <MenuOptions>
-            <MenuCustomOptions menuList={menu} />
-          </MenuOptions>
-        </Menu>
-      </View>
+            <View className="flex-col flex-1 mr-4">
+              <View className="flex-row justify-between">
+                <Text className="text-2xl font-extrabold">
+                  {appointmentDetail.appointmentInfo.name}
+                </Text>
+                <Menu>
+                  <MenuTrigger>
+                    <MoreIcon
+                      height={24}
+                      width={24}
+                    />
+                  </MenuTrigger>
+                  <MenuOptions>
+                    <MenuCustomOptions menuList={menu} />
+                  </MenuOptions>
+                </Menu>
+              </View>
+              <View className="flex-row justify-between">
+                <Text className="text-primary text-xl font-semibold">
+                  {appointmentDetail.clubInfo.name}
+                </Text>
+                <Text className="text-text-secondary text-base mt-1 font-medium mr-2">
+                  #{t(`category.${appointmentDetail.appointmentInfo.category}`)}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View className="flex-row justify-between mx-5 mt-4">
+            <View className="flex-row">
+              <VoteIcon />
+              <Text className="font-base text-text-primary font-regular">
+                {t(`voteStatus.${status}`)}
+              </Text>
+            </View>
+            <Text className="font-base text-text-primary font-regularmr-1">
+              {new Date(
+                appointmentDetail.appointmentInfo.scheduledAt,
+              ).toLocaleString('ko', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {voteInfos.length > 0 && (
+        <WebView
+          ref={webViewRef}
+          source={{ html: htmlContent }}
+          className="flex-1"
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          onError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent
+            console.warn('WebView error: ', nativeEvent)
+          }}
+        />
+      )}
 
       <View className="items-center justify-center w-full p-4">
-        <Text className="text-lg font-bold mb-4">Appointment Detail</Text>
-        <Text className="text-gray-500 mb-4">약속 ID: {id}</Text>
-        <Text className="text-gray-500 mb-4">
-          상태: {t(`voteStatus.${status}`)}
-        </Text>
         <View className="flex-1 w-full">
           {/* 상태에 따라 다른 View 렌더링 */}
           {status === 'EXPIRED' && appointmentDetail && (
@@ -355,34 +466,54 @@ export default function AppointmentDetail() {
           <DropDown title="참여 인원">
             <View>
               <Text>
-                참여 인원 :{' '}
+                참여 인원 :
                 {
                   appointmentDetail?.participantInfos.filter(
                     (participant) => participant.isAttending,
                   ).length
                 }
               </Text>
-              {appointmentDetail?.participantInfos
-                .filter((participant) => participant.isAttending)
-                .map((participant) => (
-                  <View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="space-x-4">
+                {appointmentDetail?.participantInfos
+                  .filter((participant) => participant.isAttending)
+                  .map((participant) => (
                     <View key={participant.participantId}>
-                      <Text>{participant.img}</Text>
-                      <Text>{participant.name}</Text>
+                      <Menu>
+                        <MenuTrigger>
+                          <View className="p-2 mr-2 rounded-xl min-w-16 items-center">
+                            <ImageThumbnail
+                              img={participant.img}
+                              defaultImg={require('@/assets/avatars/user1.png')}
+                              width={48}
+                              height={48}
+                              className={`w-12 h-12 rounded-full mb-2`}
+                            />
+                            <Text className="text-base font-semibold mb-1">
+                              {participant.name}
+                            </Text>
+                          </View>
+                        </MenuTrigger>
+                        <MenuOptions optionsContainerStyle={{ marginTop: -20 }}>
+                          <View>
+                            <MenuOption
+                              onSelect={() =>
+                                isHost && handleHostChange(participant)
+                              }>
+                              <Text>약속장 변경</Text>
+                            </MenuOption>
+                          </View>
+                        </MenuOptions>
+                      </Menu>
                     </View>
-                    {/* TODO: 이미지 클릭 시 약속장 변경하는 팝업 띄우기 (지금은 약속장 변경 버튼이 보이게 되어있음) */}
-                    {isHost && (
-                      <TouchableOpacity
-                        onPress={() => handleHostChange(participant)}>
-                        <Text>약속장 변경</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
+                  ))}
+              </ScrollView>
             </View>
           </DropDown>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
