@@ -17,7 +17,7 @@ export interface Club {
   category: string
   teamCode: string
   img: string
-  createdAt: string
+  createDate: string
   members: ClubMember[]
 }
 

@@ -1,30 +1,23 @@
 // /src/store/slices/appointmentSlice.ts
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
+import { Club } from '@/types/club'
+
 import type { RootState } from '../store'
 
-const initialState = {
+interface ClubSliceInitialState {
+  create: {
+    name: string
+    category: string
+  }
+  clubs: Club[]
+}
+const initialState: ClubSliceInitialState = {
   create: {
     name: '',
     category: 'FRIEND',
   },
-  clubs: [
-    {
-      clubId: 1,
-      name: '테스트 클럽',
-      category: 'FRIEND',
-      teamCode: 'H9UKRI',
-      img: '',
-      createdAt: '',
-      appointment: [
-        {
-          appointmentId: 1,
-          name: '테스트 약속',
-          category: 'STUDY',
-        },
-      ],
-    },
-  ],
+  clubs: [],
 }
 
 const clubSlice = createSlice({
@@ -41,12 +34,6 @@ const clubSlice = createSlice({
     setCreateCategory(state, action) {
       state.create.category = action.payload
     },
-    setAppointments(state, action) {
-      const club = state.clubs.find((club) => club.id === action.payload.id)
-      if (club) {
-        club.appointment = action.payload.appointmentList
-      }
-    },
     setClubs(state, action) {
       state.clubs = action.payload
     },
@@ -54,14 +41,9 @@ const clubSlice = createSlice({
 })
 
 // selector를 별도로 정의
-export const selectAppointments = (state: RootState, clubId: number) =>
-  state.club.clubs.find((club) => club.id === clubId)?.appointment ?? []
+// export const selectAppointments = (state: RootState, clubId: number) =>
+//   state.club.clubs.find((club) => club.clubId === clubId)?.appointment ?? []
 
-export const {
-  resetCreate,
-  setCreateName,
-  setCreateCategory,
-  setAppointments,
-  setClubs,
-} = clubSlice.actions
+export const { resetCreate, setCreateName, setCreateCategory, setClubs } =
+  clubSlice.actions
 export default clubSlice.reducer

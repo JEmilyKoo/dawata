@@ -1,15 +1,15 @@
-import { useTranslation } from "react-i18next"
-import { Image, Pressable, Text, View } from "react-native"
+import { useTranslation } from 'react-i18next'
+import { Image, Pressable, Text, View } from 'react-native'
 
-import { usePathname, useRouter } from "expo-router"
+import { usePathname, useRouter } from 'expo-router'
 
-import AppointmentIcon from "@/assets/icons/appointment.svg"
-import MainIcon from "@/assets/icons/main.svg"
-import NoticeIcon from "@/assets/icons/notice.svg"
-import ProfileIcon from "@/assets/icons/profile.svg"
-import colors from "@/constants/Colors"
+import AppointmentIcon from '@/assets/icons/appointment.svg'
+import MainIcon from '@/assets/icons/main.svg'
+import NoticeIcon from '@/assets/icons/notice.svg'
+import ProfileIcon from '@/assets/icons/profile.svg'
+import colors from '@/constants/Colors'
 
-import TabBarIcon from "./TabBarIcon"
+import TabBarIcon from './TabBarIcon'
 
 export default function TabBar() {
   const { t } = useTranslation()
@@ -18,23 +18,23 @@ export default function TabBar() {
 
   const tabs = [
     {
-      name: "main",
+      name: 'main',
       icon: MainIcon,
     },
     {
-      name: "appointment",
+      name: 'appointment',
       icon: AppointmentIcon,
     },
     {
-      name: "live",
+      name: 'live',
       icon: null, // 특별 처리
     },
     {
-      name: "notice",
+      name: 'notice',
       icon: NoticeIcon,
     },
     {
-      name: "profile",
+      name: 'profile',
       icon: ProfileIcon,
     },
   ]
@@ -42,11 +42,15 @@ export default function TabBar() {
   return (
     <View
       style={{
-        flexDirection: "row",
-        marginTop: 10,
+        flexDirection: 'row',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
         height: 85,
         paddingHorizontal: 10,
-        backgroundColor: "white",
+        backgroundColor: 'white',
+        elevation: 4,
       }}>
       {tabs.map((tab) => {
         const isFocused = pathname.startsWith(`/${tab.name}`)
@@ -58,18 +62,18 @@ export default function TabBar() {
             style={[
               {
                 flex: 1,
-                alignItems: "center",
-                borderTopWidth: tab.name !== "live" ? 1 : 0,
+                alignItems: 'center',
+                borderTopWidth: tab.name !== 'live' ? 1 : 0,
                 borderTopColor: isFocused ? colors.primary : colors.secondary,
                 marginHorizontal: 10,
                 paddingTop: 10,
               },
-              tab.name === "live" && { marginVertical: 8 },
+              tab.name === 'live' && { marginVertical: 8 },
             ]}>
-            {tab.name === "live" ? (
-              <View style={{ width: 60 }}>
+            {tab.name === 'live' ? (
+              <View style={{ width: 54 }}>
                 <Image
-                  source={require("@/assets/icons/live.png")}
+                  source={require('@/assets/icons/live.png')}
                   style={{
                     width: 54,
                     height: 54,
