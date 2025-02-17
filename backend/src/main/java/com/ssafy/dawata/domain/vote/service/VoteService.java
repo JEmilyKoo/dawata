@@ -1,5 +1,8 @@
 package com.ssafy.dawata.domain.vote.service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +12,7 @@ import com.ssafy.dawata.domain.appointment.entity.Appointment;
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.participant.entity.Participant;
 import com.ssafy.dawata.domain.participant.repository.ParticipantRepository;
+import com.ssafy.dawata.domain.tmap.service.TransitService;
 import com.ssafy.dawata.domain.vote.dto.request.VoteItemRequest;
 import com.ssafy.dawata.domain.vote.dto.request.VotesRequest;
 import com.ssafy.dawata.domain.vote.entity.VoteItem;
@@ -29,18 +33,30 @@ public class VoteService {
 	private final ParticipantRepository participantRepository;
 	private final AppointmentRepository appointmentRepository;
 
+	private final TransitService transitService;
+
 	@Transactional
 	public void createVoteItem(VoteItemRequest requestDto, Long memberId, Long appointmentId) {
-		validateAndGetParticipant(memberId, appointmentId);
+		Participant participant = validateAndGetParticipant(memberId, appointmentId);
+		Address participantAddress = participant.getMemberAddressMapping().getAddress();
 
-		Address address = Address.of(requestDto.roadAddress(), requestDto.longitude(), requestDto.latitude());
-		Address addressEntity = addressRepository.save(address);
+		Address destAddress = Address.of(requestDto.roadAddress(), requestDto.longitude(), requestDto.latitude());
+		Address addressEntity = addressRepository.save(destAddress);
 
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 ID의 약속이 존재하지 않습니다."));
 
-		// TODO(준): 투표 항목의 평균 소요 시간 계산
-		Integer avgDuration = 30;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+		int avgDuration = Objects.requireNonNull(
+			transitService.requestTransitSubAPI(
+				participantAddress.getLongitude(),
+				participantAddress.getLatitude(),
+				destAddress.getLongitude(),
+				destAddress.getLatitude(),
+				appointment.getScheduledAt().format(formatter)
+			).block()
+		).getTotalTime();
+
 		VoteItem voteItem = VoteItem.of(
 			addressEntity,
 			appointment,

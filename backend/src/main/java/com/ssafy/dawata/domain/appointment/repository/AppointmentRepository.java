@@ -60,14 +60,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 		@Param("now") LocalDateTime now,
 		@Param("twoHoursLater") LocalDateTime twoHoursLater
 	);
-
-	@Query("SELECT DISTINCT p.appointment FROM Participant p " +
-		"WHERE p.clubMember.club.id IN :clubIds " +
-		"AND p.appointment.scheduledAt BETWEEN :startDate AND :endDate")
-	List<Appointment> findAppointmentsByClubIds(
-		@Param("clubIds") List<Long> clubIds,
-		@Param("startDate") LocalDateTime startDate,
-		@Param("endDate") LocalDateTime endDate
-	);
-
 }

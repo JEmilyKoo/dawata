@@ -24,12 +24,6 @@ public class GeoMidpointUtil {
 		return new double[] {sumLat / count, sumLng / count}; // 중앙값 반환
 	}
 
-	public static double[] getMidpoint() {
-		// TODO: 구현 필요
-
-		return new double[] {37.498095, 127.027610};
-	}
-
 	public static double[] getLatLngBounds(List<double[]> coordinates) {
 		if (coordinates == null || coordinates.isEmpty()) {
 			throw new IllegalArgumentException("좌표 리스트가 비어 있습니다.");

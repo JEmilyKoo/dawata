@@ -23,8 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomOAuth2AuthenticationSuccessHandler extends
 	SimpleUrlAuthenticationSuccessHandler {
-
-	// TODO: 로그인 성공 시 토큰 넘기도록 할 것
+	
 	private final JwtTokenProvider tokenProvider;
 	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 

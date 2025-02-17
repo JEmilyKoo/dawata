@@ -1,10 +1,15 @@
 package com.ssafy.dawata.domain.appointment.service;
 
+import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -112,6 +117,7 @@ public class AppointmentService {
 		);
 	}
 
+	// 내가 속해 있는 약속만 가져오기
 	public List<AppointmentWithExtraInfoResponse> findMyAllAppointmentList(
 		Long memberId,
 		Integer nextRange,
@@ -119,21 +125,13 @@ public class AppointmentService {
 		int currentYear,
 		int currentMonth
 	) {
-		List<Long> clubIds = clubRepository.findClubIdsByMemberId(memberId);
-
-		LocalDateTime firstDayOfMonth = LocalDateTime.of(currentYear, currentMonth, 15, 0, 0);
-
-		LocalDateTime startDate = firstDayOfMonth.minusWeeks(prevRange);
-		LocalDateTime endDate = firstDayOfMonth.plusWeeks(nextRange);
-		List<Appointment> appointments = appointmentRepository.findAppointmentsByClubIds(
-			clubIds,
-			startDate,
-			endDate
-		);
+		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberId(memberId, prevRange,
+			nextRange, currentYear, currentMonth);
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
 	}
 
+	// 내가 속해 있는 클럽의 약속 가져오기 (내가 속해 있지 않아도 가져옴)
 	public List<AppointmentWithExtraInfoResponse> findMyAppointmentListByClubId(
 		Long memberId,
 		Long clubId,
@@ -313,42 +311,50 @@ public class AppointmentService {
 
 		List<Participant> participants = participantRepository.findParticipantsByAppointmentId(appointmentId);
 
-		// TODO: 추천 알고리즘 구현하기
 		List<double[]> coordinates = participants.stream()
 			.map(p -> {
 				Address address = p.getMemberAddressMapping().getAddress();
-				log.info("주소: {}", p.getMemberAddressMapping().getAddress().getRoadAddress());
 				return new double[] {address.getLatitude(), address.getLongitude()};
 			})
 			.toList();
-		// TODO: searchDttm을 appointment의 scheduledAt으로 변경
-		double[] point = recommendService.getRecommendPlace(coordinates, "202502211200");
 
-		List<AppointmentPlaceResponse.ParticipantInfo> participantInfos = participants.stream()
-			.map(participant -> {
-				ClubMember clubMember = participant.getClubMember();
-				Photo photo = photoRepository
-					.findByEntityIdAndEntityCategory(
-						clubMember.getMember().getId(), EntityCategory.MEMBER
-					)
-					.orElse(Photo.createDefaultPhoto(clubMember.getMember().getId(), EntityCategory.MEMBER));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+		double[] point = recommendService.getRecommendPlace(
+				coordinates,
+				appointment.getScheduledAt().format(formatter)
+			)
+			.block();
 
-				return AppointmentPlaceResponse.ParticipantInfo.of(
-					clubMember.getMember().getId(),
-					participant.getId(),
-					clubMember.getNickname(),
-					s3Service.generatePresignedUrl(
-						photo.getPhotoName(),
-						"get",
-						EntityCategory.MEMBER,
-						clubMember.getMember().getId()
-					),
-					(int)(Math.random() * 11) + 30
-				);
-			})
-			.toList();
+		Map<Long, URL> photoUrls = new HashMap<>();
+		for (Participant participant : participants) {
+			Photo photo = photoRepository.findByEntityIdAndEntityCategory(
+					participant.getClubMember().getMember().getId(),
+					EntityCategory.MEMBER
+				)
+				.orElse(
+					Photo.createDefaultPhoto(participant.getClubMember().getMember().getId(), EntityCategory.MEMBER));
+			photoUrls.put(participant.getId(),
+				s3Service.generatePresignedUrl(
+					photo.getPhotoName(),
+					"get",
+					EntityCategory.MEMBER,
+					participant.getClubMember().getMember().getId()
+				)
+			);
+		}
 
-		return AppointmentPlaceResponse.of(point[0], point[1], participantInfos);
+		assert point != null;
+		return AppointmentPlaceResponse.of(
+			point[0],
+			point[1],
+			recommendService.getParticipantInfos(
+					point,
+					participants,
+					photoUrls,
+					appointment.getScheduledAt().format(formatter)
+				)
+				.block()
+		);
 	}
 
 	private List<AppointmentWithExtraInfoResponse> makeAppointmentWithExtraInfoResponses(Long memberId,

@@ -43,10 +43,10 @@ public class TransitService {
 
 	// Tmap API에 대한 요청을 보내는 메소드
 	public Mono<TransitResponse> requestTransitAPI(
-		String startX,
-		String startY,
-		String endX,
-		String endY,
+		Double startX,
+		Double startY,
+		Double endX,
+		Double endY,
 		String searchDttm
 	) {
 		WebClient client = getTransitClient();
@@ -66,10 +66,10 @@ public class TransitService {
 	}
 
 	public Mono<TransitResponse> requestTransitSubAPI(
-		String startX,
-		String startY,
-		String endX,
-		String endY,
+		Double startX,
+		Double startY,
+		Double endX,
+		Double endY,
 		String searchDttm
 	) {
 		WebClient client = getTransitClient();

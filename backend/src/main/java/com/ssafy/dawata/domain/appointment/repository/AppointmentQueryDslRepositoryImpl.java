@@ -29,6 +29,7 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 		QClubMember clubMember = QClubMember.clubMember;
 
 		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startDate = now.minusDays(prevRange * 7L);
 		LocalDateTime endDate = now.plusDays(nextRange * 7L);
 
 		return queryFactory
@@ -37,7 +38,7 @@ public class AppointmentQueryDslRepositoryImpl implements AppointmentQueryDslRep
 			.join(participant.clubMember, clubMember)
 			.where(
 				clubMember.member.id.eq(memberId),
-				appointment.scheduledAt.between(now, endDate)
+				appointment.scheduledAt.between(startDate, endDate)
 			)
 			.fetch();
 	}
