@@ -12,6 +12,7 @@ import { updateRoutine } from '@/apis/routine'
 import SettingPlayItem from '@/app/routine/components/SettingPlayItem'
 import BackButton from '@/components/BackButton'
 import SlideModalUI from '@/components/SlideModalUI'
+import TopHeader from '@/components/TopHeader'
 import { RootState } from '@/store/store'
 import { Play, RoutineCreate } from '@/types/routine'
 import { CreatePlay } from '@/types/routine'
@@ -103,14 +104,9 @@ export default function UpdateRoutine() {
   }
 
   return (
-    <View className="flex-1 bg-white p-4 justify-between">
-      <View>
-        <View className="flex-row pb-2 border-b border-bord">
-          <BackButton />
-          <View className="flex-1 mt-2">
-            <Text className="text-xl font-bold">루틴 수정</Text>
-          </View>
-        </View>
+    <View className="flex-1 bg-white ">
+      <TopHeader title="루틴 수정" />
+      <View className="p-4 justify-between">
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-lg font-bold">루틴이름을 설정해주세요</Text>
           <TouchableOpacity

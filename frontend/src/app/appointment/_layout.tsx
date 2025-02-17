@@ -1,39 +1,39 @@
-import { Stack, usePathname } from "expo-router"
+import { Stack, usePathname } from 'expo-router'
 
-import TabBar from "@/components/TabBar"
+import TabBar from '@/components/TabBar'
 
 export default function AppointmentLayout() {
   const pathname = usePathname()
   return (
     <>
-      <Stack screenOptions={{ headerShown: true }}>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="create1"
           options={{
-            title: "약속 생성",
+            title: '약속 생성',
           }}
         />
         <Stack.Screen
           name="create2"
           options={{
-            title: "약속 생성",
+            title: '약속 생성',
           }}
         />
         <Stack.Screen
           name="create3"
           options={{
-            title: "약속 생성",
+            title: '약속 생성',
           }}
         />
         <Stack.Screen
           name="create4"
           options={{
-            title: "약속 생성",
+            title: '약속 생성',
           }}
         />
         <Stack.Screen name="detail" />
       </Stack>
-      {pathname.indexOf("create") == -1 && <TabBar />}
+      {pathname.indexOf('create') == -1 && <TabBar />}
     </>
   )
 }

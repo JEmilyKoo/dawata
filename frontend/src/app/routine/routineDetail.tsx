@@ -7,7 +7,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 
 import { getRoutine } from '@/apis/routine'
 import EditIcon from '@/assets/icons/edit.svg'
-import BackButton from '@/components/BackButton'
+import TopHeader from '@/components/TopHeader'
 import { setCreatePlayList } from '@/store/slices/routineSlice'
 import { setCreateRoutineName } from '@/store/slices/routineSlice'
 import { Play, RoutineDetailInfo } from '@/types/routine'
@@ -37,14 +37,9 @@ export default function RoutineDetail() {
     fetchRoutine()
   }, [])
   return (
-    <View className="flex-1 bg-white p-4">
-      <View className="flex-row justify-between pb-2 border-b border-bord">
-        <View className="flex-row">
-          <BackButton />
-          <View className="flex-1 mt-2">
-            <Text className="text-xl font-bold">{routine?.routineName}</Text>
-          </View>
-        </View>
+    <View className="flex-1 bg-white">
+      <View className="flex-row justify-between border-b border-bord">
+        <TopHeader title={routine?.routineName || ''} />
         <TouchableOpacity
           className="mt-3"
           onPress={() => {

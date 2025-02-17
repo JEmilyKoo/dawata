@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+} from 'react-native'
 
-import BackButton from '@/components/BackButton'
 import NoticeItem from '@/components/NoticeItem'
+import TopHeader from '@/components/TopHeader'
 
 interface NoticeInfo {
   id: number // 알림의 고유 ID
@@ -101,25 +105,20 @@ const noticeInfo: NoticeInfo[] = [
 export default function TabOneScreen() {
   const { t } = useTranslation()
   return (
-    <View className="flex-1 bg-white">
-      <View className="flex-row p-4 border-b border-bord">
-        <TouchableOpacity className="mr-4">
-          <BackButton />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-xl font-bold mt-2">{t('notice')}</Text>
-        </View>
-      </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <TopHeader title={t('notice')} />
       <ScrollView>
         {noticeInfo.map(
           (noticeInfo) =>
             !noticeInfo.deleted && (
-              <View className="px-4">
+              <View
+                className="px-4"
+                key={noticeInfo.id}>
                 <NoticeItem noticeInfo={noticeInfo} />
               </View>
             ),
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }

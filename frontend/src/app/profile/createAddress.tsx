@@ -18,7 +18,7 @@ import CloseCircleIcon from '@/assets/icons/close-circle.svg'
 import CrosshairIcon from '@/assets/icons/crosshair.svg'
 import MapPinIcon from '@/assets/icons/map-pin.svg'
 import SearchIcon from '@/assets/icons/search.svg'
-import BackButton from '@/components/BackButton'
+import TopHeader from '@/components/TopHeader'
 import Colors from '@/constants/Colors'
 import { RootState } from '@/store/store'
 import { AddressCreate, Coord } from '@/types/address'
@@ -98,12 +98,7 @@ export default function CreateAddress() {
   }
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 mb-3 border-b border-gray-200">
-        <View className="flex-row p-4 pt-2">
-          <BackButton />
-          <Text className="text-xl font-bold mt-2">주소 설정</Text>
-        </View>
-      </View>
+      <TopHeader title="주소 설정" />
       <ScrollView className="flex-1 w-full">
         <View className="w-100 flex-row border-b border-gray-200 px-4 my-3">
           <TouchableOpacity onPress={handleSubmit(onSubmit)}>

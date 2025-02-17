@@ -10,14 +10,9 @@ import {
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 import { useDispatch } from 'react-redux'
 
-import { useActionSheet } from '@expo/react-native-action-sheet'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
-import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
-import CopyIcon from '@/assets/icons/copy.svg'
-import MoreIcon from '@/assets/icons/more.svg'
 import PlusIcon from '@/assets/icons/plus.svg'
-import BackButton from '@/components/BackButton'
 import { Club } from '@/types/club'
 
 import {

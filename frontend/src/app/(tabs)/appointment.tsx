@@ -19,12 +19,7 @@ import { router } from 'expo-router'
 
 import AppointmentCalendar from '@/app/appointment/components/AppointmentCalendar'
 import AppointmentList from '@/app/appointment/components/AppointmentList'
-import ChevronLeftIcon from '@/assets/icons/chevron-left.svg'
-import CopyIcon from '@/assets/icons/copy.svg'
-import MoreIcon from '@/assets/icons/more.svg'
-import PlusIcon from '@/assets/icons/plus.svg'
-import AppointmentItem from '@/components/AppointmentItem'
-import BackButton from '@/components/BackButton'
+import TopHeader from '@/components/TopHeader'
 
 LocaleConfig.locales['kr'] = {
   monthNames: [
@@ -222,16 +217,7 @@ function Appointment() {
   const dispatch = useDispatch()
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* 헤더 */}
-      <View className="flex-row p-4 border-b border-bord">
-        <TouchableOpacity className="mr-4">
-          <BackButton />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-xl font-bold">약속 모아보기</Text>
-        </View>
-      </View>
-
+      <TopHeader title="약속 모아보기" />
       <ScrollView>
         {/* 캘린더 섹션 */}
         <AppointmentCalendar

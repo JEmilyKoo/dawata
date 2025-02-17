@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router'
 
 import { deleteAddress, getAddresses } from '@/apis/address'
 import PlusCircleIcon from '@/assets/icons/plus-circle.svg'
-import BackButton from '@/components/BackButton'
+import TopHeader from '@/components/TopHeader'
 import { filterOutAddress, setAddresses } from '@/store/slices/addressSlice'
 import { RootState } from '@/store/store'
 import { Address } from '@/types/address'
@@ -45,12 +45,7 @@ export default function ManageAddress() {
   }
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
-        <View className="flex-row p-4 pt-2">
-          <BackButton />
-          <Text className="text-xl font-bold mt-2">주소 관리</Text>
-        </View>
-      </View>
+      <TopHeader title="주소 관리" />
       <ScrollView className="flex-1">
         <TouchableOpacity
           className="flex-row items-center px-4 py-4 border-b border-gray-100"
