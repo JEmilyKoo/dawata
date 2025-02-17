@@ -1,10 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Platform,
-  StatusBar,
-  View,
-} from 'react-native'
+import { Platform, StatusBar, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 

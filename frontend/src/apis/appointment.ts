@@ -1,5 +1,5 @@
 import { BooleanResponse } from '@/types/api'
-import { AppointmentCreateInfo } from '@/types/appointment'
+import { AppointmentCreateInfo, AppointmentInfo } from '@/types/appointment'
 
 import api from './api'
 
@@ -76,6 +76,21 @@ export const getAppointmentDetail = async (appointmentId: number) => {
     return response.data
   } catch (error) {
     console.error('⛔ 약속 상세 조회 실패:')
+    return null
+  }
+}
+
+// 약속 수정
+export const updateAppointment = async (appointmentInfo: AppointmentInfo) => {
+  try {
+    let { name, category, scheduledAt, voteEndTime } = appointmentInfo
+    const response = await api.put(
+      `/appointments/${appointmentInfo.appointmentId}`,
+      { name, category, scheduledAt, voteEndTime },
+    )
+    return response.status == 'success'
+  } catch (error) {
+    console.error('⛔ 약속 수정 실패:')
     return null
   }
 }

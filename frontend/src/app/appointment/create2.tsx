@@ -1,17 +1,20 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Platform, Text, TouchableOpacity, View } from 'react-native'
 import NativeDatePicker from 'react-native-date-picker'
 import { useDispatch, useSelector } from 'react-redux'
+
+import { format } from 'date-fns'
+import { ko } from 'date-fns/locale'
 import { useRouter } from 'expo-router'
+
 import WebDatePicker from '@/components/WebDatePicker'
 import { RootState } from '@/store/store'
+
 import {
   setCreateScheduledAt,
   setCreateVoteEndTime,
 } from '../../store/slices/appointmentSlice'
-import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
-import { useTranslation } from 'react-i18next'
 
 const AppointmentCreate2 = () => {
   const { t } = useTranslation()
@@ -29,9 +32,11 @@ const AppointmentCreate2 = () => {
 
   const onSubmit = () => {
     dispatch(setCreateScheduledAt(date.toISOString()))
-    dispatch(setCreateVoteEndTime(
-      new Date(date.setDate(date.getDate() - 7)).toISOString(),
-    ))
+    dispatch(
+      setCreateVoteEndTime(
+        new Date(date.setDate(date.getDate() - 1)).toISOString(),
+      ),
+    )
   }
 
   const onPressNext = () => {
@@ -56,10 +61,10 @@ const AppointmentCreate2 = () => {
       </TouchableOpacity>
       {Platform.OS === 'web' ? (
         <View className="w-full h-1/2 items-center">
-        <WebDatePicker
-          date={date}
-          handleConfirm={handleConfirm}
-        />
+          <WebDatePicker
+            date={date}
+            handleConfirm={handleConfirm}
+          />
         </View>
       ) : (
         <NativeDatePicker
@@ -77,7 +82,9 @@ const AppointmentCreate2 = () => {
         <TouchableOpacity
           className="bg-bord p-2 rounded w-1/4"
           onPress={onPressPrev}>
-          <Text className="text-text-primary text-center font-bold">{t('prev')}</Text>
+          <Text className="text-text-primary text-center font-bold">
+            {t('prev')}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="bg-primary p-2 rounded w-3/4"

@@ -80,12 +80,12 @@ export default function CreateAddress() {
       width: 32,
       height: 16,
       borderRadius: 25,
-      padding: 2,
     },
     switchCircle: {
-      width: 13,
-      height: 13,
+      width: 14,
+      height: 14,
       borderRadius: 20,
+      right: 4,
     },
   })
   return (
@@ -135,17 +135,8 @@ export default function CreateAddress() {
                     circleColorOff="white"
                     backgroundColorOn={Colors.primary}
                     backgroundColorOff={Colors.bord}
-                    containerStyle={{
-                      width: 40,
-                      height: 20,
-                      borderRadius: 25,
-                      padding: 2,
-                    }}
-                    circleStyle={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: 20,
-                    }}
+                    containerStyle={styles.switchContainer}
+                    circleStyle={styles.switchCircle}
                   />
                 )}
               />
@@ -156,9 +147,9 @@ export default function CreateAddress() {
           )}
         </View>
       </ScrollView>
-      <View className="flex-row justify-between space-x-2 w-full px-4 pb-4">
+      <View className="flex-row justify-between w-full pb-4">
         <TouchableOpacity
-          className="bg-bord p-3 rounded w-1/4"
+          className="bg-bord items-center p-2 rounded w-1/4"
           onPress={() => {
             router.back()
           }}>
@@ -167,7 +158,7 @@ export default function CreateAddress() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-primary p-3 rounded w-3/4"
+          className="bg-primary items-center p-2 ml-1 rounded w-3/4"
           onPress={handleSubmit(onSubmit)}>
           <Text className="text-white text-center font-bold">
             {t('finish')}

@@ -16,6 +16,7 @@ import {
 } from 'react-native-popup-menu'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import { useRoute } from '@react-navigation/native'
 import Constants from 'expo-constants'
@@ -51,6 +52,8 @@ import {
   VoteInfo,
 } from '@/types/appointment'
 import { MenuItem } from '@/types/menu'
+
+import { initUpdate, patchUpdate } from '../../store/slices/appointmentSlice'
 
 export default function AppointmentDetail() {
   const { t } = useTranslation()
@@ -111,10 +114,15 @@ export default function AppointmentDetail() {
     }
   }, [appointmentDetail])
 
+  const dispatch = useDispatch()
   const handleEdit = () => {
-    router.push(
-      `/appointment/update1?id=${appointmentDetail?.appointmentInfo.appointmentId}`,
-    )
+    if (!appointmentDetail) return
+
+    dispatch(initUpdate())
+    if (appointmentDetail.appointmentInfo) {
+      dispatch(patchUpdate(appointmentDetail.appointmentInfo))
+    }
+    router.push(`/appointment/update1`)
   }
 
   const handleDelete = async () => {
@@ -283,7 +291,7 @@ export default function AppointmentDetail() {
   return (
     <SafeAreaView className="flex-1 items-center justify-start bg-white items-center">
       {appointmentDetail && (
-        <View className="flex-col w-full mt-5">
+        <View className="flex-col w-full mt-5 pt-7 h-full">
           <View className="flex-row flex-1">
             <ImageThumbnail
               img={appointmentDetail.clubInfo.img}
