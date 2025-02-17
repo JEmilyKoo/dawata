@@ -56,6 +56,9 @@ export default function CreateAddress() {
     dispatch(setCreateRoadAddress(address.address_name))
     dispatch(setCreateLatitude(address.y))
     dispatch(setCreateLongitude(address.x))
+    router.push({
+      pathname: '/profile/createAddress2',
+    })
   }
 
   const fetchAddressCoord = async (roadAddress: string) => {
@@ -68,14 +71,14 @@ export default function CreateAddress() {
     }
     if (data.data.meta.total_count === 0) {
       setSearchedAddresses([])
-      return
-    }
-    if (data.data.documents) {
+    } else if (data.data.documents) {
       const roadAddress: Coord[] = data.data.documents.map((item: any) => {
         return {
-          address_name: item.road_address.address_name,
-          x: item.road_address.x,
-          y: item.road_address.y,
+          address_name: item.road_address
+            ? item.road_address.address_name
+            : item.address_name,
+          x: item.road_address ? item.road_address.x : item.address.x,
+          y: item.road_address ? item.road_address.y : item.address.y,
         }
       })
       if (roadAddress) {
@@ -122,7 +125,7 @@ export default function CreateAddress() {
               />
             )}
           />
-          {inputValue && (
+          {inputValue != '' && (
             <TouchableOpacity onPress={() => setInputValue('')}>
               <CloseCircleIcon className="mr-2" />
             </TouchableOpacity>

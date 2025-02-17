@@ -102,14 +102,11 @@ export default function createAddress2() {
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.EXPO_PUBLIC_KAKAO_MAP_JS_API_KEY}"></script>
     <script type="text/javascript">
       function initTmap() {
-        console.log("집이나 가고 싶다");
-
         var mapContainer = document.getElementById('map'); // ID 수정
         var options = {
           center: new kakao.maps.LatLng(${create.latitude}, ${create.longitude}),
           level: 3
         };
-        
 
         var map = new kakao.maps.Map(mapContainer, options);
 
