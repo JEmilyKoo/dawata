@@ -90,16 +90,22 @@ export default function SettingPlayModal({
     setValue('spendTime', 1)
     setValue('playName', '')
   }
+
+  // 최대 playId를 추적하는 state 추가
+  const [nextPlayId, setNextPlayId] = useState(() => {
+    const maxId = playList.reduce((max, play) => Math.max(max, play.playId), 0)
+    return maxId + 1
+  })
+
   const onSubmit = (data: { playName: string; spendTime: number }) => {
     if (isCreate) {
       const newPlay: Play = {
-        playId: playList.length + 1,
+        playId: nextPlayId, // length + 1 대신 nextPlayId 사용
         playName: data.playName,
         spendTime: data.spendTime,
       }
       setPlayList([...playList, newPlay])
-      console.log('행동 추가하는 playName ', data.playName)
-      console.log('행동 추가하는 spendTime ', data.spendTime)
+      setNextPlayId(nextPlayId + 1) // 다음 ID 준비
     } else {
       const updatedPlayList = playList.map((play) =>
         play.playId === playId
