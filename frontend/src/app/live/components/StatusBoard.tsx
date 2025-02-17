@@ -35,3 +35,4 @@ export const StatusBoard = ({
     </View>
   )
 }
+export default StatusBoard

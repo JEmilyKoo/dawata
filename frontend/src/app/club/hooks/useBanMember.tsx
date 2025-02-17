@@ -22,3 +22,5 @@ export const useBanMember = ({ clubId, memberId }: UseBanMemberProps) => {
     fetchMemberBan()
   }, [clubId, memberId])
 }
+
+export default useBanMember

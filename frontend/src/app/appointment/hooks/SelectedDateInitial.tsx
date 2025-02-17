@@ -38,3 +38,5 @@ export function getSelectedDate(
       new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime(),
   )[0].scheduledAt
 }
+
+export default getSelectedDate

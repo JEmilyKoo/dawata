@@ -25,3 +25,5 @@ export const useUserAppointment = ({
 
   return { userAppointment }
 }
+
+export default useUserAppointment

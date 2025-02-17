@@ -18,9 +18,7 @@ export const UserDetail = ({ user }: { user: User }) => {
       />
       <View className="flex-1 ml-3">
         <Text className="text-lg font-semibold">{user.name}</Text>
-        <Text className="text-sm text-gray-500">
-          {user.details.lastActive}
-        </Text>
+        <Text className="text-sm text-gray-500">{user.details.lastActive}</Text>
       </View>
       <View className="flex-row gap-2">
         <TouchableOpacity className="p-2 bg-gray-300 rounded-xl">
@@ -33,3 +31,5 @@ export const UserDetail = ({ user }: { user: User }) => {
     </View>
   )
 }
+
+export default UserDetail

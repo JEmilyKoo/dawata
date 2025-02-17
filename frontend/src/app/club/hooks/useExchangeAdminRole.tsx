@@ -25,3 +25,5 @@ export const useExchangeAdminRole = ({
     fetchAdminRole()
   }, [clubId, newAdminId])
 }
+
+export default useExchangeAdminRole

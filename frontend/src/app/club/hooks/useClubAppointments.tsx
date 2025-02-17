@@ -40,3 +40,5 @@ export const useClubAppointments = ({
     loading,
   }
 }
+
+export default useClubAppointments

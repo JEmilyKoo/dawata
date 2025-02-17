@@ -26,3 +26,5 @@ export const useMarkedDates = ({ userAppointment }: UseMarkedDatesProps) => {
 
   return { markedDates }
 }
+
+export default useMarkedDates

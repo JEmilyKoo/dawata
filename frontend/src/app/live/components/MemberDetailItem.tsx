@@ -69,3 +69,5 @@ export const MemberDetailItem = ({ member }: { member: LiveMember | null }) => {
     )
   )
 }
+
+export default MemberDetailItem

@@ -255,3 +255,4 @@ export const dummyAppointmentList = [
     voteStatus: 'EXPIRED',
   },
 ]
+export default dummyAppointmentList

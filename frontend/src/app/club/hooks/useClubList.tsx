@@ -18,3 +18,5 @@ export const useClubList = () => {
 
   return { clubList }
 }
+
+export default useClubList

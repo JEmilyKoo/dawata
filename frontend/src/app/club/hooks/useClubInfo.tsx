@@ -25,3 +25,5 @@ export const useClub = ({ clubId }: { clubId: number }) => {
     loading,
   }
 }
+
+export default useClub
