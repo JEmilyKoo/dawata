@@ -94,10 +94,7 @@ const AppointmentList: React.FC = () => {
               <View
                 key={appointmentListInfo.appointmentInfo.appointmentId}
                 className="p-4">
-                <AppointmentItem
-                  appointmentListInfo={appointmentListInfo}
-                  userImages={userImages}
-                />
+                <AppointmentItem appointmentListInfo={appointmentListInfo} />
               </View>
             ))
         ) : (

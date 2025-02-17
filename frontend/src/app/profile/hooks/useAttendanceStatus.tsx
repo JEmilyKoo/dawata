@@ -26,3 +26,5 @@ export const useAttendanceStatus = () => {
 
   return { attendanceStatus, loading }
 }
+
+export default useAttendanceStatus

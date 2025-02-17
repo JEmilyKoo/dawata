@@ -1,17 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Dimensions,
-  Image,
   Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
+  StatusBar,
   View,
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 
+import Constants from 'expo-constants'
 import * as Location from 'expo-location'
 
 import BottomSheetContent from '@/app/live/components/BottomSheetContent'
@@ -93,23 +90,21 @@ export default function createAddress2() {
 
   const webViewRef = React.useRef<WebView>(null)
 
+  const kakaoJsApiKey = Constants.expoConfig?.extra?.kakaoJsApiKey
   const htmlContent = `
    <!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.EXPO_PUBLIC_KAKAO_MAP_JS_API_KEY}"></script>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
     <script type="text/javascript">
       function initTmap() {
-        console.log("집이나 가고 싶다");
-
         var mapContainer = document.getElementById('map'); // ID 수정
         var options = {
           center: new kakao.maps.LatLng(${create.latitude}, ${create.longitude}),
           level: 3
         };
-        
 
         var map = new kakao.maps.Map(mapContainer, options);
 
@@ -156,6 +151,11 @@ export default function createAddress2() {
     </View>
   ) : (
     <View className="flex-1">
+      <StatusBar
+        translucent={true}
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       <View className="relative flex-1">
         <WebView
           ref={webViewRef}

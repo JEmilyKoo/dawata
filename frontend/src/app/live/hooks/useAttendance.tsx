@@ -21,3 +21,5 @@ export const useAttendance = () => {
     toggleShowAbsent: () => dispatch(toggleShowAbsent()),
   }
 }
+
+export default useAttendance

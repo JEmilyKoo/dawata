@@ -24,3 +24,5 @@ export const useClubInvite = () => {
 
   return { targetMember }
 }
+
+export default useClubInvite

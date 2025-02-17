@@ -1,19 +1,19 @@
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 import { router } from 'expo-router'
 
-import BackButton from '@/components/BackButton'
+import TopHeader from '@/components/TopHeader'
 
 export default function EditProfile() {
   return (
-    <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
-        <View className="flex-row p-4 pt-2">
-          <BackButton />
-          <Text className="text-xl font-bold mt-2">내 정보</Text>
-        </View>
-      </View>
-
+    <SafeAreaView className="flex-1 bg-white">
+      <TopHeader title="내 정보" />
       <ScrollView>
         {/* 회원 정보 수정 */}
         <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">
@@ -96,6 +96,6 @@ export default function EditProfile() {
           </View>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }

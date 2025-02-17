@@ -18,7 +18,7 @@ import CloseCircleIcon from '@/assets/icons/close-circle.svg'
 import CrosshairIcon from '@/assets/icons/crosshair.svg'
 import MapPinIcon from '@/assets/icons/map-pin.svg'
 import SearchIcon from '@/assets/icons/search.svg'
-import BackButton from '@/components/BackButton'
+import TopHeader from '@/components/TopHeader'
 import Colors from '@/constants/Colors'
 import { RootState } from '@/store/store'
 import { AddressCreate, Coord } from '@/types/address'
@@ -56,6 +56,9 @@ export default function CreateAddress() {
     dispatch(setCreateRoadAddress(address.address_name))
     dispatch(setCreateLatitude(address.y))
     dispatch(setCreateLongitude(address.x))
+    router.push({
+      pathname: '/profile/createAddress2',
+    })
   }
 
   const fetchAddressCoord = async (roadAddress: string) => {
@@ -68,14 +71,14 @@ export default function CreateAddress() {
     }
     if (data.data.meta.total_count === 0) {
       setSearchedAddresses([])
-      return
-    }
-    if (data.data.documents) {
+    } else if (data.data.documents) {
       const roadAddress: Coord[] = data.data.documents.map((item: any) => {
         return {
-          address_name: item.road_address.address_name,
-          x: item.road_address.x,
-          y: item.road_address.y,
+          address_name: item.road_address
+            ? item.road_address.address_name
+            : item.address_name,
+          x: item.road_address ? item.road_address.x : item.address.x,
+          y: item.road_address ? item.road_address.y : item.address.y,
         }
       })
       if (roadAddress) {
@@ -95,12 +98,7 @@ export default function CreateAddress() {
   }
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 mb-3 border-b border-gray-200">
-        <View className="flex-row p-4 pt-2">
-          <BackButton />
-          <Text className="text-xl font-bold mt-2">주소 설정</Text>
-        </View>
-      </View>
+      <TopHeader title="주소 설정" />
       <ScrollView className="flex-1 w-full">
         <View className="w-100 flex-row border-b border-gray-200 px-4 my-3">
           <TouchableOpacity onPress={handleSubmit(onSubmit)}>
@@ -122,7 +120,7 @@ export default function CreateAddress() {
               />
             )}
           />
-          {inputValue && (
+          {inputValue != '' && (
             <TouchableOpacity onPress={() => setInputValue('')}>
               <CloseCircleIcon className="mr-2" />
             </TouchableOpacity>

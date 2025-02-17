@@ -21,3 +21,5 @@ export const useClubMemberList = ({ clubId }: { clubId: number }) => {
   }, [])
   return { clubMemberList }
 }
+
+export default useClubMemberList

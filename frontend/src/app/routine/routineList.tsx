@@ -15,6 +15,7 @@ import RoutineListItem from '@/app/routine/components/RoutineListItem'
 import PlusIcon from '@/assets/icons/plus.svg'
 import BackButton from '@/components/BackButton'
 import SlideModalUI from '@/components/SlideModalUI'
+import TopHeader from '@/components/TopHeader'
 import { Routine } from '@/types/routine'
 
 export default function RoutineList() {
@@ -46,13 +47,8 @@ export default function RoutineList() {
     })
   }
   return (
-    <View className="flex-1 bg-white p-4">
-      <View className="flex-row pb-2 border-b border-bord">
-        <BackButton />
-        <View className="flex-1 mt-2">
-          <Text className="text-xl font-bold">내 루틴 목록</Text>
-        </View>
-      </View>
+    <View className="flex-1 bg-white">
+      <TopHeader title="내 루틴 목록" />
       <FlatList
         data={routines}
         keyExtractor={(item) => item.routineId.toString()}

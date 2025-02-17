@@ -4,18 +4,21 @@ import { Image, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { MenuProvider } from 'react-native-popup-menu'
 import 'react-native-reanimated'
+import 'react-native-reanimated'
 import { Provider, useDispatch, useSelector } from 'react-redux'
 
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import { usePathname, useRouter } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
+import 'global.css'
 import { PersistGate } from 'redux-persist/integration/react'
 
 import ErrorModal from '@/components/ErrorModal'
 import { getFcmToken } from '@/services/firebaseService'
 import { setFCMToken } from '@/store/slices/authSlice'
 import { RootState } from '@/store/store'
+import { FontProvider } from '@/utils/FontContext'
 
 import '../../global.css'
 import i18n from '../../i18n'
@@ -95,18 +98,25 @@ function RootLayoutNav() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <MenuProvider>
-        <I18nextProvider i18n={i18n}>
-          <ErrorModal />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen
-              name="club"
-              options={{ headerShown: false }}
-            />
-          </Stack>
-        </I18nextProvider>
-      </MenuProvider>
+      <FontProvider>
+        <MenuProvider>
+          <Provider store={store}>
+            <I18nextProvider i18n={i18n}>
+              <ErrorModal />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen
+                  name="club"
+                  options={{
+                    headerShown: false,
+                    headerShadowVisible: false,
+                  }}
+                />
+              </Stack>
+            </I18nextProvider>
+          </Provider>
+        </MenuProvider>
+      </FontProvider>
     </GestureHandlerRootView>
   )
 }

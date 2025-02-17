@@ -1,100 +1,139 @@
-import React, { useCallback, useMemo, useRef } from "react"
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import React, { useEffect, useRef, useState } from 'react'
+import { View } from 'react-native'
+import { WebView } from 'react-native-webview'
 
-import BottomSheet from "@gorhom/bottom-sheet"
+import Constants from 'expo-constants'
+import * as Location from 'expo-location'
 
-export default function TestPage() {
-  // BottomSheet의 ref 설정
-  const bottomSheetRef = useRef<BottomSheet>(null)
+export default function LiveScreen() {
+  const webViewRef = useRef<WebView>(null)
+  const kakaoJsApiKey = Constants.expoConfig?.extra?.kakaoJsApiKey
+  const [webViewLoaded, setWebViewLoaded] = useState(false) // WebView 로드 상태 추적
 
-  // snapPoints 설정: BottomSheet 위치를 설정 (10%, 50%, 90%)
-  const snapPoints = useMemo(() => ["10%", "50%", "90%"], [])
+  useEffect(() => {
+    let unsubscribe: Location.LocationSubscription | null = null
 
-  // 상태 변경 핸들러 (BottomSheet 위치 변경 시)
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("Current BottomSheet index:", index)
-  }, [])
+    ;(async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        console.error('위치 권한이 거부되었습니다')
+        return
+      }
 
-  // BottomSheet 내용
-  const renderBottomSheetContent = () => (
-    <View style={styles.contentContainer}>
-      <Text style={styles.title}>BottomSheet Content</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => alert("Button Pressed!")}>
-        <Text style={styles.buttonText}>Press me</Text>
-      </TouchableOpacity>
-    </View>
-  )
+      unsubscribe = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000,
+          distanceInterval: 5,
+        },
+        (location) => {
+          const { latitude, longitude } = location.coords
+
+          console.log('📍 내 위치 전송: ', latitude, longitude)
+
+          if (webViewLoaded) {
+            webViewRef.current?.postMessage(
+              JSON.stringify({ latitude, longitude }),
+            )
+          }
+        },
+      )
+    })()
+
+    return () => {
+      // ✅ cleanup (위치 감지 중지)
+      if (unsubscribe) {
+        unsubscribe.remove()
+      }
+    }
+  }, [webViewLoaded])
+
+  const htmlContent = `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}&libraries=services"></script>
+      <script>
+        let map;
+        let marker;
+
+        function initKakaoMap() {
+          const container = document.getElementById('map_div');
+          const options = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 3
+          };
+          map = new kakao.maps.Map(container, options);
+        }
+
+        function updateMyLocation(lat, lng) {
+          console.log("📌 업데이트 위치: ", lat, lng)
+          const position = new kakao.maps.LatLng(lat, lng);
+          
+          if (!marker) {
+            marker = new kakao.maps.Marker({
+              position: position,
+              map: map
+            });
+          } else {
+            marker.setPosition(position);
+          }
+          map.setCenter(position);
+        }
+
+        // ✅ React Native → WebView 데이터 수신
+        window.addEventListener('message', (event) => {
+          try {
+            console.log('📩 메시지 수신 from RN')
+            const data = JSON.parse(event.data);
+            updateMyLocation(data.latitude, data.longitude);
+          } catch (e) {
+            console.error('🚨 잘못된 데이터: ', event.data);
+          }
+        });
+
+        function notifyReactNative() {
+          window.ReactNativeWebView.postMessage("WebView Loaded");
+        }
+      </script>
+      <style>
+        html, body, #map_div {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      </style>
+    </head>
+    <body onload="initKakaoMap(); notifyReactNative();">
+      <div id="map_div"></div>
+    </body>
+  </html>
+  `
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>BottomSheet Test Page</Text>
-
-      {/* BottomSheet Component */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={0} // 기본적으로 10% 위치에서 시작
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-        enablePanDownToClose={true} // 스와이프하여 닫을 수 있게 설정
-        style={styles.bottomSheet}>
-        {renderBottomSheetContent()}
-      </BottomSheet>
-
-      {/* Open BottomSheet Button */}
-      <TouchableOpacity
-        style={styles.testButton}
-        onPress={() => bottomSheetRef.current?.expand()} // expand()로 BottomSheet를 열기
-      >
-        <Text style={styles.buttonText}>Open BottomSheet</Text>
-      </TouchableOpacity>
+    <View className="flex-1">
+      <WebView
+        ref={webViewRef}
+        source={{ html: htmlContent }}
+        className="flex-1"
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        onMessage={(event) => {
+          console.log(
+            '📩 WebView → React Native 메시지 수신:',
+            event.nativeEvent.data,
+          )
+          if (event.nativeEvent.data === 'WebView Loaded') {
+            setWebViewLoaded(true)
+          }
+        }}
+        onError={(syntheticEvent) => {
+          console.warn('⚠️ WebView error: ', syntheticEvent.nativeEvent)
+        }}
+      />
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  bottomSheet: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000, // BottomSheet가 다른 요소 위로 올라오게 설정
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  button: {
-    padding: 10,
-    backgroundColor: "#4CAF50",
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-  testButton: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: "#2196F3",
-    borderRadius: 5,
-  },
-})

@@ -1,14 +1,25 @@
-const colors = require("./src/constants/Colors").default
+const colors = require('./src/constants/Colors').default
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // NOTE: Update this to include the paths to all of your component files.
   content: [
-    "./src/app/**/*.{js,jsx,ts,tsx}",
-    "./src/components/**/*.{js,jsx,ts,tsx}",
+    './src/app/**/*.{js,jsx,ts,tsx}',
+    './src/components/**/*.{js,jsx,ts,tsx}',
   ],
-  presets: [require("nativewind/preset")],
+  presets: [require('nativewind/preset')],
   theme: {
+    fontFamily: {
+      sans: ['NotoSansKR-Regular'], // Tailwind 기본 sans 덮어쓰기
+      thin: ['NotoSansKR-Thin'],
+      extraLight: ['NotoSansKR-ExtraLight'],
+      light: ['NotoSansKR-Light'],
+      regular: ['NotoSansKR-Regular'],
+      medium: ['NotoSansKR-Medium'],
+      semiBold: ['NotoSansKR-SemiBold'],
+      bold: ['NotoSansKR-Bold'],
+      extraBold: ['NotoSansKR-ExtraBold'],
+      black: ['NotoSansKR-Black'],
+    },
     extend: {
       colors: colors,
     },

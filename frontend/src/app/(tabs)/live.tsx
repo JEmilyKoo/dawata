@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 
+import Constants from 'expo-constants'
 import * as Location from 'expo-location'
 
 import BottomSheetContent from '@/app/live/components/BottomSheetContent'
@@ -50,115 +51,101 @@ export default function LiveScreen() {
   const handleChange = (newIndex: number) => {
     setIndex(newIndex)
   }
-  // 샘플 사용자 데이터
-  const users: User[] = [
-    {
-      id: '1',
-      name: '고성태',
-      avatar: require('@/assets/avatars/user1.png'),
-      details: {
-        status: '도착',
-        lastActive: '3분 5초 전 예정',
-      },
-    },
-    {
-      id: '2',
-      name: '구정은',
-      avatar: require('@/assets/avatars/user2.png'),
-      details: {
-        status: '미도착',
-        lastActive: '10분 전',
-      },
-    },
-  ]
 
   useEffect(() => {
     ;(async () => {
-      // 위치 권한 요청
       const { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
         console.error('위치 권한이 거부되었습니다')
         return
       }
 
-      // 실시간 위치 추적 시작
       Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
-          timeInterval: 5000, // 5초마다 업데이트
-          distanceInterval: 5, // 5미터 이상 이동 시 업데이트
+          timeInterval: 50,
+          distanceInterval: 5,
         },
         (location) => {
-          setCurrentLocation(location)
-          setLocationRecords((prev) => [
-            ...prev,
-            {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              timestamp: location.timestamp,
-            },
-          ])
+          console.log('내 위치를 받아옴', location)
+          const { latitude, longitude } = location.coords
 
-          // 지도에 현재 위치 표시를 위한 JavaScript 실행
+          // WebView로 위치 정보 전달
           webViewRef.current?.injectJavaScript(`
-            updateMyLocation(${location.coords.latitude}, ${location.coords.longitude});
+            window.dispatchEvent(new MessageEvent('message', {
+              data: JSON.stringify(location))
+            }));
           `)
         },
       )
     })()
   }, [])
 
+  const kakaoJSApiKey = Constants.expoConfig?.extra?.kakaoJSApiKey
+
   const webViewRef = React.useRef<WebView>(null)
 
   const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-        <script src="https://apis.openapi.sk.com/tmap/vectorjs?version=1&appKey=${TMAP_API_KEY}"></script>
-        <script type="text/javascript">
-          let map;
-          let marker;
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJSApiKey}&libraries=services"></script>
+      <script>
+        let map;
+        let marker;
 
-          function initTmap() {
-            map = new Tmapv3.Map("map_div", {
-              center: new Tmapv3.LatLng(37.566481622437934, 126.98502302169841),
-              width: "100%",
-              height: "100%",
-              zoom: 18
+        function initKakaoMap() {
+          const container = document.getElementById('map_div');
+          const options = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 3
+          };
+          map = new kakao.maps.Map(container, options);
+        }
+
+        function updateMyLocation(lat, lng) {
+          console.log("업데이트 마이 로케이션, lat,lng ")
+          const position = new kakao.maps.LatLng(lat, lng);
+          
+          if (!marker) {
+            marker = new kakao.maps.Marker({
+              position: position,
+              map: map
             });
+          } else {
+            marker.setPosition(position);
           }
+          map.setCenter(position);
+        }
 
-          function updateMyLocation(lat, lng) {
-            const position = new Tmapv3.LatLng(lat, lng);
-            console.log("position", position);
-            if (!marker) {
-              marker = new Tmapv3.Marker({
-                position: position,
-                map: map
-              });
-            } else {
-              marker.setPosition(position);
-            }
-
-            map.setCenter(position);
-          }
-        </script>
-        <style>
-          html, body, #map_div {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-          }
-        </style>
-      </head>
-      <body onload="initTmap()">
-        <div id="map_div"></div>
-      </body>
-    </html>
-  `
+        // React Native에서 호출할 함수 정의
+ document.addEventListener('message', function(event) {
+    try {
+      console.log("addEvent")
+      const data = JSON.parse(event.data);
+      console.log("Received from RN:", data);
+      updateMyLocation(data.latitude, data.longitude);
+    } catch (e) {
+      console.error('Invalid RN message:', event.data);
+    }
+  });
+      </script>
+      <style>
+        html, body, #map_div {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+      </style>
+    </head>
+    <body onload="initKakaoMap()">
+      <div id="map_div"></div>
+    </body>
+  </html>
+`
 
   return Platform.OS === 'web' ? (
     <View className="w-full h-full">
