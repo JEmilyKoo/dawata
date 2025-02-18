@@ -33,13 +33,14 @@ const fetchFCMToken = async () => {
   return await messaging().getToken()
 }
 
-export const getFcmToken = async () => {
+export const getFcmToken = async (FCMToken: string) => {
   try {
     const token = await fetchFCMToken()
-    if (token) {
+    if (token != FCMToken && token) {
       await insertFCMToken({ token })
+      return token
     }
-    return token
+    return false
   } catch (error) {
     throw error
   }

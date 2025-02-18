@@ -25,7 +25,7 @@ const clubSlice = createSlice({
   initialState,
   reducers: {
     resetCreate(state) {
-      state.create = initialState.create
+      Object.assign(state.create, initialState.create)
     },
     setCreateName(state, action) {
       state.create.name = action.payload

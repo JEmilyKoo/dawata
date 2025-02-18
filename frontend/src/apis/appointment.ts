@@ -28,25 +28,15 @@ interface UpdateAppointmentHostParams {
 // 약속 리스트 조회
 export const getAppointments = async ({
   clubId,
-  nextRange = 4,
-  prevRange = 4,
+  nextRange = 99,
+  prevRange = 99,
   date,
 }: GetAppointmentsParams) => {
   try {
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange, date },
     })
-    console.log(
-      '✅✅✅✅API REQUEST✅✅✅✅',
-      clubId,
-      nextRange,
-      prevRange,
-      date,
-    )
-    if (response) {
-      console.log('✅✅✅✅response✅✅✅✅', response)
-    }
-    return response
+    return response.data
   } catch (error) {
     console.error('⛔ 약속 리스트 조회 실패:')
     return null

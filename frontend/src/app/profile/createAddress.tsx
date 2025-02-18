@@ -101,8 +101,10 @@ export default function CreateAddress() {
       <TopHeader title="주소 설정" />
       <ScrollView className="flex-1 w-full">
         <View className="w-100 flex-row border-b border-gray-200 px-4 my-3">
-          <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-            <SearchIcon className="mr-2" />
+          <TouchableOpacity
+            className="mr-2"
+            onPress={handleSubmit(onSubmit)}>
+            <SearchIcon />
           </TouchableOpacity>
           <Controller
             control={control}

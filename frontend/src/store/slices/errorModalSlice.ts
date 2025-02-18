@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
+
 import { ErrorModalButtonTypes } from '@/constants/errors'
 import { ErrorModalProps } from '@/types/errors'
 
-const initialState:  ErrorModalProps = {
+const initialState: ErrorModalProps = {
   modalTitle: '에러 발생',
   modalContent: '에러가 발생했습니다.',
   primaryButtonType: ErrorModalButtonTypes.confirm,
@@ -15,14 +16,14 @@ const errorModalSlice = createSlice({
   initialState,
   reducers: {
     resetErrorModal(state) {
-      state = initialState
+      Object.assign(state, initialState)
     },
     setErrorModal(state, action) {
-      state.modalTitle = action.payload.modalTitle;
-      state.modalContent = action.payload.modalContent;
-      state.primaryButtonType = action.payload.primaryButtonType;
-      state.secondaryButtonType = action.payload.secondaryButtonType;
-      state.isVisible = action.payload.isVisible;
+      state.modalTitle = action.payload.modalTitle
+      state.modalContent = action.payload.modalContent
+      state.primaryButtonType = action.payload.primaryButtonType
+      state.secondaryButtonType = action.payload.secondaryButtonType
+      state.isVisible = action.payload.isVisible
     },
     setErrorModalVisible(state, action) {
       state.isVisible = action.payload

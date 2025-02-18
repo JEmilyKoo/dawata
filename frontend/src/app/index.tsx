@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import changeNavigationBarColor from 'react-native-navigation-bar-color'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Link } from 'expo-router'
@@ -30,6 +31,8 @@ export default function Index() {
       initKakao()
       dispatch(setIsInitialized(true))
     }
+
+    changeNavigationBarColor('white', true)
   }, [isInitialized, dispatch])
 
   const loginStart = async () => {

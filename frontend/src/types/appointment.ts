@@ -48,6 +48,7 @@ export interface AppointmentListInfo {
   appointmentInfo: AppointmentInfo
   participantInfos: ParticipantInfo[]
   voteStatus: string
+  votePlace: string
 }
 
 export interface AppointmentCreateInfo {
@@ -59,5 +60,42 @@ export interface AppointmentCreateInfo {
   memberIds: number[]
 }
 
+export interface CreateVoteInfo {
+  roadAddress: string
+  longitude: number
+  latitude: number
+  title: string
+  category: string
+  linkUrl: string
+}
+
+interface Participant {
+  memberId: number
+  participantId: number
+  nickname: string
+  img: string
+  latitude: number
+  longitude: number
+  duration: number
+  paths: string[]
+}
+
+export interface LocationData {
+  latitude: number
+  longitude: number
+  participantInfo: Participant[]
+}
+
+export interface RecommandApiResponse {
+  status: string
+  data: LocationData
+}
+
+export interface Standard {
+  title: string
+  latitude: number
+  longitude: number
+  isRecommanded: boolean
+}
 //약속 조회로 받아온 데이터의 끝에는  Info를 붙인다.
 //clubInfo, appointmentInfo, participantInfo, voteInfo

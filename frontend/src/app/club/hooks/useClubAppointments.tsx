@@ -20,7 +20,7 @@ export const useClubAppointments = ({
           date: date,
         })
         if (result) {
-          setAppointments(result.data)
+          setAppointments(result)
         } else {
           console.log('🚫🚫🚫🚫result is null🚫🚫🚫🚫')
         }

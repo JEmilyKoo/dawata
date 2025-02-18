@@ -1,14 +1,13 @@
-import { TouchableOpacity } from "react-native"
+import { TouchableOpacity } from 'react-native'
 
-import { useRouter } from "expo-router"
+import { useRouter } from 'expo-router'
 
-import ArrowLeftIcon from "@/assets/icons/chevron-left.svg"
+import ArrowLeftIcon from '@/assets/icons/chevron-left.svg'
 
 const BackButton = () => {
   const router = useRouter()
 
   const handlePress = () => {
-    console.log("뒤로 가기")
     router.back()
   }
 

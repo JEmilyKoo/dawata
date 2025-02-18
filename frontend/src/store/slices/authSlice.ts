@@ -28,7 +28,7 @@ const authSlice = createSlice({
       state.FCMToken = action.payload
     },
     clearTokens: (state) => {
-      state = initialState
+      Object.assign(state, initialState)
     },
   },
 })

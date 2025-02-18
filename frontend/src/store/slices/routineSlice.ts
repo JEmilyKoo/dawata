@@ -22,7 +22,7 @@ const routineSlice = createSlice({
   initialState,
   reducers: {
     initCreate(state) {
-      state.create = initialState.create
+      Object.assign(state.create, initialState.create)
     },
 
     setCreateRoutineName(state, action) {

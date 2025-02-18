@@ -1,17 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, SafeAreaView, Text, View } from 'react-native'
 import NativeDatePicker from 'react-native-date-picker'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
 import { useRouter } from 'expo-router'
 
 import { updateAppointment } from '@/apis/appointment'
+import PrevNextButton from '@/components/PrevNextButton'
+import StepIndicator from '@/components/StepIndicator'
+import TopHeader from '@/components/TopHeader'
 import WebDatePicker from '@/components/WebDatePicker'
 import { RootState } from '@/store/store'
-import { AppointmentInfo } from '@/types/appointment'
 
 import {
   setUpdateScheduledAt,
@@ -26,29 +26,33 @@ const AppointmentUpdate2 = () => {
 
   const [date, setDate] = useState(
     update.scheduledAt ? new Date(update.scheduledAt) : new Date(),
-  ) // 선택된 날짜 상태
-  const [open, setOpen] = useState(true) // React Native DatePicker 열고 닫는 상태
+  )
 
+  const [voteDate, setVoteDate] = useState(new Date(date))
   const minimumDate = () => {
     let today = new Date()
     today.setDate(today.getDate() - 1)
     return today
   }
   const handleConfirm = (date: Date) => {
-    setDate(date) // 선택한 날짜를 상태로 업데이트
+    console.log('date', date)
+    setDate(date)
   }
 
-  const onSubmit = async () => {
-    dispatch(setUpdateScheduledAt(date.toISOString()))
-    dispatch(
-      setUpdateVoteEndTime(
-        new Date(date.setDate(date.getDate() - 1)).toISOString(),
-      ),
-    )
-  }
+  useEffect(() => {
+    let vote = new Date(date)
+    vote.setDate(vote.getDate() - 1)
+    setVoteDate(vote)
+  }, [date])
+
+  const [next, setNext] = useState(false)
 
   const onPressNext = async () => {
-    await onSubmit()
+    dispatch(setUpdateScheduledAt(date.toISOString()))
+    dispatch(setUpdateVoteEndTime(voteDate.toISOString()))
+  }
+
+  const updateAppo = async () => {
     if (await updateAppointment(update)) {
       router.push({
         pathname: '/appointment/detail',
@@ -58,61 +62,96 @@ const AppointmentUpdate2 = () => {
       console.log('오류 발생')
     }
   }
+  const isFirstRender = useRef(true)
+
+  const isUpdating = useRef(false)
+
+  useEffect(() => {
+    if (next && !isUpdating.current) {
+      isUpdating.current = true
+      updateAppo().finally(() => {
+        isUpdating.current = false
+      })
+    }
+  }, [next])
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
+    if (update.voteEndTime) setNext(true)
+  }, [update.voteEndTime])
+
   const onPressPrev = () => {
-    onSubmit()
     router.push('/appointment/update1')
   }
-
   return (
-    <View className="flex-1 p-4 justify-between">
-      <Text className="text-xl font-bold mb-2">
-        약속 날짜와 시간을 설정해주세요
-      </Text>
+    <SafeAreaView className="flex-1 bg-white justify-between">
+      <View className="flex-1 justify-start">
+        <TopHeader title={t('updateAppointment.title')} />
+        <StepIndicator
+          step={2}
+          nowStep={2}
+        />
+        <Text className="text-text-primary text-xl font-bold p-5 mr-3">
+          {t('createAppointment.date.title')}
+        </Text>
 
-      {Platform.OS === 'web' ? (
-        <View>
-          <TouchableOpacity
-            className="p-2 bg-primary"
-            onPress={() => setOpen(true)}>
-            <Text className="text-white text-center">날짜와 시간 선택</Text>
-          </TouchableOpacity>
-          <View className="w-full h-1/2 items-center">
-            <WebDatePicker
-              date={date}
-              handleConfirm={handleConfirm}
-            />
+        <View className="flex-1 justify-center items-center">
+          {Platform.OS === 'web' ? (
+            <View>
+              <View className="w-full h-1/2 items-center">
+                <WebDatePicker
+                  date={date}
+                  handleConfirm={handleConfirm}
+                />
+              </View>
+            </View>
+          ) : (
+            <View className="bg-primary">
+              <NativeDatePicker
+                date={date}
+                onDateChange={handleConfirm}
+                minimumDate={minimumDate()}
+              />
+            </View>
+          )}
+          <View className="py-5 mb-4 w-3/4">
+            {[
+              { label: t('createAppointment.date.scheduledAt'), value: date },
+              {
+                label: t('createAppointment.date.voteEndTime'),
+                value: voteDate,
+              },
+            ].map(({ label, value }) => (
+              <View
+                key={label}
+                className="flex-row justify-between">
+                <Text className="text-base font-medium text-text-primary">
+                  {label}
+                </Text>
+                <Text className="text-base font-regular text-primary pl-1">
+                  {value.toLocaleString('ko', {
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}
+                </Text>
+              </View>
+            ))}
           </View>
-
-          <Text className="mb-4">
-            선택된 날짜와 시간: {format(date, 'PPP p', { locale: ko })}
-          </Text>
         </View>
-      ) : (
-        <View className="bg-primary">
-          <NativeDatePicker
-            open={open}
-            date={date}
-            onDateChange={handleConfirm}
-            minimumDate={minimumDate()}
-            onCancel={() => setOpen(false)}
-          />
-        </View>
-      )}
-      <View className="flex-row justify-between space-x-2">
-        <TouchableOpacity
-          className="bg-bord p-2 rounded w-1/4"
-          onPress={onPressPrev}>
-          <Text className="text-text-primary text-center font-bold">
-            {t('prev')}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="bg-primary p-2 rounded w-3/4"
-          onPress={onPressNext}>
-          <Text className="text-white text-center font-bold">{t('next')}</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+
+      <PrevNextButton
+        onPressPrev={onPressPrev}
+        onPressNext={onPressNext}
+      />
+    </SafeAreaView>
   )
 }
 
