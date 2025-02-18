@@ -103,7 +103,8 @@ function RootLayoutNav() {
           <Provider store={store}>
             <I18nextProvider i18n={i18n}>
               <ErrorModal />
-              <Stack screenOptions={{ headerShown: false }}>
+              <Stack
+                screenOptions={{ headerShown: false, statusBarStyle: 'dark' }}>
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen
                   name="club"

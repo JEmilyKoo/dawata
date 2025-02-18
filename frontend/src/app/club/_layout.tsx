@@ -6,7 +6,7 @@ export default function ClubLayout() {
   const pathname = usePathname()
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, statusBarStyle: 'dark' }}>
         <Stack.Screen
           name="create1"
           options={{

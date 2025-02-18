@@ -6,7 +6,7 @@ export default function AppointmentLayout() {
   const pathname = usePathname()
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, statusBarStyle: 'dark' }}>
         <Stack.Screen
           name="create1"
           options={{
@@ -33,7 +33,9 @@ export default function AppointmentLayout() {
         />
         <Stack.Screen name="detail" />
       </Stack>
-      {pathname.indexOf('create') == -1 && <TabBar />}
+      {pathname.indexOf('create') == -1 && pathname.indexOf('update') == -1 && (
+        <TabBar />
+      )}
     </>
   )
 }
