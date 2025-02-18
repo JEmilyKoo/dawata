@@ -6,6 +6,8 @@ import {
   AppointmentInfo,
   CreateVoteInfo,
   LocationData,
+  Recommand,
+  RecommandList,
   Standard,
 } from '@/types/appointment'
 
@@ -15,6 +17,8 @@ const initialState: {
   update: AppointmentInfo
   currentVoteStatus: string
   recommandedPlace: LocationData | null
+  recommandList: RecommandList[]
+  selectedRecommandList: Recommand[]
   createVoteItemList: CreateVoteInfo[]
   standardList: Standard[]
 } = {
@@ -36,7 +40,52 @@ const initialState: {
   },
   currentVoteStatus: '',
   recommandedPlace: null,
-  createVoteItemList: [],
+  recommandList: [
+    {
+      loading: 1,
+      category_group_code: 'SW8',
+      recommand: [
+        {
+          id: '1',
+          place_name: '추천타이틀',
+          category_name: '추천카테고리',
+          category_group_code: 'SW8',
+          category_group_name: 'category_group_name',
+          phone: 'phone',
+          address_name: 'address_name ',
+          road_address_name: '추천장소',
+          x: '126.902626',
+          y: '37.485005',
+          place_url: 'http://naver.com',
+        },
+      ],
+    },
+  ],
+  selectedRecommandList: [
+    {
+      id: '1',
+      place_name: '추천타이틀',
+      category_name: '추천카테고리',
+      category_group_code: 'SW8',
+      category_group_name: 'category_group_name',
+      phone: 'phone',
+      address_name: 'address_name ',
+      road_address_name: '추천장소',
+      x: '126.902626',
+      y: '37.485005',
+      place_url: 'http://naver.com',
+    },
+  ],
+  createVoteItemList: [
+    {
+      roadAddress: '추천장소',
+      longitude: 126.902626,
+      latitude: 37.485005,
+      title: '추천타이틀',
+      category: '추천카테고리',
+      linkUrl: 'http://naver.com',
+    },
+  ],
   standardList: [],
 }
 
@@ -108,6 +157,12 @@ const appointmentSlice = createSlice({
     addStandardList(state, action) {
       state.standardList = [...state.standardList, ...action.payload]
     },
+    setRecommandList(state, action) {
+      state.recommandList = action.payload
+    },
+    setSelectedRecommandList(state, action) {
+      state.selectedRecommandList = action.payload
+    },
   },
 })
 
@@ -130,5 +185,7 @@ export const {
   setRecommandedPlace,
   setCreateVoteItemList,
   setStandardList,
+  setRecommandList,
+  setSelectedRecommandList,
 } = appointmentSlice.actions
 export default appointmentSlice.reducer

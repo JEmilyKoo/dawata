@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  ActivityIndicator,
   Platform,
   StatusBar,
   Text,
@@ -9,8 +10,9 @@ import {
   View,
 } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
+import { Picker } from '@react-native-picker/picker'
 /// 화면에 지도를 띄운다
 
 import Constants from 'expo-constants'
@@ -18,17 +20,17 @@ import * as Location from 'expo-location'
 import { useRouter } from 'expo-router'
 
 import RecommandTabBar from '@/app/appointment/components/RecommandTabBar'
-import BottomSheetContent from '@/app/live/components/BottomSheetContent'
-import { MemberDetailItem } from '@/app/live/components/MemberDetailItem'
 import PlusCircleIcon from '@/assets/icons/plus-circle.svg'
 import BottomSheet from '@/components/BottomSheet'
-import PrevNextButton from '@/components/PrevNextButton'
 import Colors from '@/constants/Colors'
 import RecommandData from '@/constants/RecommandData'
-import { liveData } from '@/constants/liveData'
+import { CategoryGroupCodeTypes } from '@/constants/categoryGroupCode'
+import { setSelectedRecommandList } from '@/store/slices/appointmentSlice'
 import { RootState } from '@/store/store'
+import { CreateVoteInfo, Recommand, RecommandList } from '@/types/appointment'
 import { LiveMember } from '@/types/live'
 
+import CreateRecommandItem from './components/CreateRecommandItem'
 import CreateVoteItem from './components/CreateVoteItem'
 
 interface LocationRecord {
@@ -37,20 +39,20 @@ interface LocationRecord {
   timestamp: number
 }
 
-interface User {
-  id: string
-  name: string
-  avatar: string
-  location?: LocationRecord
-  details: {
-    status: string
-    lastActive: string
-  }
-}
-
-export default function createAddress2() {
+export default function createAddress4() {
   const { t } = useTranslation()
+
+  const dispatch = useDispatch()
   const create = useSelector((state: RootState) => state.address.create)
+  const createVoteItemList: CreateVoteInfo[] = useSelector(
+    (state: RootState) => state.appointment.createVoteItemList,
+  )
+  const selectedRecommandList: Recommand[] = useSelector(
+    (state: RootState) => state.appointment.selectedRecommandList,
+  )
+  const recommandList: RecommandList[] = useSelector(
+    (state: RootState) => state.appointment.recommandList,
+  )
 
   const [locationRecords, setLocationRecords] = useState<LocationRecord[]>([])
   const [currentLocation, setCurrentLocation] =
@@ -65,47 +67,53 @@ export default function createAddress2() {
     setIndex(newIndex)
   }
 
-  const deleteItem = (id: number) => {
+  const deleteItem = (id: string) => {
     console.log('deleteItem')
   }
+  const categoryCodes = Object.values(CategoryGroupCodeTypes)
 
-  const [target, setTarget] = useState(['추천 기준'])
+  const [pickedList, setPickedList] = useState<RecommandList | null>(null)
+  const [isEmpty, setIsEmpty] = useState(true)
+
+  const [categoryGroupCode, setCategoryGroupCode] = useState(
+    CategoryGroupCodeTypes.SW8,
+  )
+  useEffect(() => {
+    let list = recommandList?.find(
+      (item) => item.category_group_code == categoryGroupCode,
+    )
+    if (list) {
+      setPickedList(list)
+    } else {
+      setPickedList(null)
+    }
+  }, [categoryGroupCode])
 
   useEffect(() => {
-    ;(async () => {
-      // 위치 권한 요청
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status !== 'granted') {
-        console.error('위치 권한이 거부되었습니다')
-        return
-      }
+    setIsEmpty(
+      !pickedList ||
+        (pickedList.loading == 1 && pickedList.recommand.length == 0),
+    )
+  }, [pickedList])
 
-      // 실시간 위치 추적 시작
-      Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.High,
-          timeInterval: 5000, // 5초마다 업데이트
-          distanceInterval: 5, // 5미터 이상 이동 시 업데이트
-        },
-        (location) => {
-          setCurrentLocation(location)
-          setLocationRecords((prev) => [
-            ...prev,
-            {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              timestamp: location.timestamp,
-            },
-          ])
+  const handleSelect = (id: string, isSelected: boolean) => {
+    const hasList = selectedRecommandList.some((item) => item.id === id)
+    const result = recommandList
+      .filter((item) => item.category_group_code === 'SW8')
+      .flatMap((item) => item.recommand)
+      .find((recommand) => recommand.id === id)
 
-          // 지도에 현재 위치 표시를 위한 JavaScript 실행
-          webViewRef.current?.injectJavaScript(`
-            updateMyLocation(${location.coords.latitude}, ${location.coords.longitude});
-          `)
-        },
+    if (!hasList && !isSelected && result) {
+      dispatch(setSelectedRecommandList([...selectedRecommandList, result]))
+    } else if (hasList && !isSelected) {
+      dispatch(
+        setSelectedRecommandList(
+          selectedRecommandList.filter((item) => item.id !== id),
+        ),
       )
-    })()
-  }, [])
+    }
+    console.log('handleSelect 결과 ', selectedRecommandList)
+  }
 
   const webViewRef = React.useRef<WebView>(null)
   const onSubmit = () => {
@@ -115,8 +123,6 @@ export default function createAddress2() {
   const onPressNext = () => {
     console.log('data 확인', RecommandData)
     // onSubmit()
-
-    // router.push('/appointment/create4')
   }
   const onPressPrev = () => {
     onSubmit()
@@ -199,29 +205,76 @@ export default function createAddress2() {
           snaps={snapPoints}>
           <View>
             <View className="flex-row">
-              <TouchableOpacity className="bg-primary">
-                <Text>추천 기준</Text>
+              <TouchableOpacity className="bg-primary rounded-xl">
+                <Text className="text-white">추천 기준</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={addCreateVoteItem}>
+              <TouchableOpacity
+                className="flex-row border border-primary rounded-xl"
+                onPress={addCreateVoteItem}>
                 <PlusCircleIcon
                   width={20}
                   height={20}
                 />
-                <Text> 기준 추가</Text>
+                <Text className="text-primary"> 기준 추가</Text>
               </TouchableOpacity>
             </View>
             {!isList && (
               <View>
-                <Text> 추천</Text>
+                <Text>추천</Text>
+                <View className="border border-primary rounded-md">
+                  <Picker
+                    selectedValue={categoryGroupCode}
+                    onValueChange={setCategoryGroupCode}
+                    className="border-2 p-2 mb-4">
+                    {categoryCodes.map((item) => (
+                      <Picker.Item
+                        key={item}
+                        label={t(`categoryGroupCode.${item}`)}
+                        value={item}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+
+                {pickedList &&
+                  pickedList.loading == 1 &&
+                  pickedList.recommand.map((item, index) => (
+                    <CreateRecommandItem
+                      key={index}
+                      recommand={item}
+                      isSelected={selectedRecommandList.some(
+                        (srl) => srl.id === item.id,
+                      )}
+                      onSelect={handleSelect}
+                    />
+                  ))}
+
+                {pickedList && pickedList.loading == 0 && (
+                  <View className="inset-0 items-center justify-center">
+                    <ActivityIndicator
+                      size="small"
+                      color={Colors.primary}
+                    />
+                  </View>
+                )}
+                {isEmpty && (
+                  <View>
+                    <Text>{t('createAddress.search.error')}</Text>
+                  </View>
+                )}
               </View>
             )}
             {isList && (
               <View>
-                <CreateVoteItem
-                  id={3}
-                  deleteItem={deleteItem}
-                />
+                {selectedRecommandList &&
+                  selectedRecommandList.map((item) => (
+                    <CreateVoteItem
+                      key={item.id}
+                      recommand={item}
+                      deleteItem={deleteItem}
+                    />
+                  ))}
               </View>
             )}
           </View>

@@ -1,14 +1,15 @@
 import { Text, TouchableOpacity, View } from 'react-native'
 
 import MinusCircleIcon from '@/assets/icons/minus-circle.svg'
+import { Recommand } from '@/types/appointment'
 
 interface CreateVoteItemProps {
-  deleteItem: (id: number) => void
-  id: number
+  deleteItem: (id: string) => void
+  recommand: Recommand
 }
 
 export default function CreateVoteItem({
-  id,
+  recommand,
   deleteItem,
 }: CreateVoteItemProps) {
   return (
@@ -16,15 +17,17 @@ export default function CreateVoteItem({
       <View>
         <View className="flex-row">
           <Text className="text-text-primary font-bold text-base pt-[1px]">
-            {'title'}
+            {recommand.place_name}
           </Text>
-          <Text className="text-text-secondary text-sm pt-1">{'category'}</Text>
+          <Text className="text-text-secondary text-sm pt-1">
+            {recommand.category_name}
+          </Text>
         </View>
-        <Text>{'roadAddress'}</Text>
+        <Text>{recommand.road_address_name ?? recommand.address_name}</Text>
       </View>
       <TouchableOpacity
         onPress={() => {
-          deleteItem(id)
+          deleteItem(recommand.id)
         }}
         className="w-10 justify-center items-center">
         <MinusCircleIcon />
