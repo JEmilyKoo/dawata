@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:384341033074:android:552f0460d704a9957002eb",
+        "android_client_info": {
+          "package_name": "com.dawata.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSZlAQFzFBIr5p0otVdfn3w-KDLRKhau4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:384341033074:android:ea357da32d1609a47002eb",
         "android_client_info": {
           "package_name": "com.dawata.app"
