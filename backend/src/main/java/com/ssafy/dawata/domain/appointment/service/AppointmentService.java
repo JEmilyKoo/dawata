@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -51,7 +50,6 @@ import com.ssafy.dawata.domain.vote.entity.Voter;
 import com.ssafy.dawata.domain.vote.enums.VoteStatus;
 import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 import com.ssafy.dawata.domain.vote.repository.VoterRepository;
-import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +77,7 @@ public class AppointmentService {
 	private final RecommendService recommendService;
 
 	@Transactional
-	public void createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
+	public Long createAppointment(AppointmentWithParticipantsRequest requestDto, Long memberId) {
 		Appointment appointment = requestDto.toDto().toEntity();
 		final Appointment appointmentEntity = appointmentRepository.save(appointment);
 
@@ -105,6 +103,7 @@ public class AppointmentService {
 			);
 
 			participantRepository.save(participant);
+
 		});
 
 		// redis에 vote 만료시간으로 in
@@ -115,6 +114,7 @@ public class AppointmentService {
 			"",
 			redisService.getExpirationTime(appointmentEntity.getVoteEndTime(), LocalDateTime.now())
 		);
+		return appointment.getId();
 	}
 
 	// 내가 속해 있는 약속만 가져오기
@@ -127,6 +127,8 @@ public class AppointmentService {
 	) {
 		List<Appointment> appointments = appointmentRepository.findAppointmentsByMemberId(memberId, prevRange,
 			nextRange, currentYear, currentMonth);
+		appointments.sort(
+			Comparator.comparing(Appointment::getScheduledAt, Comparator.nullsLast(Comparator.naturalOrder())));
 
 		return makeAppointmentWithExtraInfoResponses(memberId, appointments);
 	}
