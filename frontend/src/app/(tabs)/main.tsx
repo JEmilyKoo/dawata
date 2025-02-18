@@ -18,6 +18,7 @@ import ChevronRightIcon from '@/assets/icons/chevron-right.svg'
 import AppointmentItem from '@/components/AppointmentItem'
 import ImageThumbnail from '@/components/ImageThumbnail'
 import Colors from '@/constants/Colors'
+import useCurrentMonth from '@/hooks/useCurrentMonth'
 import { setClubs } from '@/store/slices/clubSlice'
 import { RootState } from '@/store/store'
 import { AppointmentListInfo } from '@/types/appointment'
@@ -36,12 +37,8 @@ export default function MainScreen() {
   const [isAppoEmpty, setIsAppoEmpty] = useState(false)
 
   const today = new Date()
-  const [currentMonth, setCurrentMonth] = useState(
-    today.getFullYear() +
-      '-' +
-      (today.getMonth() + 1).toString().padStart(2, '0'),
-  )
-  //
+  const [currentMonth, setCurrentMonth] = useCurrentMonth()
+
   const fetchAppointments = async () => {
     try {
       setShowAppoLoading(true)
@@ -51,7 +48,7 @@ export default function MainScreen() {
         prevRange: 0,
       })
       if (result) {
-        setAppoList(result.data)
+        setAppoList(result)
       }
     } catch (error) {
       console.error('약속 목록을 가져오는 중 오류 발생:', error)

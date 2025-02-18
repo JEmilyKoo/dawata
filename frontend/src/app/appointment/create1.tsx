@@ -1,97 +1,91 @@
-import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Picker } from '@react-native-picker/picker'
 import { useRouter } from 'expo-router'
 
-import Category from '@/constants/Category'
+import { createAppointment } from '@/apis/appointment'
+import PrevNextButton from '@/components/PrevNextButton'
+import SelectMemberItem from '@/components/SelectMemberItem'
+import StepIndicator from '@/components/StepIndicator'
+import TopHeader from '@/components/TopHeader'
 import { RootState } from '@/store/store'
-import { AppointmentCreateInfo } from '@/types/appointment'
 
-import {
-  setCreateCategory,
-  setCreateName,
-} from '../../store/slices/appointmentSlice'
+import { setCreateMemberIds } from '../../store/slices/appointmentSlice'
+import { useClub } from '../club/hooks/useClubInfo'
 
 const AppointmentCreate1 = () => {
   const { t } = useTranslation()
-  const { create } = useSelector((state: RootState) => state.appointment)
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<AppointmentCreateInfo>({
-    defaultValues: {
-      name: create.name,
-      category: create.category,
-    },
-  })
   const dispatch = useDispatch()
   const router = useRouter()
+  const { user } = useSelector((state: RootState) => state.member)
+  const { create } = useSelector((state: RootState) => state.appointment) // Redux store에서 모든 데이터 가져오기
+  const { clubInfo } = useClub({ clubId: create.clubId })
+  const clubMembers = clubInfo?.members || []
+  const memberIds = create.memberIds
 
-  const onSubmit = (data: AppointmentCreateInfo) => {
-    dispatch(setCreateName(data.name))
-    dispatch(setCreateCategory(data.category))
+  const onSubmit = async () => {
+    dispatch(setCreateMemberIds(memberIds))
+
+    // if (await createAppointment(create)) {
+    //   router.push('/appointment/create4')
+    // } else {
+    //   console.log('오류 발생')
+    // }
+  }
+
+  const handleCheckboxChange = (value: number) => {
+    if (memberIds.includes(value)) {
+      dispatch(setCreateMemberIds(memberIds.filter((v) => v !== value)))
+    } else {
+      dispatch(setCreateMemberIds([...memberIds, value]))
+    }
+  }
+  const onPressNext = () => {
+    onSubmit()
+
     router.push('/appointment/create2')
   }
 
-  return (
-    <View className="flex-1 p-4">
-      <Text className="text-xl font-bold mb-2 text-text-primary">
-        {t('createAppointment.name.title')}
-      </Text>
-      <Text className="text-xs font-bold mb-2 text-text-secondary">
-        {t('createAppointment.name.subTitle')}
-      </Text>
-      <Controller
-        control={control}
-        name="name"
-        rules={{ required: t('createAppointment.name.error') }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            placeholder={t('createAppointment.name.title')}
-            onBlur={onBlur}
-            className="border-b-2 mb-4 border-primary"
-            onChangeText={onChange}
-            value={value}
-          />
-        )}
-      />
-      {errors.name && (
-        <Text className="text-light-red">{errors.name.message}</Text>
-      )}
+  const isUser = (memberId: number) => {
+    return memberId === user.id
+  }
+  const selectAll = () => {
+    if (clubMembers.length == 0) return
+    dispatch(setCreateMemberIds(clubMembers.map((item) => item.memberId)))
+  }
 
-      <Text className="text-xl font-bold mb-2 text-text-primary">
-        {t('createAppointment.category.title')}
-      </Text>
-      <Controller
-        control={control}
-        name="category"
-        render={({ field }) => (
-          <Picker
-            selectedValue={field.value}
-            onValueChange={field.onChange}
-            className="border-2 p-2 mb-4">
-            {
-              Category.map((item) => (
-                <Picker.Item
-                  key={item}
-                  label={t(`category.${item}`)}
-                  value={item}
-                />
-              ))}
-          </Picker>
-        )}
-      />
-      <TouchableOpacity
-        className="bg-primary p-2 rounded"
-        onPress={handleSubmit(onSubmit)}>
-        <Text className="text-white text-center font-bold">{t('next')}</Text>
-      </TouchableOpacity>
-    </View>
+  return (
+    <SafeAreaView className="flex-1 bg-white justify-between">
+      <View className="flex-1 justify-start">
+        <TopHeader title={t('createAppointment.title')} />
+        <StepIndicator
+          step={4}
+          nowStep={1}
+        />
+        <View className="p-5">
+          <Text className="text-xl font-bold mb-2">참여자를 선택해주세요</Text>
+          <View className="flex-row justify-end">
+            <TouchableOpacity onPress={selectAll}>
+              <Text className="text-base text-text-secondary">모두 선택</Text>
+            </TouchableOpacity>
+          </View>
+          {clubMembers &&
+            clubMembers.map((item) => (
+              <SelectMemberItem
+                key={item.memberId}
+                disabled={isUser(item.memberId)}
+                img={item.img}
+                name={item.nickname}
+                email={item.email}
+                checked={memberIds.includes(item.memberId)}
+                setChecked={() => handleCheckboxChange(item.memberId)}
+              />
+            ))}
+        </View>
+      </View>
+      <PrevNextButton onPressNext={onPressNext} />
+    </SafeAreaView>
   )
 }
 

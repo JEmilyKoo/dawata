@@ -17,185 +17,55 @@ import {
 import { useLocalSearchParams } from 'expo-router'
 import { router } from 'expo-router'
 
+import { getAppointments } from '@/apis/appointment'
 import AppointmentCalendar from '@/app/appointment/components/AppointmentCalendar'
 import AppointmentList from '@/app/appointment/components/AppointmentList'
+import { getSelectedDate } from '@/app/appointment/hooks/SelectedDateInitial'
+import AppointmentItem from '@/components/AppointmentItem'
 import TopHeader from '@/components/TopHeader'
+import { AppointmentListInfo } from '@/types/appointment'
 
-LocaleConfig.locales['kr'] = {
-  monthNames: [
-    '1월',
-    '2월',
-    '3월',
-    '4월',
-    '5월',
-    '6월',
-    '7월',
-    '8월',
-    '9월',
-    '10월',
-    '11월',
-    '12월',
-  ],
-  monthNamesShort: [
-    '1월',
-    '2월',
-    '3월',
-    '4월',
-    '5월',
-    '6월',
-    '7월',
-    '8월',
-    '9월',
-    '10월',
-    '11월',
-    '12월',
-  ],
-  dayNames: [
-    '일요일',
-    '월요일',
-    '화요일',
-    '수요일',
-    '목요일',
-    '금요일',
-    '토요일',
-  ],
-  dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-}
 LocaleConfig.defaultLocale = 'kr'
-interface ClubInfo {
-  clubId: number
-  name: string
-  img: any
-  category: string
-}
-
-interface AppointmentInfo {
-  appointmentId: number
-  name: string
-  category: string
-  scheduledAt: string
-  voteEndTime: string
-}
-
-interface ParticipantInfo {
-  email: string
-  isAttending: boolean
-  dailyStatus: string
-}
-
-interface VoteInfo {
-  content: string
-  isSelected: boolean
-}
-
-interface AppointmentsInfo {
-  clubInfo: ClubInfo
-  appointmentInfo: AppointmentInfo
-  participantInfo: ParticipantInfo[]
-  voteInfo: VoteInfo[]
-}
-type RouteParams = {
-  clubId: string
-}
 
 function Appointment() {
-  const params = useLocalSearchParams<RouteParams>()
-  const myClubs: ClubInfo[] = [
-    {
-      clubId: 1,
-      name: 'No.1',
-      img: require('@/assets/clubs/club1.png'),
-      category: '#스터디',
-    },
-    {
-      clubId: 2,
-      name: '역삼FC',
-      img: require('@/assets/clubs/club2.png'),
-      category: '#풋살',
-    },
-    {
-      clubId: 3,
-      name: 'DogLover',
-      img: require('@/assets/clubs/club3.png'),
-      category: '#애견',
-    },
-  ]
-  const userImages = [
-    require('@/assets/avatars/user1.png'),
-    require('@/assets/avatars/user2.png'),
-    require('@/assets/avatars/user3.png'),
-    require('@/assets/avatars/user4.png'),
-    require('@/assets/avatars/user5.png'),
-    require('@/assets/avatars/user6.png'),
-    require('@/assets/avatars/user7.png'),
-    require('@/assets/avatars/user8.png'),
-  ]
-  const AppointmentInfos: AppointmentsInfo[] = [
-    {
-      clubInfo: myClubs[0],
-      appointmentInfo: {
-        appointmentId: 1,
-        name: '1월 17일 스터디 • No.1',
-        category: '스터디',
-        scheduledAt: '2025-02-09T13:00:56',
-        voteEndTime: '2025-02-02T13:00:56',
-      },
-      participantInfo: [
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-      ],
-      voteInfo: [
-        {
-          content: '역삼 투썸플레이스',
-          isSelected: true,
-        },
-      ],
-    },
+  const [appointments, setAppointments] = useState<AppointmentListInfo[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null) // ✅ selectedDate 추가
 
-    {
-      clubInfo: myClubs[2],
-      appointmentInfo: {
-        appointmentId: 2,
-        name: '애견모임 • DogLover',
-        category: '애견',
-        scheduledAt: '2025-02-08T13:00:56',
-        voteEndTime: '2025-02-01T13:00:56',
-      },
-      participantInfo: [
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-        {
-          email: 'user1@example.com',
-          isAttending: true,
-          dailyStatus: '오늘 참여',
-        },
-      ],
-      voteInfo: [
-        {
-          content: '역삼 투썸플레이스',
-          isSelected: true,
-        },
-      ],
-    },
-  ]
   const [markedDates, setMarkedDates] = useState<{ [key: string]: number[] }>(
     {},
   )
 
   useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const data = await getAppointments({
+          nextRange: 4,
+          prevRange: 4,
+          date: '2025-02',
+        })
+        setAppointments(data || [])
+        setSelectedDate(
+          getSelectedDate(
+            data.map((a: AppointmentListInfo) => a.appointmentInfo),
+          ),
+        ) // ✅ 초기 selectedDate 설정
+      } catch (error) {
+        console.error('Failed to fetch appointments', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAppointments()
+  }, [])
+
+  useEffect(() => {
+    if (appointments.length == 0) {
+      return
+    }
     let newMarkedDates: { [key: string]: number[] } = {}
-    AppointmentInfos.forEach((info) => {
+    appointments.forEach((info) => {
       const dateKey = info.appointmentInfo.scheduledAt.split('T')[0] // "YYYY-MM-DD" 형식
       if (newMarkedDates[dateKey]) {
         if (newMarkedDates[dateKey].length > 3) {
@@ -206,7 +76,7 @@ function Appointment() {
       }
     })
     setMarkedDates(newMarkedDates)
-  }, [])
+  }, [appointments])
   interface Club {
     id: string
     name: string
@@ -219,23 +89,17 @@ function Appointment() {
     <SafeAreaView className="flex-1 bg-white">
       <TopHeader title="약속 모아보기" />
       <ScrollView>
-        {/* 캘린더 섹션 */}
         <AppointmentCalendar
           markedDates={markedDates}
-          appointments={AppointmentInfos.map((info) => info.appointmentInfo)}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
         />
-
-        {/* 스터디 목록 */}
-        {/* {AppointmentInfos.map((appointmentInfo) => (
-          <View className="p-4">
-            <AppointmentItem
-              key={appointmentInfo.appointmentInfo.appointmentId}
-              appointmentInfo={appointmentInfo}
-              userImages={userImages}
-            />{' '}
-          </View>
-        ))} */}
-        <AppointmentList />
+        <AppointmentList
+          appointments={appointments}
+          loading={loading}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
       </ScrollView>
     </SafeAreaView>
   )

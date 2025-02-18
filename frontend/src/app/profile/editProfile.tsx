@@ -5,17 +5,25 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { useDispatch } from 'react-redux'
 
-import { router } from 'expo-router'
+import { useRouter } from 'expo-router'
 
 import TopHeader from '@/components/TopHeader'
+import { clearTokens } from '@/store/slices/authSlice'
 
 export default function EditProfile() {
+  const dispatch = useDispatch()
+  const router = useRouter()
+
+  const logout = () => {
+    dispatch(clearTokens())
+    router.push('/')
+  }
   return (
     <SafeAreaView className="flex-1 bg-white">
       <TopHeader title="내 정보" />
       <ScrollView>
-        {/* 회원 정보 수정 */}
         <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">
           <View className="flex-1">
             <Text className="text-xl text-medium text-text-primary">
@@ -24,7 +32,6 @@ export default function EditProfile() {
           </View>
         </TouchableOpacity>
 
-        {/* 주소 관리 */}
         <TouchableOpacity
           onPress={() => {
             router.push({
@@ -59,7 +66,13 @@ export default function EditProfile() {
           <Text className="text-sm text-text-secondary">고객 지원</Text>
         </View>
 
-        <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">
+        <TouchableOpacity
+          className="flex-row items-center px-4 py-4 border-b border-gray-100"
+          onPress={() => {
+            router.push({
+              pathname: '/testPage2',
+            })
+          }}>
           <View className="flex-1">
             <Text className="text-xl text-medium text-text-primary">
               버그 및 오류 신고
@@ -80,7 +93,9 @@ export default function EditProfile() {
           <Text className="text-sm text-text-secondary">계정 관리</Text>
         </View>
 
-        <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">
+        <TouchableOpacity
+          className="flex-row items-center px-4 py-4 border-b border-gray-100"
+          onPress={logout}>
           <View className="flex-1">
             <Text className="text-xl text-medium text-text-primary">
               로그아웃

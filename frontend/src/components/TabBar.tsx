@@ -44,13 +44,13 @@ export default function TabBar() {
       style={{
         flexDirection: 'row',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        height: 85,
+        shadowOffset: { width: 0, height: 4 }, // 더 자연스러운 그림자
+        shadowOpacity: 0.55, // 더 부드러운 그림자
+        shadowRadius: 6, // 퍼지는 정도 증가
+        height: 65,
         paddingHorizontal: 10,
         backgroundColor: 'white',
-        elevation: 4,
+        elevation: 8, // Android에서 효과 강화
       }}>
       {tabs.map((tab) => {
         const isFocused = pathname.startsWith(`/${tab.name}`)
@@ -68,7 +68,7 @@ export default function TabBar() {
                 marginHorizontal: 10,
                 paddingTop: 10,
               },
-              tab.name === 'live' && { marginVertical: 8 },
+              tab.name === 'live' && { marginVertical: 8, marginTop: -6 },
             ]}>
             {tab.name === 'live' ? (
               <View style={{ width: 54 }}>
@@ -89,7 +89,8 @@ export default function TabBar() {
                 <Text
                   style={{
                     color: isFocused ? colors.primary : colors.secondary,
-                  }}>
+                  }}
+                  className="text-sm">
                   {t(tab.name)}
                 </Text>
               </>

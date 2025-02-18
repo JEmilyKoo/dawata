@@ -31,6 +31,7 @@ export default function AppointmentLayout() {
             title: '약속 생성',
           }}
         />
+        <Stack.Screen name="createAddress" />
         <Stack.Screen name="detail" />
       </Stack>
       {pathname.indexOf('create') == -1 && pathname.indexOf('update') == -1 && (

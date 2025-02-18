@@ -4,13 +4,21 @@ import { createSlice } from '@reduxjs/toolkit'
 import {
   AppointmentCreateInfo,
   AppointmentInfo,
+  CreateVoteInfo,
+  LocationData,
+  Standard,
 } from '@/types/appointment'
 
 const initialState: {
+  createAppointmentId: number
   create: AppointmentCreateInfo
   update: AppointmentInfo
   currentVoteStatus: string
+  recommandedPlace: LocationData | null
+  createVoteItemList: CreateVoteInfo[]
+  standardList: Standard[]
 } = {
+  createAppointmentId: 0,
   create: {
     name: '',
     category: '',
@@ -26,8 +34,10 @@ const initialState: {
     voteEndTime: '',
     appointmentId: 0,
   },
-
   currentVoteStatus: '',
+  recommandedPlace: null,
+  createVoteItemList: [],
+  standardList: [],
 }
 
 const appointmentSlice = createSlice({
@@ -57,9 +67,8 @@ const appointmentSlice = createSlice({
     setCreateMemberIds(state, action) {
       state.create.memberIds = action.payload
     },
-
     initUpdate(state) {
-      state.update = initialState.update
+      Object.assign(state.update, initialState.update)
     },
     patchUpdate(state, action) {
       state.update.name = action.payload.name
@@ -86,6 +95,19 @@ const appointmentSlice = createSlice({
     setCurrentVoteStatus(state, action) {
       state.currentVoteStatus = action.payload
     },
+
+    setRecommandedPlace(state, action) {
+      state.recommandedPlace = action.payload
+    },
+    setCreateVoteItemList(state, action) {
+      state.createVoteItemList = action.payload
+    },
+    setStandardList(state, action) {
+      state.standardList = action.payload
+    },
+    addStandardList(state, action) {
+      state.standardList = [...state.standardList, ...action.payload]
+    },
   },
 })
 
@@ -105,5 +127,8 @@ export const {
   setUpdateName,
   patchUpdate,
   initUpdate,
+  setRecommandedPlace,
+  setCreateVoteItemList,
+  setStandardList,
 } = appointmentSlice.actions
 export default appointmentSlice.reducer

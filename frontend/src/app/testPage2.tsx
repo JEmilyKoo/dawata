@@ -1,51 +1,64 @@
-import React, { useRef } from 'react'
-import { Button, View } from 'react-native'
+import React, { useRef, useState } from 'react'
+import { Button, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 
-export default function App() {
-  const webViewRef = useRef<WebView>(null)
+const WebViewTest = () => {
+  const webViewRef = useRef<WebView | null>(null)
+  const [nativeText, setNativeText] = useState('')
+  const [webviewText, setWebviewText] = useState('')
 
-  const sendMessageToWebView = () => {
-    const message = JSON.stringify({
-      type: 'update',
-      value: 'Hello from React Native!',
-    })
-    webViewRef.current?.postMessage(message)
+  const sendMessageToWebView = (message: string) => {
+    return `document.getElementById('webviewtextbox').value = '${message}';`
   }
+
+  const sendToWebView = () => {
+    const message = `in react native ${new Date()}`
+    webViewRef.current?.injectJavaScript(sendMessageToWebView(message))
+  }
+
+  const handleOnMessage = (event: any) => {
+    setNativeText(event.nativeEvent.data)
+  }
+
+  const onMessage = (event: unknown) => handleOnMessage(event)
+
+  const webViewContent = `
+    <!DOCTYPE html>
+    <html>
+    <body>
+      <input type="text" id="webviewtextbox" />
+      <button id="webviewButton">Send to React Native</button>
+      <script>
+        document.getElementById('webviewButton').addEventListener('click', function() {
+          window.ReactNativeWebView.postMessage('in webview ' + new Date());
+        });
+        window.addEventListener('message', function(event) {
+          document.getElementById('webviewtextbox').value = event.data;
+        });
+      </script>
+    </body>
+    </html>
+  `
 
   return (
     <View style={{ flex: 1 }}>
-      <Button
-        title="Send Message to WebView"
-        onPress={sendMessageToWebView}
-      />
       <WebView
-        ref={webViewRef}
-        source={{
-          html: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <script>
-              window.addEventListener('message', (event) => {
-                console.log('📩 Received message:', event.data);
-                document.getElementById('message').innerText = event.data;
-              });
-            </script>
-          </head>
-          <body>
-            <h1>WebView</h1>
-            <p id="message">Waiting for message...</p>
-          </body>
-          </html>
-        `,
-        }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        onMessage={(event) => {
-          console.log('📩 WebView → React Native:', event.nativeEvent.data)
-        }}
+        ref={(ref) => (webViewRef.current = ref)}
+        originWhitelist={['*']}
+        source={{ html: webViewContent }}
+        onMessage={onMessage}
+      />
+      <TextInput
+        value={nativeText}
+        editable={false}
+        style={{ borderWidth: 1, margin: 10, padding: 5 }}
+      />
+      <Button
+        title="Send to WebView"
+        onPress={sendToWebView}
       />
     </View>
   )
 }
+
+export default WebViewTest

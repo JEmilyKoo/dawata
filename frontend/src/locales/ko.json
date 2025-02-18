@@ -19,7 +19,11 @@
       "empty": "현재 그룹이 없습니다. 그룹을 추가해보세요."
     }
   },
+  "updateAppointment": {
+    "title": "약속 정보 수정"
+  },
   "createAppointment": {
+    "title": "약속 생성",
     "name": {
       "title": "약속 이름을 설정해주세요",
       "subTitle": "약속과 관련된 한 줄 설명을 작성해주세요.",
@@ -27,6 +31,11 @@
     },
     "category": {
       "title": "약속 카테고리를 설정해주세요"
+    },
+    "date": {
+      "title": "약속 날짜와 시간을 설정해주세요",
+      "scheduledAt": "약속 시간",
+      "voteEndTime": "투표 마감 시간"
     }
   },
   "createClub": {
@@ -112,5 +121,7 @@
       "title": "알 수 없는 오류",
       "content": "알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
     }
-  }
+  },
+  "recommand": "추천",
+  "list": "리스트"
 }

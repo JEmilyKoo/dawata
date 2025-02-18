@@ -21,6 +21,7 @@ import { getAddressCoord } from '@/apis/mapApi'
 import CloseCircleIcon from '@/assets/icons/close-circle.svg'
 import CrosshairIcon from '@/assets/icons/crosshair.svg'
 import MapPinIcon from '@/assets/icons/map-pin.svg'
+import PrevNextButton from '@/components/PrevNextButton'
 import Colors from '@/constants/Colors'
 import {
   setCreateAddressName,
@@ -90,7 +91,7 @@ export default function CreateAddress() {
   })
   return (
     <View className="flex-1 bg-white">
-      <ScrollView className="flex-1 w-full px-4">
+      <ScrollView className="flex-1 w-full px-4 ">
         <View className="my-3">
           <Text className="text-xl font-bold mb-3 text-text-primary">
             {t('createAddress.addressName.title')}
@@ -147,24 +148,13 @@ export default function CreateAddress() {
           )}
         </View>
       </ScrollView>
-      <View className="flex-row justify-between w-full pb-4">
-        <TouchableOpacity
-          className="bg-bord items-center p-2 rounded w-1/4"
-          onPress={() => {
-            router.back()
-          }}>
-          <Text className="text-text-primary text-center font-bold">
-            {t('prev')}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="bg-primary items-center p-2 ml-1 rounded w-3/4"
-          onPress={handleSubmit(onSubmit)}>
-          <Text className="text-white text-center font-bold">
-            {t('finish')}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <PrevNextButton
+        onPressPrev={() => {
+          router.back()
+        }}
+        onPressNext={handleSubmit(onSubmit)}
+        nextText={t('finish')}
+      />
     </View>
   )
 }
