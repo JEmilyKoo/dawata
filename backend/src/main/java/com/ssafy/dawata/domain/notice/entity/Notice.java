@@ -39,8 +39,6 @@ public class Notice {
 	@Column(nullable = false)
 	private int referenceId;
 
-	// TODO(고) : categoryId = Long
-
 	@Column(name = "is_read", nullable = false)
 	private boolean read = false;
 

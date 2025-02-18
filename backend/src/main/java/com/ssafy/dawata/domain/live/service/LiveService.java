@@ -20,7 +20,8 @@ import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.fcm.service.FCMService;
 import com.ssafy.dawata.domain.live.dto.MemberLocationDto;
 import com.ssafy.dawata.domain.live.dto.ParticipantDto;
-import com.ssafy.dawata.domain.live.dto.TMapResponse;
+import com.ssafy.dawata.domain.live.dto.TMapTransitResponse;
+import com.ssafy.dawata.domain.live.dto.TMapWalkResponse;
 import com.ssafy.dawata.domain.live.dto.request.UrgentRequest;
 import com.ssafy.dawata.domain.live.dto.response.LiveDetailResponse;
 import com.ssafy.dawata.domain.live.dto.response.LiveParticipantResponse;
@@ -129,17 +130,17 @@ public class LiveService {
 
 			// t map에 길찾기 요청 (걷는 기준)
 			try {
-				Map<String, Object> json = skOpenApiService.getWalkingRoute(
+				Map<String, Object> json = skOpenApiService.getRoute(
 					Double.parseDouble(locationArray[0]),
 					Double.parseDouble(locationArray[1]),
 					Double.parseDouble(arrivals[1]),
 					Double.parseDouble(arrivals[2])
 				);
 
-				TMapResponse tMapResponse =
-					objectMapper.convertValue(json, TMapResponse.class);
+				TMapWalkResponse tMapWalkResponse =
+					objectMapper.convertValue(json, TMapWalkResponse.class);
 
-				if (tMapResponse.getFeatures() != null && !tMapResponse.getFeatures().isEmpty()) {
+				if (tMapWalkResponse.getFeatures() != null && !tMapWalkResponse.getFeatures().isEmpty()) {
 					//리스트에 추가
 					participantResponseList.add(
 						LiveParticipantResponse.toResponse(
@@ -153,10 +154,10 @@ public class LiveService {
 							).toString(),
 							Double.parseDouble(locationArray[0]),
 							Double.parseDouble(locationArray[1]),
-							tMapResponse.getFeatures().get(0).getProperties().getTotalDistance() < 100 ?
+							tMapWalkResponse.getFeatures().get(0).getProperties().getTotalDistance() < 100 ?
 								ArrivalState.ARRIVED :
 								ArrivalState.NOT_ARRIVED,
-							tMapResponse.getFeatures().get(0).getProperties().getTotalTime()
+							tMapWalkResponse.getFeatures().get(0).getProperties().getTotalTime()
 						)
 					);
 				} else {
@@ -181,7 +182,6 @@ public class LiveService {
 			.build();
 	}
 
-	// TODO(고) : 테스트 필요
 	public LiveRoutineResponse findMyRoutineInLive(Long memberId) {
 		Long appointmentId = findLives(memberId);
 
@@ -191,6 +191,10 @@ public class LiveService {
 				.max(Comparator.comparingInt(v -> v.getVoters().size()))
 				.orElse(null);
 
+		if (appointmentId == 0 || maxVoteItem == null) {
+			  return null;
+		}
+
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("참가하는 약속이 없습니다."));
 
@@ -199,15 +203,18 @@ public class LiveService {
 				.orElseThrow(() -> new IllegalArgumentException("해당하는 참여자의 위치가 없"));
 
 		try {
-			Map<String, Object> walkingRoute = skOpenApiService.getWalkingRoute(
+			Map<String, Object> routine = skOpenApiService.getRoute(
 				memberLocationDto.latitude(),
 				memberLocationDto.longitude(),
 				maxVoteItem.getAddress().getLatitude(),
 				maxVoteItem.getAddress().getLongitude()
 			);
 
-			TMapResponse tMapResponse =
-				objectMapper.convertValue(walkingRoute, TMapResponse.class);
+			TMapTransitResponse response =
+				objectMapper.convertValue(routine, TMapTransitResponse.class);
+			List<TMapTransitResponse.Itinerary> itineraries =
+				response.getMetaData().getPlan().getItineraries();
+
 			Long routineTemplateId = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
 				.orElseThrow(() -> new IllegalArgumentException("조건에 맞는 참여자가 없습니다."))
 				.getRoutineTemplateId();
@@ -217,11 +224,15 @@ public class LiveService {
 					.orElseThrow(() -> new IllegalArgumentException("멤버 없음")));
 			RoutineTemplate routineTemplate = routineTemplateList.stream()
 				.filter(x -> x.getId() == routineTemplateId)
-				.findFirst().orElseThrow(() -> new IllegalArgumentException("routine 없음"));
+				.findFirst().orElse(null);
+
+			if (routineTemplate == null) {
+				return null;
+			}
 
 			LocalDateTime l = appointment.getScheduledAt()
 				.minusSeconds(
-					tMapResponse.getFeatures().get(0).getProperties().getTotalTime())
+					itineraries.get(0).getTotalTime())
 				.minusMinutes(
 					routineTemplate.getRoutineElements()
 						.stream()

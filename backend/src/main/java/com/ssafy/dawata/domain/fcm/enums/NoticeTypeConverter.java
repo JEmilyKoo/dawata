@@ -4,9 +4,9 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class NoticeTypeConverter implements AttributeConverter<NoticeType, Integer> {
+public class NoticeTypeConverter implements AttributeConverter<FCMNoticeType, Integer> {
 	@Override
-	public Integer convertToDatabaseColumn(NoticeType attribute) {
+	public Integer convertToDatabaseColumn(FCMNoticeType attribute) {
 		if (attribute == null)
 			return null;
 
@@ -14,11 +14,11 @@ public class NoticeTypeConverter implements AttributeConverter<NoticeType, Integ
 	}
 
 	@Override
-	public NoticeType convertToEntityAttribute(Integer dbData) {
+	public FCMNoticeType convertToEntityAttribute(Integer dbData) {
 		if (dbData == null)
 			return null;
 
-		return NoticeType.fromCodeToNoticeType(dbData); //숫자 -> string
+		return FCMNoticeType.fromCodeToNoticeType(dbData); //숫자 -> string
 	}
 }
 

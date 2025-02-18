@@ -30,7 +30,7 @@ public class RoutineService {
 
     public RoutineDetailResponse findRoutine(Long memberId, Long routineId) {
         return RoutineDetailResponse.builder()
-            .routineName(routineTemplateRepository.findById(memberId)
+            .routineName(routineTemplateRepository.findByIdAndMemberId(routineId, memberId)
                 .orElseThrow(IllegalArgumentException::new).getName())
             .playList(
                 routineTemplateRepository.customFindByRoutineId(routineId))

@@ -476,13 +476,13 @@ public class AppointmentService {
 				appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("조건에 해당하는 참여자가 없습니다."));
 
-		RoutineTemplate routineTemplate = routineTemplateRepository.findById(participant.getRoutineTemplateId())
+		RoutineTemplate routineTemplate = routineTemplateRepository.findById(requestDto.routineId())
 			.orElseThrow(() -> new IllegalArgumentException("해당하는 루틴이 존재하지 않습니다."));
 
 		if (!Objects.equals(routineTemplate.getMember().getId(), memberId)) {
 			throw new IllegalArgumentException("현재 회원의 루틴이 아닙니다.");
 		}
 
-		participant.updateRoutineId(participant.getRoutineTemplateId());
+		participant.updateRoutineId(routineTemplate.getId());
 	}
 }

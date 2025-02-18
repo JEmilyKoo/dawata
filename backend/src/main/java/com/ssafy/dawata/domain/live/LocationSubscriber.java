@@ -9,10 +9,9 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dawata.domain.common.service.RedisService;
-import com.ssafy.dawata.domain.live.dto.TMapResponse;
+import com.ssafy.dawata.domain.live.dto.TMapWalkResponse;
 import com.ssafy.dawata.domain.live.dto.request.LiveRequest;
 import com.ssafy.dawata.domain.live.dto.response.LiveResponse;
 import com.ssafy.dawata.domain.live.enums.ArrivalState;
@@ -60,7 +59,7 @@ public class LocationSubscriber implements MessageListener {
 				RedisKeyCategory.VOTE_RESULT.getKey() + appointmentId
 			).split(",");
 
-			// TODO(고) : redis에 해당 유저의 위치를 저장
+			// redis에 해당 유저의 위치를 저장
 			redisService.updateDataUseTTL(
 				redisTemplateForLiveLocation,
 				String.format(
@@ -73,19 +72,19 @@ public class LocationSubscriber implements MessageListener {
 
 
 			// t map에 길찾기 요청 (걷는 기준)
-			Map<String, Object> json = skOpenApiService.getWalkingRoute(
+			Map<String, Object> json = skOpenApiService.getRoute(
 				liveRequest.latitude(),
 				liveRequest.longitude(),
 				Double.parseDouble(arrivals[1]),
 				Double.parseDouble(arrivals[2])
 			);
 
-			TMapResponse tMapResponse =
-				objectMapper.convertValue(json, TMapResponse.class);
+			TMapWalkResponse tMapWalkResponse =
+				objectMapper.convertValue(json, TMapWalkResponse.class);
 
-			if (tMapResponse.getFeatures() != null && !tMapResponse.getFeatures().isEmpty()) {
-				int totalDistance = tMapResponse.getFeatures().get(0).getProperties().getTotalDistance();
-				int totalTime = tMapResponse.getFeatures().get(0).getProperties().getTotalTime();
+			if (tMapWalkResponse.getFeatures() != null && !tMapWalkResponse.getFeatures().isEmpty()) {
+				int totalDistance = tMapWalkResponse.getFeatures().get(0).getProperties().getTotalDistance();
+				int totalTime = tMapWalkResponse.getFeatures().get(0).getProperties().getTotalTime();
 
 				webSocketHandler.broadcast(
 					appointmentId,
