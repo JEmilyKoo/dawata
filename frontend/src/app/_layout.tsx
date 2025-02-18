@@ -83,14 +83,14 @@ function RootLayoutNav() {
   }, [socialLogin.accessToken, isInitialized])
 
   const fetchFcmToken = useCallback(async () => {
-    if (!isInitialized || FCMToken) return
+    if (!isInitialized || !socialLogin.accessToken) return
     try {
-      const result = await getFcmToken()
+      const result = await getFcmToken(FCMToken)
       if (result) dispatch(setFCMToken(result))
     } catch (error) {
       console.error('🚨 FCM 토큰 가져오기 실패:', error)
     }
-  }, [FCMToken, isInitialized])
+  }, [socialLogin.accessToken, FCMToken, isInitialized])
 
   useEffect(() => {
     fetchFcmToken()
