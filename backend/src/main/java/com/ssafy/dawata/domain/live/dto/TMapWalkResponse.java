@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true) // JSON에서 필요 없는 필드는 무시
-public class TMapResponse {
+public class TMapWalkResponse {
 
 	@JsonProperty("features")
 	private List<Feature> features;

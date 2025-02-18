@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,10 +29,13 @@ public class SkOpenApiService {
 	@Value("${sk.t_map_drive}")
 	private String tMapDriveUrl;
 
+	@Value("${sk.t_map_transit}")
+	private String tMapTransitUrl;
+
 	@Value("${sk.api_key}")
 	private String apiKey;
 
-	public Map<String, Object> getWalkingRoute(
+	public Map<String, Object> getRoute(
 		double startLat,
 		double startLnt,
 		double endLat,
@@ -52,13 +54,13 @@ public class SkOpenApiService {
 		requestBody.put("startY", startLat);
 		requestBody.put("endX", endLnt);
 		requestBody.put("endY", endLat);
-		requestBody.put("startName", "startName");
-		requestBody.put("endName", "endName");
+		// requestBody.put("startName", "startName");
+		// requestBody.put("endName", "endName");
 
 		// API 요청
 		ResponseEntity<String> response =
 			restTemplate.exchange(
-				tMapWalkUrl,
+				tMapTransitUrl,
 				HttpMethod.POST,
 				new HttpEntity<>(requestBody, headers),
 				String.class

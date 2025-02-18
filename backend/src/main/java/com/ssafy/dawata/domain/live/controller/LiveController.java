@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class LiveController {
 	private final LiveService liveService;
 
-	//TODO(고) : list -> 가장 최신 appointmentId로 수정
 	@Operation(summary = "현재 나의 live 조회",
 		description = "현재 나의 live 조회하는 작업을 수행합니다.")
 	@GetMapping
