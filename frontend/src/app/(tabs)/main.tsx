@@ -23,6 +23,8 @@ import { RootState } from '@/store/store'
 import { AppointmentListInfo } from '@/types/appointment'
 import { Club } from '@/types/club'
 
+import MainPlayList from '../routine/components/MainPlayList'
+
 export default function MainScreen() {
   const dispatch = useDispatch()
   const { clubs } = useSelector((state: RootState) => state.club)
@@ -110,7 +112,7 @@ export default function MainScreen() {
     <SafeAreaView className="flex-1 bg-white text-text-primary">
       <ScrollView className="flex-1 bg-white text-text-primary">
         {/* 타이머 섹션 */}
-        <View className="items-center p-5">
+        {/* <View className="items-center p-5">
           <Text className="text-5xl font-bold">00:59</Text>
           <Text className="text-base text-text-primary mt-2">
             일어나야 할 시간까지
@@ -123,7 +125,8 @@ export default function MainScreen() {
               <Text>옷 갈아입기 00:05</Text>
             </View>
           </View>
-        </View>
+        </View> */}
+        <MainPlayList />
 
         {/* 내 그룹 섹션 */}
         <View className="p-5">
