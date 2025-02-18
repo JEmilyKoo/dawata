@@ -105,15 +105,7 @@ public class AppointmentService {
 			participantRepository.save(participant);
 
 		});
-
-		// redis에 vote 만료시간으로 in
-		System.out.println(redisService.getExpirationTime(appointmentEntity.getVoteEndTime(), LocalDateTime.now()));
-		redisService.saveDataUseTTL(
-			redisTemplateForOthers,
-			RedisKeyCategory.APPOINTMENT_VOTE.getKey() + appointmentEntity.getId(),
-			"",
-			redisService.getExpirationTime(appointmentEntity.getVoteEndTime(), LocalDateTime.now())
-		);
+		
 		return appointment.getId();
 	}
 
