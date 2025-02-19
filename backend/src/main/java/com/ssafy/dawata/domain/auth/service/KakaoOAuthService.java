@@ -42,31 +42,28 @@ public class KakaoOAuthService {
 
 	public LoginResponse socialLogin(String accessToken) {
 		KakaoOAuth2Response attributes = getUserInfoFromKakao(accessToken);
-		Authentication authentication = createMemberAuthentication(attributes);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		return generateJwt(authentication);
+		return createMemberAndCreateJwt(attributes);
 	}
 
-	private LoginResponse generateJwt(Authentication authentication) {
+	private LoginResponse createMemberAndCreateJwt(KakaoOAuth2Response attributes) {
+		String email = attributes.email();
+		boolean exists = memberRepository.existsByEmail(email);
+
+		Member member = memberRepository.findByEmail(email)
+			.orElseGet(() -> memberRepository.save(Member.createMember(email, attributes.name())));
+
+		SecurityMemberDetails principal = new SecurityMemberDetails(member);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+			principal, null
+		);
+
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 		return new LoginResponse(
 			tokenProvider.createAccessToken(authentication),
 			tokenProvider.createRefreshToken(authentication),
-			tokenProvider.getExpiration()
+			tokenProvider.getExpiration(),
+			!exists
 		);
-	}
-
-	private Authentication createMemberAuthentication(KakaoOAuth2Response attributes) {
-		String email = attributes.email();
-
-		Member member = memberRepository.findByEmail(email)
-			.orElseGet(() -> memberRepository.save(
-					Member.createMember(email, attributes.name())
-				)
-			);
-
-		SecurityMemberDetails principal = new SecurityMemberDetails(member);
-
-		return new UsernamePasswordAuthenticationToken(principal, null);
 	}
 
 	private KakaoOAuth2Response getUserInfoFromKakao(String accessToken) {

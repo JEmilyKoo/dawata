@@ -61,4 +61,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 			WHERE p.id = :participantId
 		""")
 	Optional<Long> customFindByParticipantId(@Param("participantId") Long participantId);
+
+	boolean existsByEmail(String email);
 }
