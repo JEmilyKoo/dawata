@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.live.dto.request.UrgentRequest;
+import com.ssafy.dawata.domain.live.service.LiveKitTokenService;
 import com.ssafy.dawata.domain.live.service.LiveService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LiveController {
 	private final LiveService liveService;
+	private final LiveKitTokenService liveKitTokenService;
 
-	//TODO(고) : list -> 가장 최신 appointmentId로 수정
 	@Operation(summary = "현재 나의 live 조회",
 		description = "현재 나의 live 조회하는 작업을 수행합니다.")
 	@GetMapping
@@ -64,4 +65,21 @@ public class LiveController {
 		liveService.postUrgentNotification(memberDetails.member().getId(), urgentRequest);
 		return ResponseEntity.ok(ApiResponse.success());
 	}
+
+	@Operation(summary = "화상 통화 토큰 발급", description = "화상 통화를 위한 토큰을 발급합니다.")
+	@GetMapping("/{appointmentId}/token")
+	public ResponseEntity<ApiResponse<String>> getLiveKitToken(
+		@PathVariable Long appointmentId,
+		@AuthenticationPrincipal SecurityMemberDetails memberDetails
+	) {
+		return ResponseEntity.ok(
+			ApiResponse.success(
+				liveKitTokenService.getLiveKitToken(
+					appointmentId,
+					memberDetails.member().getEmail()
+				)
+			)
+		);
+	}
+
 }

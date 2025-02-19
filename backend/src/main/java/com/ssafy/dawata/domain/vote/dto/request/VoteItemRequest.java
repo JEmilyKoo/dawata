@@ -23,7 +23,10 @@ public record VoteItemRequest(
 	String category,
 
 	@Schema(description = "링크 URL", example = "http://example.com")
-	String linkUrl
+	String linkUrl,
+
+	@Schema(description = "투표 항목 확정", example = "false")
+	Boolean isOnly
 ) {
 
 }

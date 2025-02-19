@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,9 @@ import com.ssafy.dawata.domain.club.repository.ClubMemberRepository;
 import com.ssafy.dawata.domain.common.service.RedisService;
 import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.fcm.service.FCMService;
+import com.ssafy.dawata.domain.live.dto.BestTimeAndDistanceResponse;
 import com.ssafy.dawata.domain.live.dto.MemberLocationDto;
 import com.ssafy.dawata.domain.live.dto.ParticipantDto;
-import com.ssafy.dawata.domain.live.dto.TMapResponse;
 import com.ssafy.dawata.domain.live.dto.request.UrgentRequest;
 import com.ssafy.dawata.domain.live.dto.response.LiveDetailResponse;
 import com.ssafy.dawata.domain.live.dto.response.LiveParticipantResponse;
@@ -77,7 +76,7 @@ public class LiveService {
 
 	/**
 	 * 재촉기능
-	 * */
+	 */
 	public void postUrgentNotification(Long memberId, UrgentRequest urgentRequest) {
 		// 재촉알림 fcm
 		fcmService.sendNotification(
@@ -91,7 +90,7 @@ public class LiveService {
 
 	/**
 	 * Live기능 Detail
-	 * */
+	 */
 	public LiveDetailResponse findLiveDetail(Long id, Long appointmentId) {
 		List<Long> memberList =
 			objectMapper.convertValue(
@@ -109,6 +108,7 @@ public class LiveService {
 		List<LiveParticipantResponse> participantResponseList = new ArrayList<>();
 
 		for (Long memberId : memberList) {
+
 			ParticipantDto participantDto =
 				clubMemberRepository.findByMemberIdToParticipantDto(memberId)
 					.orElseThrow(() -> new IllegalArgumentException("참여자가 없습니다."));
@@ -129,17 +129,14 @@ public class LiveService {
 
 			// t map에 길찾기 요청 (걷는 기준)
 			try {
-				Map<String, Object> json = skOpenApiService.getWalkingRoute(
+				BestTimeAndDistanceResponse bestApiResponse = skOpenApiService.getBestApiResponse(
 					Double.parseDouble(locationArray[0]),
 					Double.parseDouble(locationArray[1]),
 					Double.parseDouble(arrivals[1]),
 					Double.parseDouble(arrivals[2])
 				);
 
-				TMapResponse tMapResponse =
-					objectMapper.convertValue(json, TMapResponse.class);
-
-				if (tMapResponse.getFeatures() != null && !tMapResponse.getFeatures().isEmpty()) {
+				if (bestApiResponse.totalDistance() != -1 && bestApiResponse.totalTime() != -1) {
 					//리스트에 추가
 					participantResponseList.add(
 						LiveParticipantResponse.toResponse(
@@ -153,10 +150,10 @@ public class LiveService {
 							).toString(),
 							Double.parseDouble(locationArray[0]),
 							Double.parseDouble(locationArray[1]),
-							tMapResponse.getFeatures().get(0).getProperties().getTotalDistance() < 100 ?
+							bestApiResponse.totalDistance() < 100 ?
 								ArrivalState.ARRIVED :
 								ArrivalState.NOT_ARRIVED,
-							tMapResponse.getFeatures().get(0).getProperties().getTotalTime()
+							bestApiResponse.totalTime()
 						)
 					);
 				} else {
@@ -181,7 +178,6 @@ public class LiveService {
 			.build();
 	}
 
-	// TODO(고) : 테스트 필요
 	public LiveRoutineResponse findMyRoutineInLive(Long memberId) {
 		Long appointmentId = findLives(memberId);
 
@@ -191,6 +187,10 @@ public class LiveService {
 				.max(Comparator.comparingInt(v -> v.getVoters().size()))
 				.orElse(null);
 
+		if (appointmentId == 0 || maxVoteItem == null) {
+			return null;
+		}
+
 		Appointment appointment = appointmentRepository.findById(appointmentId)
 			.orElseThrow(() -> new IllegalArgumentException("참가하는 약속이 없습니다."));
 
@@ -199,15 +199,13 @@ public class LiveService {
 				.orElseThrow(() -> new IllegalArgumentException("해당하는 참여자의 위치가 없"));
 
 		try {
-			Map<String, Object> walkingRoute = skOpenApiService.getWalkingRoute(
+			BestTimeAndDistanceResponse bestApiResponse = skOpenApiService.getBestApiResponse(
 				memberLocationDto.latitude(),
 				memberLocationDto.longitude(),
 				maxVoteItem.getAddress().getLatitude(),
 				maxVoteItem.getAddress().getLongitude()
 			);
 
-			TMapResponse tMapResponse =
-				objectMapper.convertValue(walkingRoute, TMapResponse.class);
 			Long routineTemplateId = participantRepository.findByMemberIdAndAppointmentId(memberId, appointmentId)
 				.orElseThrow(() -> new IllegalArgumentException("조건에 맞는 참여자가 없습니다."))
 				.getRoutineTemplateId();
@@ -217,11 +215,15 @@ public class LiveService {
 					.orElseThrow(() -> new IllegalArgumentException("멤버 없음")));
 			RoutineTemplate routineTemplate = routineTemplateList.stream()
 				.filter(x -> x.getId() == routineTemplateId)
-				.findFirst().orElseThrow(() -> new IllegalArgumentException("routine 없음"));
+				.findFirst().orElse(null);
+
+			if (routineTemplate == null) {
+				return null;
+			}
 
 			LocalDateTime l = appointment.getScheduledAt()
 				.minusSeconds(
-					tMapResponse.getFeatures().get(0).getProperties().getTotalTime())
+					bestApiResponse.totalTime())
 				.minusMinutes(
 					routineTemplate.getRoutineElements()
 						.stream()

@@ -35,11 +35,8 @@ public class Notice {
 	@Column(nullable = false)
 	private int messageType;
 
-	// TODO(고) : referenceId = Long
 	@Column(nullable = false)
-	private int referenceId;
-
-	// TODO(고) : categoryId = Long
+	private Long referenceId;
 
 	@Column(name = "is_read", nullable = false)
 	private boolean read = false;
@@ -55,19 +52,24 @@ public class Notice {
 	private Member member;
 
 	@Builder(access = AccessLevel.PRIVATE)
-	public Notice(NoticeType noticeType, int messageType, int referenceId, boolean read, boolean deleted) {
+	public Notice(NoticeType noticeType, int messageType, Long referenceId, Member member) {
 		this.noticeType = noticeType;
 		this.messageType = messageType;
 		this.referenceId = referenceId;
-		this.read = read;
-		this.deleted = deleted;
+		this.member = member;
 	}
 
-	public static Notice createNotice(NoticeType noticeType, int messageType, int referenceId) {
+	public static Notice createNotice(
+		NoticeType noticeType,
+		int messageType,
+		Long referenceId,
+		Member member
+	) {
 		return Notice.builder()
 			.noticeType(noticeType)
 			.messageType(messageType)
 			.referenceId(referenceId)
+			.member(member)
 			.build();
 	}
 

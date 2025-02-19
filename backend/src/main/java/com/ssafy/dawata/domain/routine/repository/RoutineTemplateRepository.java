@@ -5,6 +5,8 @@ import com.ssafy.dawata.domain.routine.dto.response.RoutineElementResponse;
 import com.ssafy.dawata.domain.routine.dto.response.RoutineTemplateResponse;
 import com.ssafy.dawata.domain.routine.entity.RoutineTemplate;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +44,14 @@ public interface RoutineTemplateRepository extends JpaRepository<RoutineTemplate
     RoutineTemplate save(RoutineTemplate routineTemplate);
 
     List<RoutineTemplate> findAllByMember(Member member);
+
+    @Query("""
+          SELECT rt
+          FROM RoutineTemplate  rt
+          WHERE rt.id = :routineId AND rt.member.id = :memberId
+        """)
+    Optional<RoutineTemplate> findByIdAndMemberId(
+        @Param("routineId")Long routineId,
+        @Param("memberId")Long memberId
+    );
 }

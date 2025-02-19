@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -59,18 +60,15 @@ public class TransitResponse {
 	@Setter
 	public static class Leg {
 		private String mode;
-		private int sectionTime;
-		private int distance;
 		private Place start;
 		private Place end;
-		private List<Step> steps;
+		private PassShape passShape;
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	@Getter
 	@Setter
 	public static class Place {
-		private String name;
 		private Double lon;
 		private Double lat;
 	}
@@ -78,15 +76,42 @@ public class TransitResponse {
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	@Getter
 	@Setter
-	public static class Step {
-		private String streetName;
-		private int distance;
-		private String description;
+	public static class PassShape {
 		private String linestring;
 	}
 
 	public int getTotalTime() {
-		return metaData.getPlan().getItineraries().get(0).getTotalTime();
+		if (metaData == null || metaData.getPlan() == null || metaData.getPlan().getItineraries() == null
+			|| metaData.getPlan().getItineraries().isEmpty()) {
+			return Integer.MAX_VALUE;
+		}
+		return Math.round((float)metaData.getPlan().getItineraries().get(0).getTotalTime() / 60);
+	}
+
+	public List<String> getPaths() {
+		List<String> result = new ArrayList<>();
+
+		if (metaData == null || metaData.getPlan() == null || metaData.getPlan().getItineraries() == null
+			|| metaData.getPlan().getItineraries().isEmpty()) {
+			return result;
+		}
+
+		List<Leg> legs = metaData.getPlan().getItineraries().get(0).getLegs();
+
+		for (Leg leg : legs) {
+			if (
+				leg.getMode().equals("WALK")
+					|| leg.getMode().equals("BUS")
+					|| leg.getMode().equals("EXPRESSBUS")
+			) {
+				result.add(leg.getStart().getLat() + "," + leg.getStart().getLon());
+			}
+
+			if (leg.getMode().equals("SUBWAY")) {
+				result.addAll(List.of(leg.getPassShape().linestring.split(" ")));
+			}
+		}
+		return result;
 	}
 
 	public static TransitResponse errorResponse() {

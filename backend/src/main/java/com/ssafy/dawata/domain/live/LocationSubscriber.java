@@ -1,7 +1,5 @@
 package com.ssafy.dawata.domain.live;
 
-import java.util.Map;
-
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,10 +7,9 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dawata.domain.common.service.RedisService;
-import com.ssafy.dawata.domain.live.dto.TMapResponse;
+import com.ssafy.dawata.domain.live.dto.BestTimeAndDistanceResponse;
 import com.ssafy.dawata.domain.live.dto.request.LiveRequest;
 import com.ssafy.dawata.domain.live.dto.response.LiveResponse;
 import com.ssafy.dawata.domain.live.enums.ArrivalState;
@@ -60,47 +57,50 @@ public class LocationSubscriber implements MessageListener {
 				RedisKeyCategory.VOTE_RESULT.getKey() + appointmentId
 			).split(",");
 
-			// TODO(고) : redis에 해당 유저의 위치를 저장
+			// redis에 해당 유저의 위치를 저장
 			redisService.updateDataUseTTL(
 				redisTemplateForLiveLocation,
 				String.format(
 					RedisKeyCategory.LIVE_LOCATION.getKey(),
-					new Object[]{Long.parseLong(appointmentId), liveRequest.memberId()}
+					new Object[] {Long.parseLong(appointmentId), liveRequest.memberId()}
 				),
-				liveRequest.latitude()+","+ liveRequest.longitude(),
+				liveRequest.latitude() + "," + liveRequest.longitude(),
 				A_DAY
 			);
 
-
 			// t map에 길찾기 요청 (걷는 기준)
-			Map<String, Object> json = skOpenApiService.getWalkingRoute(
-				liveRequest.latitude(),
-				liveRequest.longitude(),
-				Double.parseDouble(arrivals[1]),
-				Double.parseDouble(arrivals[2])
-			);
+			BestTimeAndDistanceResponse bestApiResponse =
+				skOpenApiService.getBestApiResponse(
+					liveRequest.latitude(),
+					liveRequest.longitude(),
+					Double.parseDouble(arrivals[1]),
+					Double.parseDouble(arrivals[2])
+				);
 
-			TMapResponse tMapResponse =
-				objectMapper.convertValue(json, TMapResponse.class);
-
-			if (tMapResponse.getFeatures() != null && !tMapResponse.getFeatures().isEmpty()) {
-				int totalDistance = tMapResponse.getFeatures().get(0).getProperties().getTotalDistance();
-				int totalTime = tMapResponse.getFeatures().get(0).getProperties().getTotalTime();
-
+			if (bestApiResponse.totalDistance() != -1 && bestApiResponse.totalTime() != -1) {
 				webSocketHandler.broadcast(
 					appointmentId,
 					objectMapper.writeValueAsString(
 						LiveResponse.of(
 							liveRequest,
-							totalDistance < 100 ?
+							bestApiResponse.totalDistance() < 100 ?
 								ArrivalState.ARRIVED :
 								ArrivalState.NOT_ARRIVED,
-							totalTime)
+							bestApiResponse.totalTime()
+						)
 					)
 				);
-
 			} else {
-				throw new IllegalArgumentException("데이터를 전달할 수 없습니다.");
+				webSocketHandler.broadcast(
+					appointmentId,
+					objectMapper.writeValueAsString(
+						LiveResponse.of(
+							liveRequest,
+							ArrivalState.LOST,
+							bestApiResponse.totalTime()
+						)
+					)
+				);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

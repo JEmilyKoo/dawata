@@ -28,7 +28,6 @@ import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantAttendingRequest;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantDailyStatusRequest;
 import com.ssafy.dawata.domain.participant.dto.request.ParticipantRoutineRequest;
-import com.ssafy.dawata.global.util.GeoMidpointUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -44,13 +43,13 @@ public class AppointmentController {
 
 	@Operation(summary = "약속 생성", description = "새로운 약속을 생성합니다.")
 	@PostMapping
-	public ResponseEntity<ApiResponse<?>> createAppointment(
+	public ResponseEntity<ApiResponse<Long>> createAppointment(
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails,
 		@RequestBody AppointmentWithParticipantsRequest requestDto
 	) {
-		appointmentService.createAppointment(requestDto, memberDetails.member().getId());
+		Long appointmentId = appointmentService.createAppointment(requestDto, memberDetails.member().getId());
 		return ResponseEntity.ok(
-			ApiResponse.success()
+			ApiResponse.success(appointmentId)
 		);
 	}
 

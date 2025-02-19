@@ -43,7 +43,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 
 	@Query("SELECT a FROM Appointment a " +
 		"JOIN FETCH a.voteItems p " +
-		"WHERE a.id = :appointmentId")
+		"WHERE a.id = :appointmentId"
+	)
 	Optional<Appointment> findAppointmentByIdWithVoteItems(Long appointmentId);
 
 	@Query("""
@@ -61,13 +62,19 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 		@Param("twoHoursLater") LocalDateTime twoHoursLater
 	);
 
-	@Query("SELECT DISTINCT p.appointment FROM Participant p " +
-		"WHERE p.clubMember.club.id IN :clubIds " +
-		"AND p.appointment.scheduledAt BETWEEN :startDate AND :endDate")
-	List<Appointment> findAppointmentsByClubIds(
-		@Param("clubIds") List<Long> clubIds,
-		@Param("startDate") LocalDateTime startDate,
-		@Param("endDate") LocalDateTime endDate
+	@EntityGraph(attributePaths = {"participants", "participants.clubMember",
+		"participants.clubMember.club"}, type = EntityGraph.EntityGraphType.FETCH)
+	@Query("""
+		    SELECT DISTINCT a 
+		    FROM Appointment a 
+		    JOIN Participant p ON a.id = p.appointment.id 
+		    JOIN ClubMember cm ON p.clubMember.id = cm.id 
+		    JOIN Club c ON cm.club.id = c.id 
+		    WHERE cm.club.id = :clubId 
+		    ORDER BY a.scheduledAt ASC
+		""")
+	List<Appointment> findAppointmentsByClubId(
+		@Param("clubId") Long clubId
 	);
 
 }
