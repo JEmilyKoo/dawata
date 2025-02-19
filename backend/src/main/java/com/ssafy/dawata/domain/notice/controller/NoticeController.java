@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
@@ -27,12 +26,18 @@ public class NoticeController {
 
 	private final NoticeService noticeService;
 
+	/*
+	 * TODO(고)
+	 *  각 요소마다 이미지가 같은 문제 발생
+	 *    -> 앞에 코드로 그때마다 s3로 특정 요소를 불러와야 한다.
+	 *  1,2 -> 그룹 / 3, 4, 5 -> 우리 로고
+	 * */
 	@Operation(summary = "내 모든 알림 조회",
 		description = "내 모든 알림을 조회하는 작업을 수행합니다.")
 	@GetMapping()
 	public ResponseEntity<ApiResponse<Slice<NoticeResponse>>> getNotices(
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails
-		) {
+	) {
 		return ResponseEntity.ok(ApiResponse.success(noticeService.findNoticeList(memberDetails.member().getId())));
 	}
 

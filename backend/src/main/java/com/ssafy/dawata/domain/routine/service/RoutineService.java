@@ -12,6 +12,7 @@ import com.ssafy.dawata.domain.routine.repository.RoutineElementRepository;
 import com.ssafy.dawata.domain.routine.repository.RoutineTemplateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
