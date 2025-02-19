@@ -69,14 +69,11 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.toResponseEntity(CommonErrorCode.METHOD_NOT_ALLOWED);
 	}
 
-	@ExceptionHandler(value = {Exception.class, RuntimeException.class, SQLException.class, DataIntegrityViolationException.class,
-		DataAccessResourceFailureException.class})
+	@ExceptionHandler
 	protected ResponseEntity<ErrorResponse> handleInternalException(
 		final Exception e,
 		final HttpServletRequest request
 	) {
-		log.error("Exception: {}", e.getMessage());
-		e.printStackTrace();
 		return ErrorResponse.toResponseEntity(CommonErrorCode.INTERNAL_SERVER_ERROR);
 	}
 }
