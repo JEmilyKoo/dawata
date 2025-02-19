@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router'
 
 import TopHeader from '@/components/TopHeader'
 import { clearTokens } from '@/store/slices/authSlice'
+import { resetStore } from '@/store/store'
 
 export default function EditProfile() {
   const dispatch = useDispatch()
@@ -18,6 +19,7 @@ export default function EditProfile() {
 
   const logout = () => {
     dispatch(clearTokens())
+    dispatch(resetStore())
     router.push('/')
   }
   return (

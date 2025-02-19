@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
   Platform,
+  ScrollView,
   StatusBar,
   Text,
   Touchable,
@@ -12,22 +13,43 @@ import {
 import { WebView } from 'react-native-webview'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { Picker } from '@react-native-picker/picker'
-/// 화면에 지도를 띄운다
-
 import Constants from 'expo-constants'
 import * as Location from 'expo-location'
 import { useRouter } from 'expo-router'
 
+/// 화면에 지도를 띄운다
+import { searchByCategory } from '@/apis/mapApi'
 import RecommandTabBar from '@/app/appointment/components/RecommandTabBar'
-import PlusCircleIcon from '@/assets/icons/plus-circle.svg'
+import PlusCirclePrimaryIcon from '@/assets/icons/plus-circle-primary.svg'
 import BottomSheet from '@/components/BottomSheet'
 import Colors from '@/constants/Colors'
 import RecommandData from '@/constants/RecommandData'
 import { CategoryGroupCodeTypes } from '@/constants/categoryGroupCode'
-import { setSelectedRecommandList } from '@/store/slices/appointmentSlice'
+import {
+  addStandardRecommand,
+  resetAppointmentState,
+  resetRecommandStandard,
+  setRecommandList,
+  setSelectedRecommandList,
+  setStandardList,
+  updateLoading,
+  updatePickList,
+  updateRecommandList,
+  updateRecommandedStandardCoordinates,
+  updateStandardRecommandList,
+} from '@/store/slices/appointmentSlice'
 import { RootState } from '@/store/store'
-import { CreateVoteInfo, Recommand, RecommandList } from '@/types/appointment'
+import {
+  CategoryGroupCodeType,
+  CreateVoteInfo,
+  LocationData,
+  Recommand,
+  RecommandList,
+  Standard,
+  StandardRecommand,
+} from '@/types/appointment'
 import { LiveMember } from '@/types/live'
 
 import CreateRecommandItem from './components/CreateRecommandItem'
@@ -44,14 +66,25 @@ export default function createAddress4() {
 
   const dispatch = useDispatch()
   const create = useSelector((state: RootState) => state.address.create)
+
   const createVoteItemList: CreateVoteInfo[] = useSelector(
     (state: RootState) => state.appointment.createVoteItemList,
   )
+  const recommandedPlace: LocationData | null = useSelector(
+    (state: RootState) => state.appointment.recommandedPlace,
+  )
+
   const selectedRecommandList: Recommand[] = useSelector(
     (state: RootState) => state.appointment.selectedRecommandList,
   )
   const recommandList: RecommandList[] = useSelector(
     (state: RootState) => state.appointment.recommandList,
+  )
+  const standardList: Standard[] = useSelector(
+    (state: RootState) => state.appointment.standardList,
+  )
+  const standardRecommandList: StandardRecommand[] = useSelector(
+    (state: RootState) => state.appointment.standardRecommandList,
   )
 
   const [locationRecords, setLocationRecords] = useState<LocationRecord[]>([])
@@ -59,7 +92,7 @@ export default function createAddress4() {
     useState<Location.LocationObject | null>(null)
   const [selectedUser, setSelectedUser] = useState<LiveMember | null>(null)
   const [index, setIndex] = useState(0)
-  const snapPoints = useMemo(() => ['10%', '30%'], [])
+  const snapPoints = useMemo(() => ['10%', '30%', '50%'], [])
 
   const [isList, setIsList] = useState(true)
   const router = useRouter()
@@ -68,51 +101,119 @@ export default function createAddress4() {
   }
 
   const deleteItem = (id: string) => {
-    console.log('deleteItem')
+    dispatch(
+      setSelectedRecommandList(
+        selectedRecommandList.filter((item) => item.id !== id),
+      ),
+    )
   }
   const categoryCodes = Object.values(CategoryGroupCodeTypes)
 
   const [pickedList, setPickedList] = useState<RecommandList | null>(null)
   const [isEmpty, setIsEmpty] = useState(true)
-
   const [categoryGroupCode, setCategoryGroupCode] = useState(
     CategoryGroupCodeTypes.SW8,
   )
-  useEffect(() => {
-    let list = recommandList?.find(
-      (item) => item.category_group_code == categoryGroupCode,
-    )
-    if (list) {
-      setPickedList(list)
-    } else {
-      setPickedList(null)
-    }
-  }, [categoryGroupCode])
+  const [standardId, setStandardId] = useState<number>(-1)
 
   useEffect(() => {
+    if (!recommandedPlace?.latitude) return
+
+    let targetStandard = standardRecommandList.find(
+      (item) => item.standard.standardId == 0,
+    )
+
+    let newStandard = {
+      title: '추천장소',
+      latitude: recommandedPlace.latitude,
+      longitude: recommandedPlace.longitude,
+      isRecommanded: true,
+      standardId: 0,
+    }
+
+    if (targetStandard) {
+      dispatch(resetRecommandStandard(newStandard))
+    } else {
+      dispatch(addStandardRecommand(newStandard))
+    }
+    setStandardId(0)
+  }, [recommandedPlace])
+
+  const fetchPickedList = async () => {
+    console.log('아니씨발업뎃을 했잖아', pickedList)
+    if (standardId < 0) return
+    const props = {
+      category_group_code: categoryGroupCode,
+      x: standardRecommandList.find(
+        (item) => item.standard.standardId == standardId,
+      )?.standard.longitude,
+      y: standardRecommandList.find(
+        (item) => item.standard.standardId == standardId,
+      )?.standard.latitude,
+      radius: 1000,
+    }
+    const response = await searchByCategory(props)
+
+    let data: Recommand[] = response?.data?.documents
+
+    data = data.map((item) => ({
+      ...item,
+      standardId: standardId,
+    }))
+
+    let newPickedList = {
+      category_group_code: categoryGroupCode,
+      recommand: data,
+      loading: 1,
+    }
+    setPickedList(newPickedList)
+
+    // dispatch(updatePickList({ newPickedList, standardId }))
+  }
+
+  useEffect(() => {
+    console.log('pickedList', pickedList)
+    if (!pickedList && standardId >= 0) {
+      setPickedList(
+        standardRecommandList
+          .find((item) => item.standard.standardId == standardId)
+          ?.recommandList.find(
+            (item) => item.category_group_code == categoryGroupCode,
+          ),
+      )
+    }
     setIsEmpty(
       !pickedList ||
         (pickedList.loading == 1 && pickedList.recommand.length == 0),
     )
-  }, [pickedList])
+
+    if (pickedList?.loading == -1) {
+      setPickedList({
+        ...pickedList,
+        loading: 0,
+      })
+      fetchPickedList()
+    }
+    if (pickedList?.loading == 1) {
+      dispatch(updatePickList({ pickedList, standardId }))
+    }
+  }, [pickedList, categoryGroupCode, standardId])
 
   const handleSelect = (id: string, isSelected: boolean) => {
     const hasList = selectedRecommandList.some((item) => item.id === id)
-    const result = recommandList
-      .filter((item) => item.category_group_code === 'SW8')
-      .flatMap((item) => item.recommand)
-      .find((recommand) => recommand.id === id)
-
-    if (!hasList && !isSelected && result) {
-      dispatch(setSelectedRecommandList([...selectedRecommandList, result]))
-    } else if (hasList && !isSelected) {
+    if (hasList) {
       dispatch(
         setSelectedRecommandList(
           selectedRecommandList.filter((item) => item.id !== id),
         ),
       )
+      return
     }
-    console.log('handleSelect 결과 ', selectedRecommandList)
+    if (!pickedList) return
+    const result = pickedList.recommand.find((item) => item.id === id)
+    if (!hasList && result) {
+      dispatch(setSelectedRecommandList([...selectedRecommandList, result]))
+    }
   }
 
   const webViewRef = React.useRef<WebView>(null)
@@ -122,7 +223,6 @@ export default function createAddress4() {
 
   const onPressNext = () => {
     console.log('data 확인', RecommandData)
-    // onSubmit()
   }
   const onPressPrev = () => {
     onSubmit()
@@ -203,16 +303,20 @@ export default function createAddress4() {
         <BottomSheet
           handleChange={handleChange}
           snaps={snapPoints}>
-          <View>
+          <View className="p-4">
             <View className="flex-row">
-              <TouchableOpacity className="bg-primary rounded-xl">
+              <TouchableOpacity
+                className="bg-primary rounded-xl justify-center items-center p-1 mr-1"
+                onPress={() => {
+                  dispatch(resetAppointmentState())
+                }}>
                 <Text className="text-white">추천 기준</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="flex-row border border-primary rounded-xl"
+                className="flex-row border border-primary rounded-xl justify-center items-center p-1"
                 onPress={addCreateVoteItem}>
-                <PlusCircleIcon
+                <PlusCirclePrimaryIcon
                   width={20}
                   height={20}
                 />
@@ -220,9 +324,8 @@ export default function createAddress4() {
               </TouchableOpacity>
             </View>
             {!isList && (
-              <View>
-                <Text>추천</Text>
-                <View className="border border-primary rounded-md">
+              <View className="mt-4 h-100">
+                <View className="border border-primary rounded-md h- mb-3">
                   <Picker
                     selectedValue={categoryGroupCode}
                     onValueChange={setCategoryGroupCode}
@@ -232,23 +335,29 @@ export default function createAddress4() {
                         key={item}
                         label={t(`categoryGroupCode.${item}`)}
                         value={item}
+                        color={Colors.text.primary}
                       />
                     ))}
                   </Picker>
                 </View>
-
-                {pickedList &&
-                  pickedList.loading == 1 &&
-                  pickedList.recommand.map((item, index) => (
-                    <CreateRecommandItem
-                      key={index}
-                      recommand={item}
-                      isSelected={selectedRecommandList.some(
-                        (srl) => srl.id === item.id,
-                      )}
-                      onSelect={handleSelect}
-                    />
-                  ))}
+                <View style={{ height: '75%' }}>
+                  <BottomSheetScrollView style={{ flex: 1 }}>
+                    {pickedList &&
+                      pickedList.loading == 1 &&
+                      pickedList.recommand.map((item, index) => (
+                        <CreateRecommandItem
+                          key={index}
+                          index={index}
+                          recommand={item}
+                          isSelected={selectedRecommandList.some(
+                            (srl) => srl.id === item.id,
+                          )}
+                          onSelect={handleSelect}
+                        />
+                      ))}
+                    {/* <View className="h-[195px] w-full bg-white"></View> */}
+                  </BottomSheetScrollView>
+                </View>
 
                 {pickedList && pickedList.loading == 0 && (
                   <View className="inset-0 items-center justify-center">
@@ -265,8 +374,9 @@ export default function createAddress4() {
                 )}
               </View>
             )}
+
             {isList && (
-              <View>
+              <BottomSheetScrollView>
                 {selectedRecommandList &&
                   selectedRecommandList.map((item) => (
                     <CreateVoteItem
@@ -275,7 +385,8 @@ export default function createAddress4() {
                       deleteItem={deleteItem}
                     />
                   ))}
-              </View>
+                {/* <View className="h-[195px] w-full bg-primary"></View> */}
+              </BottomSheetScrollView>
             )}
           </View>
         </BottomSheet>

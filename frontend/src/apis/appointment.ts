@@ -46,16 +46,16 @@ export const getAppointments = async ({
 // 약속 생성
 export const createAppointment = async (
   appointmentCreateInfo: AppointmentCreateInfo,
-): Promise<boolean> => {
+): Promise<number> => {
   try {
-    const { status } = (await api.post<BooleanResponse>(
+    const { data } = (await api.post<BooleanResponse>(
       `/appointments`,
       appointmentCreateInfo,
     )) as unknown as BooleanResponse
-    return status === 'success'
+    return data
   } catch (error) {
     console.error('⛔ 약속 생성 실패')
-    return false
+    return 0
   }
 }
 
@@ -133,3 +133,14 @@ export const updateAppointmentHost = async (
 
 // 투표 방의 투표 항목 생성
 // 투표하기 (다중 투표 가능)
+
+// 장소 추천 받기
+export const recommendPlace = async (appointmentId: number) => {
+  try {
+    const response = await api.get(`/appointments/${appointmentId}/place`)
+    return response.data
+  } catch (error) {
+    console.error('⛔ 장소 추천 받기 실패:')
+    return null
+  }
+}

@@ -9,29 +9,38 @@ import PrevNextButton from '@/components/PrevNextButton'
 import SelectMemberItem from '@/components/SelectMemberItem'
 import StepIndicator from '@/components/StepIndicator'
 import TopHeader from '@/components/TopHeader'
+import { AppDispatch } from '@/store/store'
 import { RootState } from '@/store/store'
 
-import { setCreateMemberIds } from '../../store/slices/appointmentSlice'
+import {
+  fetchRecommendPlaceAsync,
+  setCreateAppointmentId,
+  setCreateMemberIds,
+} from '../../store/slices/appointmentSlice'
 import { useClub } from '../club/hooks/useClubInfo'
 
 const AppointmentCreate1 = () => {
   const { t } = useTranslation()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const { user } = useSelector((state: RootState) => state.member)
-  const { create } = useSelector((state: RootState) => state.appointment) // Redux store에서 모든 데이터 가져오기
+  const create = useSelector((state: RootState) => state.appointment.create) // Redux store에서 모든 데이터 가져오기
   const { clubInfo } = useClub({ clubId: create.clubId })
   const clubMembers = clubInfo?.members || []
   const memberIds = create.memberIds
 
   const onSubmit = async () => {
     dispatch(setCreateMemberIds(memberIds))
-
-    // if (await createAppointment(create)) {
-    //   router.push('/appointment/create4')
-    // } else {
-    //   console.log('오류 발생')
-    // }
+    console.log('✅✅✅✅✅✅무슨 값이 오나요?', create)
+    const response: number = await createAppointment(create)
+    if (response) {
+      dispatch(setCreateAppointmentId(response))
+      console.log('✅✅✅✅✅✅무슨 값이 오나요?', response)
+      dispatch(fetchRecommendPlaceAsync(24))
+      router.push('/appointment/create2')
+    } else {
+      console.log('오류 발생')
+    }
   }
 
   const handleCheckboxChange = (value: number) => {

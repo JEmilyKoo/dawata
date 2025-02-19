@@ -96,7 +96,7 @@ export interface Standard {
   title: string
   latitude: number
   longitude: number
-  isRecommanded: boolean
+  standardId: number
 }
 
 export interface RecommandList {
@@ -104,6 +104,12 @@ export interface RecommandList {
   category_group_code: CategoryGroupCodeType
   recommand: Recommand[]
 }
+
+export interface StandardRecommand {
+  standard: Standard
+  recommandList: RecommandList[]
+}
+
 export interface Recommand {
   id: string
   place_name: string
@@ -116,6 +122,7 @@ export interface Recommand {
   x: string
   y: string
   place_url: string
+  standardId?: number
 }
 
 export type CategoryGroupCodeType =

@@ -17,6 +17,7 @@ import { Club } from '@/types/club'
 
 import {
   initCreate,
+  resetVote,
   setCreateCategory,
   setCreateMemberIds,
 } from '../../store/slices/appointmentSlice'
@@ -124,6 +125,8 @@ function ClubMain() {
         setCreateMemberIds(clubInfo?.members.map((member) => member.memberId)),
       )
     }
+    dispatch(resetVote())
+
     router.push('/appointment/create1')
   }
   return (
