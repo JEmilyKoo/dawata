@@ -105,7 +105,7 @@ public class AppointmentService {
 			participantRepository.save(participant);
 
 		});
-		
+
 		return appointment.getId();
 	}
 
@@ -404,18 +404,20 @@ public class AppointmentService {
 					voteStatus = VoteStatus.NOT_PARTICIPANT;
 				} else if (appointment.getVoteEndTime().isBefore(LocalDateTime.now())) {
 					voteStatus = VoteStatus.EXPIRED;
+				} else if (voteItemRepository.existsSingleVoteItemByAppointmentId(appointment.getId())) {
+					voteStatus = VoteStatus.PLACE_ONLY;
 				} else if (participantRepository.hasVoted(participant.get().getId())) {
 					voteStatus = VoteStatus.SELECTED;
 				}
 
-				VoteItem maxVoteItem = voteItemRepository.findMaxCountByAppointmentId(appointment.getId())
-					.stream()
-					.max(Comparator.comparingInt(v -> v.getVoters().size()))
+				VoteItem maxVoteItem = voteItemRepository.findTopByAppointmentId(appointment.getId())
 					.orElse(null);
 
 				String voteTitle = "장소 투표 중";
 
-				if (voteStatus == VoteStatus.EXPIRED && maxVoteItem != null) {
+				if ((voteStatus == VoteStatus.EXPIRED
+					|| voteStatus == VoteStatus.PLACE_ONLY)
+					&& maxVoteItem != null) {
 					voteTitle = maxVoteItem.getTitle();
 				}
 

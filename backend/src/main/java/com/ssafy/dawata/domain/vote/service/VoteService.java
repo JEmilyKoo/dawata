@@ -66,6 +66,11 @@ public class VoteService {
 			requestDto.linkUrl()
 		);
 
+		if (requestDto.isOnly()) {
+			appointment.getParticipants()
+				.forEach(p -> voterRepository.save(Voter.of(p, voteItem)));
+		}
+
 		voteItemRepository.save(voteItem);
 	}
 
