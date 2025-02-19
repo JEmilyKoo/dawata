@@ -1,7 +1,5 @@
 package com.ssafy.dawata.domain.notice.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
@@ -24,16 +22,17 @@ public class NoticeService {
 	public Slice<NoticeResponse> findNoticeList(Long memberId) {
 		return new SliceImpl<>(
 			noticeRepository.customFindAllByMemberId(memberId)
-			.stream()
-			.map(notice -> {
-				return NoticeResponse.builder()
-					.id(notice.getId())
-					.type(notice.getNoticeType().name())
-					.memberInfoResponse(memberService.findMemberInfo(memberId))
-					.read(notice.isRead())
-					.createdAt(notice.getCreatedAt())
-					.build();
-			}).toList()
+				.stream()
+				.map(notice -> {
+					return NoticeResponse.builder()
+						.id(notice.getId())
+						.type(notice.getNoticeType().name())
+						// TODO(고) : 여기가 문제
+						.memberInfoResponse(memberService.findMemberInfo(notice.getMember().getId()))
+						.read(notice.isRead())
+						.createdAt(notice.getCreatedAt())
+						.build();
+				}).toList()
 		);
 	}
 

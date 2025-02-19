@@ -1,5 +1,20 @@
 package com.ssafy.dawata.domain.member.controller;
 
+import java.net.URL;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.ssafy.dawata.domain.auth.entity.SecurityMemberDetails;
 import com.ssafy.dawata.domain.common.dto.ApiResponse;
 import com.ssafy.dawata.domain.common.service.S3Service;
@@ -13,13 +28,6 @@ import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URL;
-import java.util.List;
 
 @RestController
 @RequestMapping("/members")
@@ -65,10 +73,13 @@ public class MemberController {
 		@RequestBody MemberInfoUpdateRequest memberInfoUpdateRequest,
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails
 	) {
-		memberService.updateMyInfo(memberInfoUpdateRequest, memberDetails.member());
+		memberService.updateMyInfo(memberInfoUpdateRequest, memberDetails.member().getId());
 		return ResponseEntity.ok(ApiResponse.success());
 	}
 
+	/*
+	 * TODO(고) : sqs가 안옴
+	 * */
 	@Operation(summary = "멤버 사진 추가",
 		description = "유저 사진을 추가하는 작업을 수행합니다.")
 	@PostMapping("/photo")
@@ -85,6 +96,9 @@ public class MemberController {
 			)));
 	}
 
+	/*
+	 * TODO(고) : sqs가 안옴
+	 * */
 	@Operation(summary = "멤버 사진 변경",
 		description = "유저 사진을 변경하는 작업을 수행합니다.")
 	@PutMapping("/photo")
@@ -107,7 +121,7 @@ public class MemberController {
 	public ResponseEntity<ApiResponse<Void>> withdrawInService(
 		@AuthenticationPrincipal SecurityMemberDetails memberDetails
 	) {
-		memberService.withdraw(memberDetails.member());
+		memberService.withdraw(memberDetails.member().getId());
 		return ResponseEntity.ok(ApiResponse.success());
 	}
 }

@@ -1,5 +1,10 @@
 package com.ssafy.dawata.domain.member.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ssafy.dawata.domain.appointment.repository.AppointmentRepository;
 import com.ssafy.dawata.domain.common.service.S3Service;
 import com.ssafy.dawata.domain.member.dto.request.MemberInfoUpdateRequest;
@@ -14,11 +19,6 @@ import com.ssafy.dawata.domain.photo.enums.EntityCategory;
 import com.ssafy.dawata.domain.photo.repository.PhotoRepository;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,10 +66,10 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void updateMyInfo(MemberInfoUpdateRequest memberInfoUpdateRequest, Member member) {
+	public void updateMyInfo(MemberInfoUpdateRequest memberInfoUpdateRequest, Long memberId) {
 
-		memberRepository
-			.findById(member.getId())
+		Member member = memberRepository
+			.findById(memberId)
 			.orElseThrow(IllegalArgumentException::new);
 
 		//더티 체킹 사용
@@ -77,9 +77,9 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void withdraw(Member member) {
-		memberRepository
-			.findById(member.getId())
+	public void withdraw(Long memberId) {
+		Member member = memberRepository
+			.findById(memberId)
 			.orElseThrow(IllegalArgumentException::new);
 
 		//더티 체킹 사용
