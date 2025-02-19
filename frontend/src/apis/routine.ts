@@ -61,3 +61,14 @@ export const updateRoutine = async (
     return null
   }
 }
+
+// 현재 실행 중인 내 루틴 조회
+export const getNowRoutine = async () => {
+  try {
+    const response = await api.get('/live/routine')
+    return response.data
+  } catch (error) {
+    console.error('⛔ 현재 실행 중인 내 루틴 조회 실패:')
+    return null
+  }
+}
