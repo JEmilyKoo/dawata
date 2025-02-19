@@ -21,4 +21,18 @@ public interface VoteItemRepository extends JpaRepository<VoteItem, Long> {
 			WHERE v.appointment.id = :appointmentId
 		""")
 	List<VoteItem> findMaxCountByAppointmentId(@Param("appointmentId") Long appointmentId);
+
+	@Query("""
+			SELECT v
+		 	FROM VoteItem v
+		 	LEFT JOIN v.voters voter
+		 	WHERE v.appointment.id = :appointmentId
+		 	GROUP BY v
+		 	ORDER BY COUNT(voter) DESC
+		 	LIMIT 1
+		""")
+	Optional<VoteItem> findTopByAppointmentId(@Param("appointmentId") Long appointmentId);
+
+	@Query("SELECT COUNT(v) = 1 FROM VoteItem v WHERE v.appointment.id = :appointmentId")
+	boolean existsSingleVoteItemByAppointmentId(@Param("appointmentId") Long appointmentId);
 }

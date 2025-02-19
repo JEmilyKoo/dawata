@@ -7,7 +7,8 @@ public enum VoteStatus {
 	NOT_PARTICIPANT(0),
 	EXPIRED(1),
 	SELECTED(2),
-	NOT_SELECTED(3);
+	NOT_SELECTED(3),
+	PLACE_ONLY(4);
 
 	private final int code;
 
