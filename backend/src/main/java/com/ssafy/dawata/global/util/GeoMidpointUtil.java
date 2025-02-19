@@ -46,7 +46,7 @@ public class GeoMidpointUtil {
 			minLng = Math.min(minLng, lng);
 		}
 
-		return new double[] {minLat, maxLat, minLng, maxLng};
+		return new double[] {minLat - 0.01, maxLat + 0.01, minLng - 0.03, maxLng + 0.03};
 	}
 
 	public static double calculateAverageDistance(List<double[]> coordinates) {

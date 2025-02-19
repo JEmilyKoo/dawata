@@ -91,6 +91,11 @@ public class TransitResponse {
 	public List<String> getPaths() {
 		List<String> result = new ArrayList<>();
 
+		if (metaData == null || metaData.getPlan() == null || metaData.getPlan().getItineraries() == null
+			|| metaData.getPlan().getItineraries().isEmpty()) {
+			return result;
+		}
+
 		List<Leg> legs = metaData.getPlan().getItineraries().get(0).getLegs();
 
 		for (Leg leg : legs) {

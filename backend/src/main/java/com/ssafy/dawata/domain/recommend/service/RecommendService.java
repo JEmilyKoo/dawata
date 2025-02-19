@@ -116,7 +116,9 @@ public class RecommendService {
 					train.getLongitude(),
 					train.getLatitude(),
 					searchDttm
-				).map(response -> response != null && response.getMetaData() != null ? response.getTotalTime() : null)
+				)
+				.map(response -> response != null && response.getMetaData() != null ? response.getTotalTime() :
+					0)
 				.defaultIfEmpty(Integer.MAX_VALUE))
 			.collectList()
 			.map(times -> times.stream().filter(Objects::nonNull).collect(Collectors.toList())); // null 제거
@@ -143,7 +145,7 @@ public class RecommendService {
 		return Math.sqrt(variance);
 	}
 
-	// 거리 차이가 10km 이상인 경우 필터링
+	// 거리 차이가 1km 이상인 경우 필터링
 	private static List<Train> filterByDistance(List<Train> trains, List<double[]> coordinates) {
 		List<Train> result = new ArrayList<>();
 		for (Train train : trains) {
@@ -154,7 +156,7 @@ public class RecommendService {
 					new double[] {coordinate[0], coordinate[1]},
 					new double[] {train.getLatitude(), train.getLongitude()}
 				);
-				if (distance < 10000) {
+				if (distance < 1000) {
 					isFiltered = true;
 					break;
 				}
