@@ -40,12 +40,21 @@ export default function CreateRoutine() {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm({
     defaultValues: {
       routineName: '',
       playList: [],
     },
   })
+
+  useEffect(() => {
+    if (playList.length > 0) {
+      clearErrors('playList')
+    }
+  }, [playList, clearErrors])
+
   const onPressDelete = () => {
     console.log('삭제해야 하는 id', deletePlayId)
     const updatedPlayList = playList.filter(
@@ -62,9 +71,14 @@ export default function CreateRoutine() {
     routineName: string
     playList: CreatePlay[]
   }) => {
-    // dispatch(setCreateRoutineName(data.routineName))
-    // dispatch(setCreatePlayList(data.playList))
-    // playlist 수정하는 것은 별도로 구현할 것
+    if (playList.length === 0) {
+      setError('playList', {
+        type: 'required',
+        message: '행동을 추가해주세요',
+      })
+      return
+    }
+
     const routine: RoutineCreate = {
       routineName: data.routineName,
       playList: playList,
@@ -140,6 +154,9 @@ export default function CreateRoutine() {
             key={item.playId}
           />
         ))}
+        {errors.playList && (
+          <Text className="text-light-red">{errors.playList.message}</Text>
+        )}
 
         <TouchableOpacity
           className="border border-primary p-2 rounded-xl"
