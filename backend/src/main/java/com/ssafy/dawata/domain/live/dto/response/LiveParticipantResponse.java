@@ -35,7 +35,7 @@ public record LiveParticipantResponse(
 	) {
 
 		return LiveParticipantResponse.builder()
-			.memberId(participantDto.clubMember().getId())
+			.memberId(participantDto.clubMember().getMember().getId())
 			.nickname(participantDto.clubMember().getNickname())
 			.img(preSignedUrl)
 			.latitude(latitude)

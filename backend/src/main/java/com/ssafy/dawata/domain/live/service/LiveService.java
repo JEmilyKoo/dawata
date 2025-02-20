@@ -36,10 +36,11 @@ import com.ssafy.dawata.domain.vote.entity.VoteItem;
 import com.ssafy.dawata.domain.vote.repository.VoteItemRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class LiveService {
 	private final ClubMemberRepository clubMemberRepository;
 	private final AppointmentRepository appointmentRepository;
@@ -81,11 +82,9 @@ public class LiveService {
 		// 재촉알림 fcm
 		fcmService.sendNotification(
 			"4",
-			"3",
+			"2",
 			memberId,
-			memberRepository
-				.customFindByParticipantId(urgentRequest.targetParticipantId())
-				.orElseThrow(() -> new IllegalArgumentException("해당하는 약속 참가자가 없음둥~")));
+			urgentRequest.targetParticipantId());
 	}
 
 	/**
@@ -108,9 +107,8 @@ public class LiveService {
 		List<LiveParticipantResponse> participantResponseList = new ArrayList<>();
 
 		for (Long memberId : memberList) {
-
 			ParticipantDto participantDto =
-				clubMemberRepository.findByMemberIdToParticipantDto(memberId)
+				clubMemberRepository.findByMemberIdToParticipantDto(appointmentId, memberId)
 					.orElseThrow(() -> new IllegalArgumentException("참여자가 없습니다."));
 
 			// 위치 2개

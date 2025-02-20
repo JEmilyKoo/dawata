@@ -51,6 +51,7 @@ public class MemberService {
 			);
 
 		return MemberInfoResponse.builder()
+			.memberId(member.getId())
 			.email(member.getEmail())
 			.name(member.getName())
 			.img(

@@ -72,7 +72,7 @@ public class TransitService {
 		Double endY,
 		String searchDttm
 	) {
-		WebClient client = getTransitClient();
+		WebClient client = getTransitSubClient();
 		String requestBody = "{\n" +
 			"  \"startX\": \"" + startX + "\",\n" +
 			"  \"startY\": \"" + startY + "\",\n" +
