@@ -27,7 +27,7 @@ const ProfileHeader = () => {
       <View className="flex-col justify-between p-4">
         <View className="flex-row justify-between">
           <BackButton />
-          <View className="flex-row gap-2">
+          <View className="flex-row gap-2 mr-5">
             <TouchableOpacity
               onPress={() => {
                 router.push({
@@ -45,17 +45,19 @@ const ProfileHeader = () => {
             />
           </View>
         </View>
-        <View className="flex-row justify-between">
-          <View>
-            <Text className="text-lg font-bold">{user.name}</Text>
-            <Text className="text-sm text-gray-600">{user.email}</Text>
+        <View className="ml-4 flex-row justify-between">
+          <View className="">
+            <Text className="text-2xl text-text-primary font-bold">
+              {user.name}
+            </Text>
+            <Text className="text-xl text-text-secondary">{user.email}</Text>
           </View>
-          <View>
+          <View className="mx-5">
             <ImageThumbnail
               img={user.img}
-              className="w-16 h-16 rounded-full"
-              width={72}
-              height={72}
+              className="rounded-full"
+              width={75}
+              height={75}
               defaultImg={require('@/assets/avatars/user1.png')}
             />
 

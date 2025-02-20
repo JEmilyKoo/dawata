@@ -1,9 +1,17 @@
+// 투표 방의 투표 항목 조회
+// 투표 방의 투표 항목 생성
+// 투표하기 (다중 투표 가능)
+import axios from 'axios'
+
+import store from '@/store/store'
+import { RootState } from '@/store/store'
 import { BooleanResponse } from '@/types/api'
 import {
   AppointmentCreateInfo,
   AppointmentInfo,
   CreateVoteInfo,
 } from '@/types/appointment'
+import { handleDefaultError } from '@/utils/error/handleDefaultError'
 
 import api from './api'
 
@@ -134,16 +142,53 @@ export const updateAppointmentHost = async (
     return null
   }
 }
-// 투표 방의 투표 항목 조회
 
-// 투표 방의 투표 항목 생성
-// 투표하기 (다중 투표 가능)
+const placeApi = axios.create({
+  baseURL: process.env.EXPO_PUBLIC_BASE_URL,
+  timeout: 1000000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+placeApi.interceptors.request.use(
+  (config) => {
+    const state: RootState = store.getState()
+    const accessToken = state.auth.socialLogin.accessToken
+
+    if (accessToken) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${accessToken}`
+    } else {
+      delete config.headers.accessToken
+    }
+
+    return config
+  },
+  (error) => {
+    console.error('🚨 요청 오류:', error)
+    return Promise.reject(error)
+  },
+)
+
+placeApi.interceptors.response.use(
+  (response) => {
+    console.log('🌐 인터셉터 응답:', response)
+    return response.data // 반드시 response.data만 반환
+  },
+  (error) => {
+    console.error('🚨 API 응답 오류:', error.response || error)
+    return Promise.reject(error)
+  },
+)
 
 // 장소 추천 받기
 export const recommendPlace = async (appointmentId: number) => {
   try {
-    const response = await api.get(`/appointments/${appointmentId}/place`)
-    return response.data
+    console.log('Tlqkfsusemfdl', appointmentId)
+    const response = await placeApi.get(`/appointments/${appointmentId}/place`)
+    console.log('res', response)
+    return response
   } catch (error) {
     console.error('⛔ 장소 추천 받기 실패:')
     return null
@@ -151,10 +196,13 @@ export const recommendPlace = async (appointmentId: number) => {
 }
 
 // createVoteItem
-export const createVoteItem = async (
-  createVoteInfo: CreateVoteInfo,
-  appointmentId: number,
-): Promise<number> => {
+export const createVoteItem = async ({
+  createVoteInfo,
+  appointmentId,
+}: {
+  createVoteInfo: CreateVoteInfo
+  appointmentId: number
+}) => {
   try {
     const data = await api.post(
       `/appointments/${appointmentId}/vote-items`,

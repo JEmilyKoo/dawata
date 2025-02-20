@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, StatusBar, Text, View } from 'react-native'
+import { Platform, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 
 import Constants from 'expo-constants'
 import * as Location from 'expo-location'
+import { StatusBar } from 'expo-status-bar'
 
 import BottomSheetContent from '@/app/live/components/BottomSheetContent'
 import { MemberDetailItem } from '@/app/live/components/MemberDetailItem'
@@ -93,7 +94,7 @@ export default function createAddress2() {
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
     <script type="text/javascript">
       function initTmap() {
         var mapContainer = document.getElementById('map'); // ID 수정
@@ -148,9 +149,9 @@ export default function createAddress2() {
   ) : (
     <View className="flex-1">
       <StatusBar
-        translucent={true}
+        style="dark"
+        translucent
         backgroundColor="transparent"
-        barStyle="dark-content"
       />
       <View className="relative flex-1">
         <WebView

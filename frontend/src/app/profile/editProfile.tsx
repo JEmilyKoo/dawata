@@ -23,7 +23,7 @@ export default function EditProfile() {
     router.push('/')
   }
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white pt-4">
       <TopHeader title="내 정보" />
       <ScrollView>
         <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">

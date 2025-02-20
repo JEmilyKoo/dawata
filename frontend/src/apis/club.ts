@@ -108,7 +108,6 @@ export const addMemberByCode = async ({
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange },
     })
-    console.log('결과가 나옴에 의의를 둠' + response)
     return [
       { id: 1, title: '약속1' },
       { id: 2, title: '약속2' },
@@ -135,7 +134,6 @@ export const addMemberByEmail = async ({
     const response = await api.get(`/appointments`, {
       params: { clubId, nextRange, prevRange },
     })
-    console.log('결과가 나옴에 의의를 둠' + response)
     return [
       { id: 1, title: '약속1' },
       { id: 2, title: '약속2' },

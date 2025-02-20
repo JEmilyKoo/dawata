@@ -25,7 +25,11 @@ const AppointmentUpdate2 = () => {
   const { update } = useSelector((state: RootState) => state.appointment)
 
   const [date, setDate] = useState(
-    update.scheduledAt ? new Date(update.scheduledAt) : new Date(),
+    update.scheduledAt
+      ? new Date(
+          new Date(update.scheduledAt).getTime() + (24 * 60 + 60) * 60 * 1000,
+        )
+      : new Date(Date.now() + (24 * 60 + 60) * 60 * 1000),
   )
 
   const [voteDate, setVoteDate] = useState(new Date(date))
@@ -35,7 +39,6 @@ const AppointmentUpdate2 = () => {
     return today
   }
   const handleConfirm = (date: Date) => {
-    console.log('date', date)
     setDate(date)
   }
 
@@ -88,7 +91,7 @@ const AppointmentUpdate2 = () => {
     router.push('/appointment/update1')
   }
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between pt-4">
       <View className="flex-1 justify-start">
         <TopHeader title={t('updateAppointment.title')} />
         <StepIndicator

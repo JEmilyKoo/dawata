@@ -38,25 +38,13 @@ const AppointmentCreate1 = () => {
     dispatch(setCreateMemberIds(memberIds))
 
     const response: number = await createAppointment(create)
-    console.log('결과값이씨발뭐길래아니진짜왜', response)
     if (response) {
       dispatch(setCreateAppointmentId(response))
     } else {
       console.log('오류 발생')
     }
+    router.push('/appointment/create2')
   }
-
-  useEffect(() => {
-    if (isNext && createAppointmentId != 0) {
-      console.log(
-        'fetchRecommendPlaceAsync✅✅✅✅✅✅✅✅✅',
-        createAppointmentId,
-      )
-      fetchRecommendPlaceAsync(createAppointmentId)
-      router.push('/appointment/create2')
-    }
-  }, [createAppointmentId, isNext])
-
   const handleCheckboxChange = (value: number) => {
     if (memberIds.includes(value)) {
       dispatch(setCreateMemberIds(memberIds.filter((v) => v !== value)))
@@ -66,7 +54,6 @@ const AppointmentCreate1 = () => {
   }
   const onPressNext = () => {
     onSubmit()
-    setIsNext(true)
   }
 
   const isUser = (memberId: number) => {
@@ -78,7 +65,7 @@ const AppointmentCreate1 = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between pt-4">
       <View className="flex-1 justify-start">
         <TopHeader title={t('createAppointment.title')} />
         <StepIndicator

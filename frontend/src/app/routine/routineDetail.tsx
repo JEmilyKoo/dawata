@@ -25,7 +25,6 @@ export default function RoutineDetail() {
     const fetchRoutine = async () => {
       const response = await getRoutine(Number(routineId))
       setRoutine(response)
-      console.log('response', response)
       setPlayList(response.playList)
       setTotalTime(
         response.playList.reduce(
@@ -37,7 +36,7 @@ export default function RoutineDetail() {
     fetchRoutine()
   }, [])
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white pt-4">
       <View className="flex-row justify-between border-b border-bord">
         <TopHeader title={routine?.routineName || ''} />
         <TouchableOpacity

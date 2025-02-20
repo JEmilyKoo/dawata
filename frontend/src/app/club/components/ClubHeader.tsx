@@ -70,11 +70,11 @@ const ClubHeader = ({
       onSelect: getMemberList,
       color: Colors.text.primary,
     },
-    {
-      title: t('club.updateClubProfile'),
-      onSelect: updateClubProfile,
-      color: Colors.text.primary,
-    },
+    // {
+    //   title: t('club.updateClubProfile'),
+    //   onSelect: updateClubProfile,
+    //   color: Colors.text.primary,
+    // },
     {
       title: t('club.deleteClub'),
       onSelect: deleteClub,
@@ -83,11 +83,11 @@ const ClubHeader = ({
   ]
 
   const memberMenu: MenuItem[] = [
-    {
-      title: t('club.updateClubProfile'),
-      onSelect: updateClubProfile,
-      color: Colors.text.primary,
-    },
+    // {
+    //   title: t('club.updateClubProfile'),
+    //   onSelect: updateClubProfile,
+    //   color: Colors.text.primary,
+    // },
     {
       title: t('club.leaveClub'),
       onSelect: leaveClub,
@@ -118,9 +118,9 @@ const ClubHeader = ({
         <View className="flex-row items-center mt-4">
           <View className="flex-row p-2 items-center">
             <BackButton />
-            <View className="flex-row items-center">
+            <View className="flex-row items-center w-1/2">
               <Text className="text-xl font-bold mr-1">{name}</Text>
-              <Text className="text-sm text-secondary text-base font-medium bg-white rounded-full ml-1 p-1">
+              <Text className="text-sm text-secondary text-base font-medium bg-white rounded-full p-1">
                 #{t(`category.${category}`)}
               </Text>
             </View>
@@ -144,7 +144,7 @@ const ClubHeader = ({
       <View className="absolute right-0 h-[200px] w-1/2 flex-row justify-end items-center">
         <ImageThumbnail
           img={img}
-          defaultImg={img}
+          defaultImg={require('@/assets/clubs/club1.png')}
           width={125}
           height={125}
           className="rounded-full border-2 border-white"

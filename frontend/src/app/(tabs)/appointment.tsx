@@ -23,6 +23,7 @@ import AppointmentList from '@/app/appointment/components/AppointmentList'
 import { getSelectedDate } from '@/app/appointment/hooks/SelectedDateInitial'
 import AppointmentItem from '@/components/AppointmentItem'
 import TopHeader from '@/components/TopHeader'
+import useCurrentMonth from '@/hooks/useCurrentMonth'
 import { AppointmentListInfo } from '@/types/appointment'
 
 LocaleConfig.defaultLocale = 'kr'
@@ -36,13 +37,14 @@ function Appointment() {
     {},
   )
 
+  const [currentMonth, setCurrentMonth] = useCurrentMonth()
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const data = await getAppointments({
-          nextRange: 4,
-          prevRange: 4,
-          date: '2025-02',
+          nextRange: 99,
+          prevRange: 99,
+          date: currentMonth,
         })
         setAppointments(data || [])
         setSelectedDate(
@@ -86,7 +88,7 @@ function Appointment() {
 
   const dispatch = useDispatch()
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white pt-4">
       <TopHeader title="약속 모아보기" />
       <ScrollView>
         <AppointmentCalendar

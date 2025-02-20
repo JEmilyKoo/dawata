@@ -57,7 +57,6 @@ const liveSlice = createSlice({
       state.liveLog = action.payload
     },
     patchLiveData(state, action: PayloadAction<WebSocketLiveResponse[]>) {
-      console.log('바뀌었나요? patchLiveData')
       const update = action.payload[0]
 
       if (!state.liveData || !state.liveData.participants) return
@@ -79,7 +78,6 @@ const liveSlice = createSlice({
         ...state.liveData,
         participants: updatedParticipants,
       }
-      console.log('patchLiveData', state.liveData)
     },
   },
 })

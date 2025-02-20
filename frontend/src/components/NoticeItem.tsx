@@ -7,7 +7,7 @@ interface NoticeInfo {
   type: string // 알림 유형
   read: boolean // 알림 읽음 여부
   memberInfoResponse: {
-    img: string
+    img?: string
   }
   str: string
   createdAt: string
@@ -21,30 +21,33 @@ export default function NoticeItem({
   sendRead: (id: number) => void
 }) {
   return (
-    <View
-      className={noticeInfo.read ? 'text-text-secondary' : 'text-text-primary'}>
+    <View className="">
       <TouchableOpacity
-        onPress={() => sendRead(noticeInfo.id)}
+        onPress={() => !noticeInfo.read && sendRead(noticeInfo.id)}
         key={noticeInfo.id}
         className="flex-row justify-between items-center pb-4 rounded-xl mb-3">
-        <ImageThumbnail
-          img={noticeInfo.memberInfoResponse.img}
-          defaultImg={require('@/assets/avatars/user1.png')}
-          width={48}
-          height={48}
-          className="rounded-full border border-bord"
-        />
-        <View className="flex-1 ml-2">
+        {noticeInfo?.memberInfoResponse?.img && (
+          <ImageThumbnail
+            img={noticeInfo.memberInfoResponse.img}
+            defaultImg={require('@/assets/avatars/user1.png')}
+            width={48}
+            height={48}
+            className="rounded-full border border-bord"
+          />
+        )}
+        <View className="flex-1 w-full justify-center">
           <View className="flex-row justify-between">
             <Text
-              className={`text-base font-medium mb-1
-            ${noticeInfo.read ? 'text-text-secondary' : 'text-text-primary'}`}>
+              className={`text-base font-medium mb-1 flex-shrink w-3/4
+      ${noticeInfo.read ? 'text-text-secondary' : 'text-text-primary'}`}
+              numberOfLines={2}
+              ellipsizeMode="tail">
               {noticeInfo.str}
             </Text>
 
             <Text
-              className={`text-sm ml-2 items-end
-            ${noticeInfo.read ? 'text-border' : 'text-secondary'}`}>
+              className={`text-sm ml-2 text-end
+      ${noticeInfo.read ? 'text-bord' : 'text-text-secondary'}`}>
               {new Date(noticeInfo.createdAt).toLocaleString('ko', {
                 month: 'long',
                 day: 'numeric',

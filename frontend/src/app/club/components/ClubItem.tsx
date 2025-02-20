@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 
+import { useRouter } from 'expo-router'
+
 import ChevronDownIcon from '@/assets/icons/chevron-down.svg'
 import ImageThumbnail from '@/components/ImageThumbnail'
 import MenuCustomOptions from '@/components/MenuCustomOptions'
@@ -10,12 +12,19 @@ import { Club } from '@/types/club'
 import { MenuItem } from '@/types/menu'
 
 export default function ClubItem({ clubInfo }: { clubInfo: Club }) {
+  const router = useRouter()
   const defaultImg = require('@/assets/clubs/club3.png')
   const { t } = useTranslation()
 
   return (
     <TouchableOpacity
       key={clubInfo.clubId}
+      onPress={() =>
+        router.push({
+          pathname: '/club/main',
+          params: { clubId: clubInfo.clubId },
+        })
+      }
       className="flex-row justify-between items-center pb-4 rounded-xl mb-3">
       <ImageThumbnail
         img={clubInfo.img}

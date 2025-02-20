@@ -97,7 +97,7 @@ export default function CreateAddress() {
     }
   }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white  pt-4">
       <TopHeader title="주소 설정" />
       <ScrollView className="flex-1 w-full">
         <View className="w-100 flex-row border-b border-gray-200 px-4 my-3">

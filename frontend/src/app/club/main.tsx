@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Image,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -11,7 +10,9 @@ import {
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useFocusEffect } from '@react-navigation/native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 
 import PlusIcon from '@/assets/icons/plus.svg'
 import { RootState } from '@/store/store'
@@ -79,6 +80,7 @@ export type RouteParams = {
 
 function ClubMain() {
   const create = useSelector((state: RootState) => state.appointment.create)
+
   const [isCreate, setIsCreate] = useState(false)
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(
@@ -111,25 +113,30 @@ function ClubMain() {
     if (isCreate && create.clubId != 0) {
       router.push('/appointment/create1')
     }
+    return setIsCreate(false)
   }, [create, isCreate])
 
   const onPressCreateAppointment = () => {
-    dispatch(initCreate(params.clubId))
     if (clubInfo) {
-      dispatch(setCreateCategory(clubInfo.category))
-      dispatch(
-        setCreateMemberIds(clubInfo?.members.map((member) => member.memberId)),
-      )
+      dispatch(initCreate(clubInfo))
+      dispatch(resetVote())
+      setIsCreate(true)
     }
-    dispatch(resetVote())
-    setIsCreate(true)
   }
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        console.log('클럽 페이지 종료, StatusBar 초기화')
+      }
+    }, []),
+  )
+
   return (
     <View className="flex-1 bg-white">
       <StatusBar
-        translucent={true}
+        style="dark"
+        translucent
         backgroundColor="transparent"
-        barStyle="dark-content"
       />
       {clubInfo && (
         <ClubHeader

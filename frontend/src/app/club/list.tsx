@@ -18,7 +18,7 @@ export default function ClubMain() {
   console.log('clubId:', params)
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white pt-4">
       <TopHeader title="내 그룹" />
       <ScrollView>
         {clubList.map((club, index) => (

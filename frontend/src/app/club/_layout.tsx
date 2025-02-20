@@ -7,23 +7,11 @@ export default function ClubLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false, statusBarStyle: 'dark' }}>
-        <Stack.Screen
-          name="create1"
-          options={{
-            title: '그룹 생성',
-            headerShown: true,
-          }}
-        />
+        <Stack.Screen name="create1" />
         <Stack.Screen name="main" />
         <Stack.Screen name="list" />
         <Stack.Screen name="memberList" />
-        <Stack.Screen
-          name="updateInfo"
-          options={{
-            title: '그룹 수정',
-            headerShown: true,
-          }}
-        />
+        <Stack.Screen name="updateInfo" />
       </Stack>
       {(pathname.indexOf('create') == -1 ||
         pathname.indexOf('update') == -1) && <TabBar />}

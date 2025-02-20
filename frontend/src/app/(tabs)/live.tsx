@@ -40,14 +40,11 @@ const Live = () => {
   >([])
 
   const socketRef = useRef<WebSocket | null>(null)
-  const [memberOverlayList, setMemberOverlayList] = useState<CustomOverlay[]>(
-    [],
-  )
   const [destinationOverlay, setDestinationOverlay] =
     useState<CustomOverlay | null>(null)
   const liveData = useSelector((state: RootState) => state.live.liveData)
-  // const kakaoJSApiKey = Constants.expoConfig?.extra?.kakaoJSApiKey
-  const kakaoJSApiKey = '19ea7ae7701988d8dc2bccca4ab5504c'
+  // const kakaoJsApiKey = Constants.expoConfig?.extra?.kakaoJsApiKey
+  const kakaoJsApiKey = '19ea7ae7701988d8dc2bccca4ab5504c'
   const webViewRef = useRef<WebView | null>(null)
   const [selectedMemberId, setSelectedMemberId] = useState<number>(0)
   const [webViewInit, setWebViewInit] = useState(false)
@@ -57,7 +54,6 @@ const Live = () => {
 
   const fetchFindLives = async () => {
     console.log('fetchFindLives')
-    // const lives = 120
     const lives: number = await findLives()
     if (lives) {
       dispatch(setLiveAppointmentId(lives))
@@ -70,7 +66,6 @@ const Live = () => {
 
   const liveStart = async () => {
     const live = await findLiveDetail(liveAppointmentId)
-    console.log('liveStart 라이브 데이터', live)
     if (live) {
       dispatch(setLiveData(live))
       dispatch(setLiveLat(live.latitude))
@@ -152,7 +147,6 @@ const Live = () => {
         }
         return false
       })
-      console.log('뉴메시지', newMessages)
       if (newMessages.length > 0) {
         dispatch(patchLiveData(newMessages))
       }
@@ -160,7 +154,6 @@ const Live = () => {
   }, [messages])
 
   useEffect(() => {
-    console.log('바뀌었나요?')
     if (liveData && liveData?.participants.length == 0) return
     let newMemberOverlayList = liveData.participants.map(
       (participant: LiveMember) => ({
@@ -178,7 +171,6 @@ const Live = () => {
           participant.arrivalState !== 'LOST',
       }),
     )
-    console.log('아니저장을 했다고저장을', newMemberOverlayList)
     setConvertedOverlayList(newMemberOverlayList)
   }, [JSON.stringify(liveData?.participants)])
 
@@ -262,7 +254,6 @@ const Live = () => {
 
   const clearCustomOverlay = () => {
     webViewRef.current?.injectJavaScript(`clearCustomOverlay();`)
-    setMemberOverlayList([])
   }
 
   const updateLatLngCustomOverlay = (
@@ -281,14 +272,12 @@ const Live = () => {
   }
 
   const setCustomOverlayList = (data: CustomOverlay[]) => {
-    console.log('setCustomOverlayList 실행:', data)
     if (!webViewRef.current) {
       console.log('WebView ref가 없습니다')
       return
     }
     const jsonData = JSON.stringify(data)
     const jsCode = `setCustomOverlayList(${jsonData});`
-    console.log('실행할 JavaScript:', jsCode)
     webViewRef.current.injectJavaScript(jsCode)
   }
 
@@ -300,19 +289,15 @@ const Live = () => {
   }
 
   useEffect(() => {
-    console.log('webViewInit✅✅✅✅✅✅')
     if (webViewInit && liveLat && liveLog) {
-      console.log('시작을 했냐고')
       webViewRef.current?.injectJavaScript(`initMap(${liveLat}, ${liveLog});`)
       panTo(liveLat, liveLog)
       // setWebViewInit(false)
     }
   }, [webViewInit, liveLat, liveLog])
   const handleOnMessage = (event: any) => {
-    console.log('아니뭐라고오시는데✅✅✅✅✅✅', event)
     try {
       const message = JSON.parse(event.nativeEvent.data)
-      console.log('message✅✅✅✅✅✅', message?.action)
       if (!message.action) return
 
       if (message.action == 'webviewInit') {
@@ -377,7 +362,7 @@ const Live = () => {
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
     <script
       type="text/javascript"
-      src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJSApiKey}"></script>
+      src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsApiKey}"></script>
     <script type="text/javascript">
       var mapContainer
       var mapOption

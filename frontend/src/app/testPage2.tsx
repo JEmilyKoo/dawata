@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { View } from "react-native"
-import { WebView } from "react-native-webview"
+import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { View } from 'react-native'
+import { WebView } from 'react-native-webview'
 
-import Constants from "expo-constants"
-import * as Location from "expo-location"
+import Constants from 'expo-constants'
+import * as Location from 'expo-location'
 
-import BottomSheetContent from "@/app/live/components/BottomSheetContent"
-import BottomSheet from "@/components/BottomSheet"
-import { liveData } from "@/constants/liveData"
-import { LiveMember } from "@/types/live"
+import BottomSheetContent from '@/app/live/components/BottomSheetContent'
+import BottomSheet from '@/components/BottomSheet'
+import { liveData } from '@/constants/liveData'
+import { LiveMember } from '@/types/live'
 
 interface LocationRecord {
   latitude: number
@@ -64,11 +64,11 @@ const WebViewTest = () => {
   }
 
   const handleOnMessage = (event: any) => {
-    if (event.nativeEvent.data.action == "webviewInit") {
+    if (event.nativeEvent.data.action == 'webviewInit') {
       webViewRef.current?.injectJavaScript(`initMap()`)
     }
-    if (event.nativeEvent.data.action == "clickOverlay") {
-      console.log("clickOverlay", event.nativeEvent.data.id)
+    if (event.nativeEvent.data.action == 'clickOverlay') {
+      console.log('clickOverlay', event.nativeEvent.data.id)
       setSelectedMemberId(event.nativeEvent.data.id)
     }
   }
@@ -82,8 +82,8 @@ const WebViewTest = () => {
   useEffect(() => {
     ;(async () => {
       const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status !== "granted") {
-        console.error("위치 권한이 거부되었습니다")
+      if (status !== 'granted') {
+        console.error('위치 권한이 거부되었습니다')
         return
       }
 
@@ -94,7 +94,7 @@ const WebViewTest = () => {
           distanceInterval: 5,
         },
         (location) => {
-          console.log("내 위치를 받아옴", location)
+          console.log('내 위치를 받아옴', location)
           const { latitude, longitude } = location.coords
 
           // WebView로 위치 정보 전달
@@ -118,7 +118,7 @@ const WebViewTest = () => {
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
     <script
       type="text/javascript"
-      src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJSApiKey}"></script>
+      src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJSApiKey}"></script>
     <script type="text/javascript">
       var mapContainer
       var mapOption
@@ -297,7 +297,7 @@ const WebViewTest = () => {
       <View className="relative flex-1">
         <WebView
           ref={(ref) => (webViewRef.current = ref)}
-          originWhitelist={["*"]}
+          originWhitelist={['*']}
           source={{ html: webViewContent }}
           onMessage={onMessage}
         />

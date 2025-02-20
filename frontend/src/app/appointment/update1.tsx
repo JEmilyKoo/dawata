@@ -51,7 +51,7 @@ const AppointmentUpdate1 = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between pt-4">
       <View className="flex-1 justify-start">
         <TopHeader title={t('updateAppointment.title')} />
         <StepIndicator

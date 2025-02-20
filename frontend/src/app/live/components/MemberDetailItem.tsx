@@ -11,6 +11,7 @@ import { postUrgentNotification } from '@/apis/live'
 import CallIcon from '@/assets/icons/call.svg'
 import HurryIcon from '@/assets/icons/hurry.svg'
 import ImageThumbnail from '@/components/ImageThumbnail'
+import useFormattedTime from '@/hooks/useFormattedTime'
 import { LiveMember } from '@/types/live'
 
 const userImages = [
@@ -41,10 +42,19 @@ export const MemberDetailItem = ({
 }) => {
   const postUrgent = async () => {
     if (!member) return
-    // await postUrgentNotification(liveAppointmentId, member.memberId)
-    // Alert.alert('재촉 알림이 전송되었습니다.')
+    await postUrgentNotification(liveAppointmentId, member.memberId)
     ToastAndroid.show('재촉 알림이 전송되었습니다.', ToastAndroid.SHORT)
   }
+  const getOverlayColor2 = (arrivalState: string) => {
+    if (arrivalState === 'NOT_ARRIVED')
+      return 'border-light-yellow rounded-full border-4 '
+    if (arrivalState === 'ARRIVED')
+      return 'border-light-green rounded-full border-4 '
+    if (arrivalState === 'LATE')
+      return 'border-light-red rounded-full border-4 '
+    return 'border-light-gray rounded-full border-4 '
+  }
+
   return (
     member && (
       <View>
@@ -53,17 +63,17 @@ export const MemberDetailItem = ({
           key={member.memberId}>
           <ImageThumbnail
             img={member.img}
-            className="w-6 h-6 rounded-full border-4 border-light-red"
-            defaultImg={userImages[member.memberId]}
-            width={24}
-            height={24}
+            className={getOverlayColor2(member.arrivalState)}
+            defaultImg={userImages[member.memberId % 10]}
+            width={45}
+            height={45}
           />
           <View className="flex-1 ml-3">
             <Text className="text-lg font-semibold text-text-primary">
               {member.nickname}
             </Text>
             <Text className="text-sm text-light-red">
-              {member.estimatedTime}초 후 도착 예정
+              {useFormattedTime(member.estimatedTime)} 후 도착 예정
             </Text>
           </View>
           <View className="flex-row gap-2">

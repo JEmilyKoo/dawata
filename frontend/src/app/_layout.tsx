@@ -76,7 +76,6 @@ function RootLayoutNav() {
 
   const fetchMyInfo = async () => {
     const myInfo = await getMyInfo()
-    console.log('myInfo', myInfo)
     dispatch(setUser(myInfo))
   }
 

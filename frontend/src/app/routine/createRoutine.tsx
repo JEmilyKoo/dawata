@@ -56,7 +56,6 @@ export default function CreateRoutine() {
   }, [playList, clearErrors])
 
   const onPressDelete = () => {
-    console.log('삭제해야 하는 id', deletePlayId)
     const updatedPlayList = playList.filter(
       (play) => play.playId !== deletePlayId,
     )
@@ -91,7 +90,6 @@ export default function CreateRoutine() {
   }
 
   const editPlay = (playId: number) => {
-    console.log('수정해야 할 playId', playId)
     setSettingPlayId(playId)
     setIsCreate(false)
     setIsSettingVisible(true)
@@ -107,7 +105,7 @@ export default function CreateRoutine() {
   }, [playList])
 
   return (
-    <View className="flex-1 bg-white p-4 justify-between">
+    <View className="flex-1 bg-white p-4 justify-between pt-4">
       <View>
         <View className="flex-row pb-2 border-b border-bord">
           <BackButton />

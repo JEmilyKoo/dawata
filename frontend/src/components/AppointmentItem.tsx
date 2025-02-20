@@ -103,13 +103,13 @@ export default function AppointmentItem({
           </Text>
           {/* 나중에 db 연결 확인하고 수정 예정 (voteStatus에 따라 투표 상태 보여주기) */}
         </View>
-        <View className="flex-row space-x-1">
+        <View className="flex-row">
           {appointmentListInfo.participantInfos.map((participant, index) => (
             <ImageThumbnail
               key={index}
               img={participant.img}
               defaultImg={require('@/assets/avatars/user1.png')}
-              className="rounded-full"
+              className="rounded-full mr-1"
               width={16}
               height={16}
             />

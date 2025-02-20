@@ -21,7 +21,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setLoginTokens: (state, action: PayloadAction<SocialLogin>) => {
-      console.log('action', action.payload)
       state.socialLogin = action.payload
     },
     setFCMToken: (state, action: PayloadAction<string>) => {

@@ -14,12 +14,14 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { useRouter } from 'expo-router'
 
+import { updateAppointment } from '@/apis/appointment'
 import PrevNextButton from '@/components/PrevNextButton'
 import StepIndicator from '@/components/StepIndicator'
 import TopHeader from '@/components/TopHeader'
 import WebDatePicker from '@/components/WebDatePicker'
 import { RootState } from '@/store/store'
 
+import { fetchRecommendPlaceAsync } from '../../store/slices/appointmentSlice'
 import {
   setCreateScheduledAt,
   setCreateVoteEndTime,
@@ -30,8 +32,13 @@ const AppointmentCreate2 = () => {
   const dispatch = useDispatch()
   const router = useRouter()
   const { create } = useSelector((state: RootState) => state.appointment)
+
   const [date, setDate] = useState(
-    create.scheduledAt ? new Date(create.scheduledAt) : new Date(),
+    create.scheduledAt
+      ? new Date(
+          new Date(create.scheduledAt).getTime() + (24 * 60 + 60) * 60 * 1000,
+        )
+      : new Date(Date.now() + (24 * 60 + 60) * 60 * 1000),
   )
 
   const [voteDate, setVoteDate] = useState(new Date(date))
@@ -55,11 +62,58 @@ const AppointmentCreate2 = () => {
   const onSubmit = () => {
     dispatch(setCreateScheduledAt(date.toISOString()))
     dispatch(setCreateVoteEndTime(voteDate.toISOString()))
+
+    setNext(true)
   }
+  const createAppointmentId = useSelector<RootState, number>(
+    (state) => state.appointment.createAppointmentId,
+  )
+
+  const recommandPlaceAsync = () => {
+    if (create.memberIds.length > 1 && createAppointmentId) {
+      dispatch(fetchRecommendPlaceAsync(createAppointmentId))
+        .unwrap() // 👈 이게 핵심! 성공 시 payload 직접 반환
+        .then((result) => {
+          console.log('✅ API 요청 성공:', result)
+        })
+        .catch((error) => {
+          console.error('❌ API 요청 실패:', error)
+        })
+    }
+  }
+
+  const updateAppo = async () => {
+    let update = {
+      scheduledAt: create.scheduledAt,
+      voteEndTime: create.voteEndTime,
+      name: create.name,
+      category: create.category,
+      appointmentId: createAppointmentId,
+    }
+    if (await updateAppointment(update)) {
+      if (next && createAppointmentId != 0) {
+        recommandPlaceAsync()
+        router.push('/appointment/create3')
+        return setNext(false)
+      }
+    } else {
+      console.log('오류 발생')
+    }
+  }
+  useEffect(() => {
+    if (
+      next &&
+      create.scheduledAt &&
+      create.voteEndTime &&
+      createAppointmentId
+    ) {
+      updateAppo()
+      setNext(false)
+    }
+  }, [create, createAppointmentId, next])
 
   const onPressNext = () => {
     onSubmit()
-    router.push('/appointment/create3')
   }
   const onPressPrev = () => {
     onSubmit()
@@ -67,7 +121,7 @@ const AppointmentCreate2 = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between  pt-4">
       <View className="flex-1 justify-start">
         <TopHeader title={t('createAppointment.title')} />
         <StepIndicator

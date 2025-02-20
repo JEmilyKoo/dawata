@@ -135,15 +135,22 @@ const appointmentSlice = createSlice({
       state.createVoteItemList = []
       state.recommandList = initialState.recommandList
       state.selectedRecommandList = []
-      state.recommandedPlace = null
+      // state.recommandedPlace = null
       state.standardList = state.standardList.filter(
         (item) => item.standardId != 0,
       )
       state.standardRecommandList = []
     },
+
     initCreate(state, action) {
-      state.create = initialState.create
-      state.create.clubId = action.payload
+      state.create.category = action.payload.category
+      state.create.memberIds = action.payload?.members.map(
+        (member) => member.memberId,
+      )
+      state.create.name = initialState.create.name
+      state.create.scheduledAt = initialState.create.scheduledAt
+      state.create.voteEndTime = initialState.create.voteEndTime
+      state.create.clubId = action.payload.clubId
     },
     setCreateName(state, action) {
       state.create.name = action.payload
@@ -244,7 +251,7 @@ const appointmentSlice = createSlice({
     },
     resetRecommandStandard(state, action) {
       state.standardRecommandList = state.standardRecommandList.map((item) =>
-        item.standard.standardId == action.payload.standard.standardId
+        item?.standard?.standardId === action.payload?.standard?.standardId
           ? {
               recommandList: initialState.recommandList,
               standard: action.payload,
@@ -379,10 +386,17 @@ export const {
 
 export const fetchRecommendPlaceAsync = createAsyncThunk(
   'appointment/fetchRecommendPlace',
-  async (payload: number) => {
-    const response = await recommendPlace(payload)
-    console.log('저장을 했어요✅✅✅✅✅✅✅✅✅✅', payload)
-    return response
+  async (payload: number, { rejectWithValue }) => {
+    console.log('📡 장소 추천 요청 시작:', payload)
+
+    try {
+      const response = await recommendPlace(payload)
+      console.log('✅ 장소 추천 응답 수신:', response)
+      return response.data // 성공 시 반환
+    } catch (error: any) {
+      console.error('❌ 장소 추천 실패:', error.message)
+      return rejectWithValue(error.response?.data || '알 수 없는 오류') // 실패 시 처리
+    }
   },
 )
 

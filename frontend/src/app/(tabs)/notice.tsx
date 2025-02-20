@@ -12,7 +12,7 @@ interface NoticeInfo {
   type: string // 알림 유형
   read: boolean // 알림 읽음 여부
   memberInfoResponse: {
-    img: string
+    img?: string
   }
   str: string
   createdAt: string
@@ -22,11 +22,17 @@ export default function TabOneScreen() {
   const [noticeInfo, setNoticeInfo] = useState<NoticeInfo[]>([])
   const { t } = useTranslation()
   const sendRead = async (id: number) => {
+    console.log('sendRead', 'id', id)
     const result = await updateNoticeRead({ noticeId: id })
-    let newNotice = noticeInfo.map((item) =>
-      item.id == id ? { ...item, read: true } : item,
+    console.log(result)
+
+    // 새로운 배열을 반환하도록 수정
+    const newNotice = noticeInfo.map((item) =>
+      item.id === id ? { ...item, read: true } : item,
     )
-    setNoticeInfo(newNotice)
+
+    // 상태를 새 배열로 업데이트
+    setNoticeInfo([...newNotice])
   }
   useEffect(() => {
     const fetchNotices = async () => {
@@ -40,9 +46,9 @@ export default function TabOneScreen() {
     fetchNotices()
   }, [])
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white  pt-4">
       <TopHeader title={t('notice')} />
-      <ScrollView>
+      <ScrollView className="p-2">
         {noticeInfo.length != 0 &&
           noticeInfo.map((noticeInfo) => (
             <View
