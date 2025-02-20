@@ -1,0 +1,96 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:mysql://${DB_URL}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource.hikari:
+    connection-init-sql: SET NAMES utf8mb4
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: ${REDIRECT_URI}
+            client-authentication-method: client_secret_post
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+springdoc:
+  swagger-ui:
+    path: /api-docs.html
+    persist-authorization: true
+  api-docs:
+    path: /api-docs
+    enabled: true
+  show-actuator: true
+  default-produces-media-type: application/json
+
+aws:
+  credentials:
+    region:
+      static: ap-northeast-2
+    access-key: ${ACCESS_KEY}
+    secret-key: ${SECRET_KEY}
+  s3:
+    bucket: ${BUCKET_NAME}
+    presigned-url-expiration: 10
+  sqs:
+    queue-url: ${QUEUE_URL}
+
+firebase:
+  "type": ${TYPE}
+  "project_id": ${PROJECT_ID}
+  "private_key_id": ${PRIVATE_KEY_ID}
+  "private_key": ${PRIVATE_KEY}
+  "client_email": ${CLIENT_EMAIL}
+  "client_id": ${FIREBASE_CLIENT_ID}
+  "auth_uri": ${AUTH_URI}
+  "token_uri": ${TOKEN_URI}
+  "auth_provider_x509_cert_url": ${AUTH_PROVIDER_X509_CERT_URL}
+  "client_x509_cert_url": ${CLIENT_X509_CERT_URL}
+  "universe_domain": ${UNIVERSE_DOMAIN}
+
+sk:
+  t_map_walk: https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1
+  t_map_drive: https://apis.openapi.sk.com/tmap/routes?version=1
+  t_map_transit: https://apis.openapi.sk.com/transit/routes
+  t_map_transit_sub: https://apis.openapi.sk.com/transit/routes/sub
+  api_key: ${SK_APP_KEY}
+
+jwt:
+  secret: ${SECRET}
+  access_expiration: 100000000000
+  refresh_expiration: 1000000
+
+livekit:
+  api:
+    key: ${LIVEKIT_KEYS}
+    secret: ${LIVEKIT_SECRET}
+
+logging.level:
+  org.hibernate.SQL: debug
+  org.hibernate.type: trace
