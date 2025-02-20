@@ -45,7 +45,7 @@ export const LiveMemberList = ({
             onPress={() => setSelectedMemberId(member.memberId)}>
             <ImageThumbnail
               img={member.img}
-              className={`w-12 h-12 rounded-full mb-2 ${selectedMemberId === member.memberId ? 'border-2 border-blue-500' : ''}`}
+              className={`rounded-full ${selectedMemberId === member.memberId ? 'border-2 border-blue-500' : ''}`}
               width={48}
               height={48}
               defaultImg={userImages[member.memberId % 10]}
@@ -54,7 +54,7 @@ export const LiveMemberList = ({
               {member.nickname}
             </Text>
             <Text className="text-xs text-gray-500">
-              {member.expectedArrivalTime}
+              {member.estimatedTime}
             </Text>
           </TouchableOpacity>
         ))}

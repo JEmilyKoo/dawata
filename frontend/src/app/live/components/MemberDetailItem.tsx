@@ -1,4 +1,11 @@
-import { Alert, Image, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  Image,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 import { postUrgentNotification } from '@/apis/live'
 import CallIcon from '@/assets/icons/call.svg'
@@ -34,8 +41,9 @@ export const MemberDetailItem = ({
 }) => {
   const postUrgent = async () => {
     if (!member) return
-    await postUrgentNotification(liveAppointmentId, member.memberId)
-    Alert.alert('재촉 알림이 전송되었습니다.')
+    // await postUrgentNotification(liveAppointmentId, member.memberId)
+    // Alert.alert('재촉 알림이 전송되었습니다.')
+    ToastAndroid.show('재촉 알림이 전송되었습니다.', ToastAndroid.SHORT)
   }
   return (
     member && (
@@ -55,7 +63,7 @@ export const MemberDetailItem = ({
               {member.nickname}
             </Text>
             <Text className="text-sm text-light-red">
-              {member.expectedArrivalTime}초 후 도착 예정
+              {member.estimatedTime}초 후 도착 예정
             </Text>
           </View>
           <View className="flex-row gap-2">

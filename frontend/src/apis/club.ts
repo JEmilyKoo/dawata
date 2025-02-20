@@ -8,7 +8,7 @@ import { uploadBinaryToS3 } from './s3Api'
 export const createClub = async (params: ClubCreateInfo) => {
   try {
     const response = await api.post('/clubs', params)
-    return response.data
+    return response
   } catch (error) {
     return null
   }
@@ -19,20 +19,6 @@ interface GetClubParams {
   clubId: number
   nextRange?: number
   prevRange?: number
-}
-
-export const getClub = async ({ clubId }: GetClubParams) => {
-  try {
-    const response = await api.get(`/clubs/${clubId}`)
-    console.log('결과가 나옴에 의의를 둠' + response)
-    return [
-      { id: 1, title: '약속1' },
-      { id: 2, title: '약속2' },
-    ]
-  } catch (error) {
-    console.error('⛔ 특정 그룹 데이터 조회 실패:')
-    return null
-  }
 }
 
 // 전체 그룹 데이터 조회

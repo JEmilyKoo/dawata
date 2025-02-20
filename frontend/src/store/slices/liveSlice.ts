@@ -6,6 +6,8 @@ const initialState: {
   attendanceState: AttendanceState
   liveAppointmentId: number | null
   liveData: LiveData
+  liveLat: number
+  liveLog: number
 } = {
   attendanceState: {
     showArrived: true,
@@ -19,6 +21,8 @@ const initialState: {
     appointmentTime: '',
     participants: [],
   },
+  liveLat: 0,
+  liveLog: 0,
 }
 
 const liveSlice = createSlice({
@@ -46,18 +50,36 @@ const liveSlice = createSlice({
     setLiveData(state, action) {
       state.liveData = action.payload
     },
+    setLiveLat(state, action) {
+      state.liveLat = action.payload
+    },
+    setLiveLog(state, action) {
+      state.liveLog = action.payload
+    },
     patchLiveData(state, action: PayloadAction<WebSocketLiveResponse[]>) {
-      action.payload.forEach((update) => {
-        const participant = state.liveData.participants.find(
-          (p) => p.memberId === update.memberId,
-        )
-        if (participant) {
-          participant.latitude = update.latitude
-          participant.longitude = update.longitude
-          participant.arrivalState = update.arrivalState
-          participant.expectedArrivalTime = update.estimatedTime
-        }
-      })
+      console.log('바뀌었나요? patchLiveData')
+      const update = action.payload[0]
+
+      if (!state.liveData || !state.liveData.participants) return
+
+      const updatedParticipants = state.liveData.participants.map(
+        (participant) =>
+          participant.memberId === update.memberId
+            ? {
+                ...participant,
+                latitude: update.latitude,
+                longitude: update.longitude,
+                arrivalState: update.arrivalState,
+                estimatedTime: update.estimatedTime,
+              }
+            : participant,
+      )
+
+      state.liveData = {
+        ...state.liveData,
+        participants: updatedParticipants,
+      }
+      console.log('patchLiveData', state.liveData)
     },
   },
 })
@@ -69,5 +91,7 @@ export const {
   resetLiveData,
   setLiveData,
   patchLiveData,
+  setLiveLat,
+  setLiveLog,
 } = liveSlice.actions
 export default liveSlice.reducer

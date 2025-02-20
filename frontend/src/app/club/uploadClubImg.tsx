@@ -9,7 +9,8 @@ import Cropper from '@/components/WebImageCropper'
 import ImageUploader from '@/hooks/useUploadThumbnail'
 
 export default function UploadClubImg() {
-  const { image, pickImage, cropImage, croppedImage } = ImageUploader()
+  const { image, pickImage, cropImage, croppedImage, croppedBlob } =
+    ImageUploader()
   const clubId = Number(useLocalSearchParams().clubId)
 
   useEffect(() => {
@@ -18,8 +19,10 @@ export default function UploadClubImg() {
 
   const uploadClubImg = async () => {
     let fileName = new Date().toISOString() + '.png'
-    const data = await patchClubImg(clubId, fileName)
-    console.log(data)
+    if (croppedBlob) {
+      const data = await patchClubImg(clubId, fileName, croppedBlob)
+      console.log(data)
+    }
   }
   useEffect(() => {
     if (croppedImage) {

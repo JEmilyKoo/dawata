@@ -32,35 +32,42 @@ const BottomSheetContent = ({
   }, [selectedMemberId])
 
   return (
-    <View className="flex-1 p-4">
+    <View className="flex-1">
       {showStatusBoard && (
         <StatusBoard
+          liveAppointmentId={liveAppointmentId}
           liveMembers={liveMembers}
           setShowStatusBoard={() => setShowStatusBoard(false)}
         />
       )}
 
       <View className="mb-5">
-        <View className="flex-row justify-center mb-5">
-          <AttendanceToggle />
-          <TouchableOpacity onPress={() => setShowStatusBoard(true)}>
+        <View className="p-4 flex-row justify-center items-center mb-5 w-full">
+          <View className="flex-row justify-center items-center">
+            <AttendanceToggle />
+          </View>
+          <TouchableOpacity
+            onPress={() => setShowStatusBoard(true)}
+            className="absolute right-0 p-4">
             <ChevronRightIcon
               height={24}
               width={24}
             />
           </TouchableOpacity>
         </View>
-        <LiveMemberList
-          liveMembers={liveMembers}
-          selectedMemberId={selectedMemberId}
-          setSelectedMemberId={setSelectedMemberId}
-        />
-        {selectedMemberId && (
-          <MemberDetailItem
-            liveAppointmentId={liveAppointmentId}
-            member={selectedMember}
+        <View className="px-4">
+          <LiveMemberList
+            liveMembers={liveMembers}
+            selectedMemberId={selectedMemberId}
+            setSelectedMemberId={setSelectedMemberId}
           />
-        )}
+          {selectedMemberId && (
+            <MemberDetailItem
+              liveAppointmentId={liveAppointmentId}
+              member={selectedMember}
+            />
+          )}
+        </View>
       </View>
     </View>
   )

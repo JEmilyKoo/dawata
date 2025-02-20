@@ -13,7 +13,7 @@ export default function DropDown({
 }) {
   const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   return (
-    <View className="h-full w-full">
+    <View className="">
       <TouchableOpacity
         onPress={() => setIsDropDownOpen(!isDropDownOpen)}
         className="w-full flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">

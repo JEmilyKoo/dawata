@@ -52,10 +52,10 @@ export default function CreateAddress() {
   const [isEmpty, setIsEmpty] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const selectAddress = (address: Coord) => {
-    dispatch(setCreateAddressName(address.address_name))
-    dispatch(setCreateRoadAddress(address.address_name))
-    dispatch(setCreateLatitude(address.y))
-    dispatch(setCreateLongitude(address.x))
+    // dispatch(setCreateRoadAddress(address.address_name))
+    // dispatch(setCreateLatitude(address.y))
+    // dispatch(setCreateLongitude(address.x))
+
     router.push({
       pathname: '/appointment/create4',
     })

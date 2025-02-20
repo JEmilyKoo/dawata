@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker'
 export default function ImageUploader() {
   const [image, setImage] = useState<string | null>(null)
   const [croppedImage, setCroppedImage] = useState<string | null>(null)
+  const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null)
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -38,7 +39,7 @@ export default function ImageUploader() {
         img.crossOrigin = 'anonymous'
 
         return new Promise((resolve) => {
-          img.onload = () => {
+          img.onload = async () => {
             canvas.width = 400
             canvas.height = 400
 
@@ -56,7 +57,18 @@ export default function ImageUploader() {
 
             const croppedImageUrl = canvas.toDataURL('image/png', 1.0)
             setCroppedImage(croppedImageUrl)
-            resolve(null)
+
+            // Canvas를 Blob으로 변환
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  setCroppedBlob(blob)
+                }
+                resolve(null)
+              },
+              'image/png',
+              1.0,
+            )
           }
         })
       } else {
@@ -81,11 +93,16 @@ export default function ImageUploader() {
           { compress: 1, format: ImageManipulator.SaveFormat.JPEG },
         )
         setCroppedImage(manipResult.uri)
+
+        // Native 환경에서 URI를 Blob으로 변환
+        const response = await fetch(manipResult.uri)
+        const blob = await response.blob()
+        setCroppedBlob(blob)
       }
     } catch (error) {
       console.error('이미지 크롭 중 오류 발생:', error)
     }
   }
 
-  return { image, pickImage, cropImage, croppedImage }
+  return { image, pickImage, cropImage, croppedImage, croppedBlob }
 }

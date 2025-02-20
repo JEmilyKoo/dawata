@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   ScrollView,
   StatusBar,
@@ -19,6 +20,7 @@ import Constants from 'expo-constants'
 import * as Location from 'expo-location'
 import { useRouter } from 'expo-router'
 
+import { createVoteItem } from '@/apis/appointment'
 /// 화면에 지도를 띄운다
 import { searchByCategory } from '@/apis/mapApi'
 import RecommandTabBar from '@/app/appointment/components/RecommandTabBar'
@@ -117,6 +119,7 @@ export default function createAddress4() {
   const [standardId, setStandardId] = useState<number>(-1)
 
   useEffect(() => {
+    console.log('추천 장소', recommandedPlace)
     if (!recommandedPlace?.latitude) return
 
     let targetStandard = standardRecommandList.find(
@@ -140,7 +143,6 @@ export default function createAddress4() {
   }, [recommandedPlace])
 
   const fetchPickedList = async () => {
-    console.log('아니씨발업뎃을 했잖아', pickedList)
     if (standardId < 0) return
     const props = {
       category_group_code: categoryGroupCode,
@@ -218,14 +220,41 @@ export default function createAddress4() {
 
   const webViewRef = React.useRef<WebView>(null)
   const onSubmit = () => {
+    const vList = selectedRecommandList.map(
+      (item) =>
+        ({
+          roadAddress: item.road_address_name,
+          longitude: Number(item.x),
+          latitude: Number(item.y),
+          title: item.place_name,
+          category: item.category_group_code,
+          linkUrl: item.place_url,
+          isOnly: false,
+        }) as CreateVoteInfo,
+    )
+    if (vList.length == 1) {
+      vList[0].isOnly = true
+    }
+
+    vList.forEach((item) => {
+      createVoteItem(item, create.appointmentId)
+    })
+    router.push('/appointment/create5')
     console.log('지도위치 저장')
   }
 
   const onPressNext = () => {
     console.log('data 확인', RecommandData)
-  }
-  const onPressPrev = () => {
+
+    if (selectedRecommandList.length == 0) {
+      Alert.alert('추천장소를 선택해주세요')
+      return
+    }
     onSubmit()
+    // router.push('/appointment/create5')
+  }
+
+  const onPressPrev = () => {
     router.push('/appointment/create3')
   }
 

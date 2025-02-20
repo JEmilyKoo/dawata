@@ -32,7 +32,7 @@ const initialState: {
     category: '',
     scheduledAt: '',
     voteEndTime: '',
-    clubId: 1,
+    clubId: 0,
     memberIds: [],
   },
   update: {
@@ -104,6 +104,7 @@ const initialState: {
       title: '추천타이틀',
       category: '추천카테고리',
       linkUrl: 'http://naver.com',
+      isOnly: false,
     },
   ],
   standardList: [],
@@ -142,8 +143,7 @@ const appointmentSlice = createSlice({
     },
     initCreate(state, action) {
       state.create = initialState.create
-
-      setCreateClubId(action)
+      state.create.clubId = action.payload
     },
     setCreateName(state, action) {
       state.create.name = action.payload
@@ -381,7 +381,7 @@ export const fetchRecommendPlaceAsync = createAsyncThunk(
   'appointment/fetchRecommendPlace',
   async (payload: number) => {
     const response = await recommendPlace(payload)
-    console.log('저장을 했어요', payload)
+    console.log('저장을 했어요✅✅✅✅✅✅✅✅✅✅', payload)
     return response
   },
 )

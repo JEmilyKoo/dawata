@@ -1,5 +1,9 @@
 import { BooleanResponse } from '@/types/api'
-import { AppointmentCreateInfo, AppointmentInfo } from '@/types/appointment'
+import {
+  AppointmentCreateInfo,
+  AppointmentInfo,
+  CreateVoteInfo,
+} from '@/types/appointment'
 
 import api from './api'
 
@@ -73,12 +77,13 @@ export const getAppointmentDetail = async (appointmentId: number) => {
 // 약속 수정
 export const updateAppointment = async (appointmentInfo: AppointmentInfo) => {
   try {
+    console.log('dfkdjfldk', appointmentInfo)
     let { name, category, scheduledAt, voteEndTime } = appointmentInfo
     const response = await api.put(
       `/appointments/${appointmentInfo.appointmentId}`,
       { name, category, scheduledAt, voteEndTime },
     )
-    return response.status == 'success'
+    return response
   } catch (error) {
     console.error('⛔ 약속 수정 실패:')
     return null
@@ -142,5 +147,22 @@ export const recommendPlace = async (appointmentId: number) => {
   } catch (error) {
     console.error('⛔ 장소 추천 받기 실패:')
     return null
+  }
+}
+
+// createVoteItem
+export const createVoteItem = async (
+  createVoteInfo: CreateVoteInfo,
+  appointmentId: number,
+): Promise<number> => {
+  try {
+    const data = await api.post(
+      `/appointments/${appointmentId}/vote-items`,
+      createVoteInfo,
+    )
+    return data
+  } catch (error) {
+    console.error('⛔ 투표 항목 생성 실패')
+    return 0
   }
 }

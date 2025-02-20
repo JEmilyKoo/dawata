@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -24,24 +25,37 @@ const AppointmentCreate1 = () => {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const { user } = useSelector((state: RootState) => state.member)
-  const create = useSelector((state: RootState) => state.appointment.create) // Redux store에서 모든 데이터 가져오기
+  const create = useSelector((state: RootState) => state.appointment.create)
+  const createAppointmentId = useSelector(
+    (state: RootState) => state.appointment.createAppointmentId,
+  ) // Redux store에서 모든 데이터 가져오기
   const { clubInfo } = useClub({ clubId: create.clubId })
   const clubMembers = clubInfo?.members || []
   const memberIds = create.memberIds
 
+  const [isNext, setIsNext] = useState(false)
   const onSubmit = async () => {
     dispatch(setCreateMemberIds(memberIds))
-    console.log('✅✅✅✅✅✅무슨 값이 오나요?', create)
+
     const response: number = await createAppointment(create)
+    console.log('결과값이씨발뭐길래아니진짜왜', response)
     if (response) {
       dispatch(setCreateAppointmentId(response))
-      console.log('✅✅✅✅✅✅무슨 값이 오나요?', response)
-      dispatch(fetchRecommendPlaceAsync(24))
-      router.push('/appointment/create2')
     } else {
       console.log('오류 발생')
     }
   }
+
+  useEffect(() => {
+    if (isNext && createAppointmentId != 0) {
+      console.log(
+        'fetchRecommendPlaceAsync✅✅✅✅✅✅✅✅✅',
+        createAppointmentId,
+      )
+      fetchRecommendPlaceAsync(createAppointmentId)
+      router.push('/appointment/create2')
+    }
+  }, [createAppointmentId, isNext])
 
   const handleCheckboxChange = (value: number) => {
     if (memberIds.includes(value)) {
@@ -52,8 +66,7 @@ const AppointmentCreate1 = () => {
   }
   const onPressNext = () => {
     onSubmit()
-
-    router.push('/appointment/create2')
+    setIsNext(true)
   }
 
   const isUser = (memberId: number) => {

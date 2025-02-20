@@ -21,8 +21,10 @@ export default function ClubMain() {
     <SafeAreaView className="flex-1 bg-white">
       <TopHeader title="내 그룹" />
       <ScrollView>
-        {clubList.map((club) => (
-          <View className="m-2 px-4 border-b border-bord">
+        {clubList.map((club, index) => (
+          <View
+            className="m-2 px-4 border-b border-bord"
+            key={index}>
             <ClubItem clubInfo={club} />
           </View>
         ))}

@@ -11,7 +11,7 @@ export interface LiveMember {
   latitude: number
   longitude: number
   arrivalState: 'NOT_ARRIVED' | 'ARRIVED' | 'LATE' | 'ABSENT' | 'LOST'
-  expectedArrivalTime: number
+  estimatedTime: number
 }
 
 export interface WebSocketLiveRequest {

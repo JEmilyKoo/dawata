@@ -1,18 +1,20 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Image,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { useLocalSearchParams, useRouter } from 'expo-router'
 
 import PlusIcon from '@/assets/icons/plus.svg'
+import { RootState } from '@/store/store'
 import { Club } from '@/types/club'
 
 import {
@@ -76,6 +78,8 @@ export type RouteParams = {
 }
 
 function ClubMain() {
+  const create = useSelector((state: RootState) => state.appointment.create)
+  const [isCreate, setIsCreate] = useState(false)
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(
     today.getFullYear() +
@@ -100,23 +104,15 @@ function ClubMain() {
     setCurrentMonth(formattedMonth)
   }
 
-  interface Club {
-    id: string
-    name: string
-    image: any
-    tag: string
-  }
-
-  const myClubs: Club[] = [
-    {
-      id: '1',
-      name: 'No.1',
-      image: require('@/assets/clubs/club1.png'),
-      tag: '#스터디',
-    },
-  ]
   const router = useRouter()
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (isCreate && create.clubId != 0) {
+      router.push('/appointment/create1')
+    }
+  }, [create, isCreate])
+
   const onPressCreateAppointment = () => {
     dispatch(initCreate(params.clubId))
     if (clubInfo) {
@@ -126,12 +122,15 @@ function ClubMain() {
       )
     }
     dispatch(resetVote())
-
-    router.push('/appointment/create1')
+    setIsCreate(true)
   }
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* 헤더 */}
+    <View className="flex-1 bg-white">
+      <StatusBar
+        translucent={true}
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       {clubInfo && (
         <ClubHeader
           name={clubInfo.name}
@@ -144,7 +143,9 @@ function ClubMain() {
       <ScrollView>
         <ClubMemberList clubId={Number(params.clubId)} />
         <View className="p-4">
-          <Text className="text-lg font-bold mb-4">No.1 캘린더</Text>
+          <Text className="text-lg font-bold mb-4 ml-4">
+            {clubInfo?.name} 캘린더
+          </Text>
           <Calendar
             className="border border-bord rounded-lg p-2"
             theme={{
@@ -172,10 +173,12 @@ function ClubMain() {
           />
         </View>
 
-        <AppointmentList
-          appointments={appointments}
-          clubImg={clubInfo?.img}
-        />
+        {clubInfo && (
+          <AppointmentList
+            appointments={appointments}
+            clubImg={clubInfo.img}
+          />
+        )}
       </ScrollView>
 
       <View className="absolute right-4 bottom-8">
@@ -189,7 +192,7 @@ function ClubMain() {
           />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

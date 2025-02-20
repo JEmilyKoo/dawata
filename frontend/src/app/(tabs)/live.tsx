@@ -16,6 +16,8 @@ import {
   resetLiveData,
   setLiveAppointmentId,
   setLiveData,
+  setLiveLat,
+  setLiveLog,
 } from '@/store/slices/liveSlice'
 import { RootState } from '@/store/store'
 import {
@@ -29,7 +31,9 @@ const Live = () => {
   const [isLiveStart, setIsLiveStart] = useState(false) // 카카오 지도가 뜨고, 소켓 연결이 완료되고, 데이터가 다 불러오고 나야 라이브 스타트 가능.
   const dispatch = useDispatch()
   const { user } = useSelector((state: RootState) => state.member)
-  const { liveAppointmentId } = useSelector((state: RootState) => state.live)
+  const { liveAppointmentId, liveLat, liveLog } = useSelector(
+    (state: RootState) => state.live,
+  )
   const [messages, setMessages] = useState<WebSocketLiveResponse[]>([])
   const [convertedOverlayList, setConvertedOverlayList] = useState<
     CustomOverlay[]
@@ -42,7 +46,8 @@ const Live = () => {
   const [destinationOverlay, setDestinationOverlay] =
     useState<CustomOverlay | null>(null)
   const liveData = useSelector((state: RootState) => state.live.liveData)
-  const kakaoJSApiKey = Constants.expoConfig?.extra?.kakaoJSApiKey
+  // const kakaoJSApiKey = Constants.expoConfig?.extra?.kakaoJSApiKey
+  const kakaoJSApiKey = '19ea7ae7701988d8dc2bccca4ab5504c'
   const webViewRef = useRef<WebView | null>(null)
   const [selectedMemberId, setSelectedMemberId] = useState<number>(0)
   const [webViewInit, setWebViewInit] = useState(false)
@@ -68,6 +73,8 @@ const Live = () => {
     console.log('liveStart 라이브 데이터', live)
     if (live) {
       dispatch(setLiveData(live))
+      dispatch(setLiveLat(live.latitude))
+      dispatch(setLiveLog(live.longitude))
     }
   }
   let reconnectTimeout: NodeJS.Timeout | null = null
@@ -99,6 +106,8 @@ const Live = () => {
       socketRef.current.onmessage = (event) => {
         try {
           const data: WebSocketLiveResponse = JSON.parse(event.data)
+          console.log('onmessage, data', data)
+
           setMessages((prev) => [...prev, data])
         } catch (error) {
           console.error('JSON 파싱 오류:', error)
@@ -127,23 +136,23 @@ const Live = () => {
     }
   }, [liveAppointmentId])
   useEffect(() => {
-    if (!isLiveStart && liveData?.appointmentTime) {
+    if (!isLiveStart && liveLat) {
       setIsLiveStart(true)
     }
-  }, [liveData])
+  }, [liveLat])
   const messageSetRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     if (messages.length > 0) {
       const newMessages = messages.filter((msg) => {
-        const key = JSON.stringify(msg)
+        const key = `${msg.memberId}-${msg.arrivalState}-${msg.estimatedTime}`
         if (!messageSetRef.current.has(key)) {
           messageSetRef.current.add(key)
           return true
         }
         return false
       })
-
+      console.log('뉴메시지', newMessages)
       if (newMessages.length > 0) {
         dispatch(patchLiveData(newMessages))
       }
@@ -151,6 +160,7 @@ const Live = () => {
   }, [messages])
 
   useEffect(() => {
+    console.log('바뀌었나요?')
     if (liveData && liveData?.participants.length == 0) return
     let newMemberOverlayList = liveData.participants.map(
       (participant: LiveMember) => ({
@@ -168,17 +178,18 @@ const Live = () => {
           participant.arrivalState !== 'LOST',
       }),
     )
+    console.log('아니저장을 했다고저장을', newMemberOverlayList)
     setConvertedOverlayList(newMemberOverlayList)
-  }, [liveData])
+  }, [JSON.stringify(liveData?.participants)])
 
   useEffect(() => {
-    if (liveData?.latitude && liveData?.longitude) {
+    if (liveLat && liveLog) {
       if (!destinationOverlay) {
         setDestinationOverlay({
           id: 0,
           type: 'destination',
-          latitude: liveData.latitude,
-          longitude: liveData.longitude,
+          latitude: liveLat,
+          longitude: liveLog,
           fillColor: Colors.primary,
           strokeColor: Colors.primary,
           textColor: 'white',
@@ -188,12 +199,12 @@ const Live = () => {
       } else {
         setDestinationOverlay({
           ...destinationOverlay,
-          latitude: liveData.latitude,
-          longitude: liveData.longitude,
+          latitude: liveLat,
+          longitude: liveLog,
         })
       }
     }
-  }, [liveData])
+  }, [liveLat, liveLog])
 
   const getOverlayColor = (arrivalState: string) => {
     if (arrivalState === 'NOT_ARRIVED') return Colors.light.yellow
@@ -203,53 +214,14 @@ const Live = () => {
   }
 
   useEffect(() => {
-    if (!liveData?.latitude || !liveData?.participants) return
+    console.log('convertedOverlayList 변경됨:', convertedOverlayList)
+    if (!liveLat || !liveData?.participants) return
 
-    if (memberOverlayList.length === 0) {
-      setMemberOverlayList(convertedOverlayList)
+    if (convertedOverlayList?.length == 0) {
+      clearCustomOverlay()
       setCustomOverlayList(convertedOverlayList)
     } else {
-      const updateLatLngList: CustomOverlay[] = []
-      const updateCustomOverlayList: CustomOverlay[] = []
-
-      // 기존 오버레이를 ID 기준으로 매핑
-      const memberOverlayMap = new Map(
-        memberOverlayList.map((overlay) => [overlay.id, overlay]),
-      )
-
-      convertedOverlayList.forEach((participant) => {
-        const memberOverlay = memberOverlayMap.get(participant.id)
-
-        if (!memberOverlay) return // 기존 오버레이가 없으면 건너뜀
-
-        // 상태나 색상 변경 확인
-        if (
-          participant.show !== memberOverlay.show ||
-          participant.fillColor !== memberOverlay.fillColor
-        ) {
-          updateCustomOverlayList.push(participant)
-        }
-
-        // 위치 변경 확인
-        if (
-          participant.latitude !== memberOverlay.latitude ||
-          participant.longitude !== memberOverlay.longitude
-        ) {
-          updateLatLngList.push(participant)
-        }
-      })
-
-      // 오버레이 상태 변경 반영
-      if (updateCustomOverlayList.length > 0) {
-        setCustomOverlayList(updateCustomOverlayList)
-      }
-
-      // 위치 변경 반영
-      if (updateLatLngList.length > 0) {
-        updateLatLngCustomOverlayList(updateLatLngList)
-      }
-
-      setMemberOverlayList(convertedOverlayList)
+      setCustomOverlayList(convertedOverlayList)
     }
   }, [convertedOverlayList])
 
@@ -285,11 +257,11 @@ const Live = () => {
   }, [selectedMemberId])
 
   const panTo = (lat: number, lng: number) => {
-    webViewRef.current?.injectJavaScript(`panTo(${lat}, ${lng})`)
+    webViewRef.current?.injectJavaScript(`panTo(${lat}, ${lng});`)
   }
 
   const clearCustomOverlay = () => {
-    webViewRef.current?.injectJavaScript(`clearCustomOverlay()`)
+    webViewRef.current?.injectJavaScript(`clearCustomOverlay();`)
     setMemberOverlayList([])
   }
 
@@ -299,39 +271,49 @@ const Live = () => {
     longitude: number,
   ) => {
     webViewRef.current?.injectJavaScript(
-      `updateLatLngCustomOverlay(${id}, ${latitude}, ${longitude})`,
+      `updateLatLngCustomOverlay(${id}, ${latitude}, ${longitude});`,
     )
   }
 
   const setCustomOverlay = (data: CustomOverlay) => {
     const jsonData = JSON.stringify(data)
-    webViewRef.current?.injectJavaScript(`setCustomOverlay(${jsonData})`)
+    webViewRef.current?.injectJavaScript(`setCustomOverlay(${jsonData});`)
   }
 
   const setCustomOverlayList = (data: CustomOverlay[]) => {
+    console.log('setCustomOverlayList 실행:', data)
+    if (!webViewRef.current) {
+      console.log('WebView ref가 없습니다')
+      return
+    }
     const jsonData = JSON.stringify(data)
-    webViewRef.current?.injectJavaScript(`setCustomOverlayList(${jsonData})`)
+    const jsCode = `setCustomOverlayList(${jsonData});`
+    console.log('실행할 JavaScript:', jsCode)
+    webViewRef.current.injectJavaScript(jsCode)
   }
 
   const updateLatLngCustomOverlayList = (data: CustomOverlay[]) => {
     const jsonData = JSON.stringify(data)
     webViewRef.current?.injectJavaScript(
-      `updateLatLngCustomOverlayList(${jsonData})`,
+      `updateLatLngCustomOverlayList(${jsonData});`,
     )
   }
 
   useEffect(() => {
-    if (webViewInit && liveData.latitude && liveData.longitude) {
-      setWebViewInit(false)
-      webViewRef.current?.injectJavaScript(
-        `initMap(${liveData.latitude}, ${liveData.longitude})`,
-      )
-      panTo(liveData.latitude, liveData.longitude)
+    console.log('webViewInit✅✅✅✅✅✅')
+    if (webViewInit && liveLat && liveLog) {
+      console.log('시작을 했냐고')
+      webViewRef.current?.injectJavaScript(`initMap(${liveLat}, ${liveLog});`)
+      panTo(liveLat, liveLog)
+      // setWebViewInit(false)
     }
-  }, [webViewInit, liveData])
+  }, [webViewInit, liveLat, liveLog])
   const handleOnMessage = (event: any) => {
+    console.log('아니뭐라고오시는데✅✅✅✅✅✅', event)
     try {
       const message = JSON.parse(event.nativeEvent.data)
+      console.log('message✅✅✅✅✅✅', message?.action)
+      if (!message.action) return
 
       if (message.action == 'webviewInit') {
         setWebViewInit(true)
@@ -341,7 +323,7 @@ const Live = () => {
         setSelectedMemberId(message.id)
       }
       if (message.action === 'mapInitComplete') {
-        panTo(liveData.latitude, liveData.longitude)
+        panTo(liveLat, liveLog)
         setWebViewInit(false) // 모든 작업 완료 후 상태 리셋
       }
     } catch (error) {
@@ -402,7 +384,8 @@ const Live = () => {
       var map
       var customOverlays = []
       function webviewInit() {
-        window.ReactNativeWebView.postMessage({ action: "webviewInit" })
+        window.ReactNativeWebView.postMessage(JSON.stringify({ action: "webviewInit" })
+        )
       }
       function initMap(latitude, longitude) {
         mapContainer = document.getElementById("map")
@@ -459,7 +442,7 @@ const Live = () => {
         })
       }
       function clickOverlay(id) {
-        window.ReactNativeWebView.postMessage({ action: "clickOverlay", id })
+        window.ReactNativeWebView.postMessage(JSON.stringify({ action: "clickOverlay", id }))
       }
       function makeCustomOverlayContent(data) {
         var background = makeCustomOverlayBackground(data)
@@ -526,7 +509,7 @@ const Live = () => {
       body,
       #map {
         width: 100%;
-        height: 70%;
+        height: 100%;
         margin: 0;
         padding: 0;
       }
@@ -578,20 +561,24 @@ const Live = () => {
     <>
       {isLiveStart && (
         <View style={{ flex: 1 }}>
+          {/* <Text>{JSON.stringify(memberOverlayList)}</Text> */}
           <View className="relative flex-1">
             <WebView
               ref={(ref) => (webViewRef.current = ref)}
               originWhitelist={['*']}
               source={{ html: webViewContent }}
+              javaScriptEnabled={true} // 필수 설정
               onMessage={onMessage}
             />
           </View>
           <BottomSheet handleChange={() => {}}>
-            <BottomSheetContent
-              liveMembers={liveData}
-              liveAppointmentId={liveAppointmentId}
-              selectedMemberId={selectedMemberId}
-              setSelectedMemberId={setSelectedMemberId}></BottomSheetContent>
+            {liveData && (
+              <BottomSheetContent
+                liveMembers={liveData.participants}
+                liveAppointmentId={liveAppointmentId}
+                selectedMemberId={selectedMemberId}
+                setSelectedMemberId={setSelectedMemberId}></BottomSheetContent>
+            )}
           </BottomSheet>
         </View>
       )}
@@ -607,7 +594,6 @@ const Live = () => {
                 style={{ width: '100%', maxHeight: 100 }}
               />
             </View>
-            <View></View>
           </View>
         </SafeAreaView>
       )}

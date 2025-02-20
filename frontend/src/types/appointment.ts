@@ -68,6 +68,7 @@ export interface CreateVoteInfo {
   title: string
   category: string
   linkUrl: string
+  isOnly: boolean
 }
 
 interface Participant {

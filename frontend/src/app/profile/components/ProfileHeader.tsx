@@ -56,7 +56,7 @@ const ProfileHeader = () => {
               className="w-16 h-16 rounded-full"
               width={72}
               height={72}
-              defaultImg={user.img}
+              defaultImg={require('@/assets/avatars/user1.png')}
             />
 
             <TouchableOpacity
