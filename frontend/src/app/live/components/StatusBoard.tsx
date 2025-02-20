@@ -27,7 +27,7 @@ export const StatusBoard = ({
       <ScrollView className="flex-wrap w-full px-4">
         {liveMembers.map((member) => (
           <MemberDetailItem
-            key={member.id}
+            key={member.memberId}
             member={member}
           />
         ))}

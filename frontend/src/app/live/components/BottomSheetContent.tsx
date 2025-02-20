@@ -12,9 +12,11 @@ import { StatusBoard } from './StatusBoard'
 const BottomSheetContent = ({
   liveMembers,
   selectedMemberId,
+  liveAppointmentId,
   setSelectedMemberId,
 }: {
   liveMembers: LiveMember[]
+  liveAppointmentId: number
   selectedMemberId: number
   setSelectedMemberId: (id: number) => void
 }) => {
@@ -23,7 +25,8 @@ const BottomSheetContent = ({
   useEffect(() => {
     if (selectedMemberId) {
       setSelectedMember(
-        liveMembers.find((member) => member.id === selectedMemberId) || null,
+        liveMembers.find((member) => member.memberId === selectedMemberId) ||
+          null,
       )
     }
   }, [selectedMemberId])
@@ -36,7 +39,6 @@ const BottomSheetContent = ({
           setShowStatusBoard={() => setShowStatusBoard(false)}
         />
       )}
-
 
       <View className="mb-5">
         <View className="flex-row justify-center mb-5">
@@ -53,7 +55,12 @@ const BottomSheetContent = ({
           selectedMemberId={selectedMemberId}
           setSelectedMemberId={setSelectedMemberId}
         />
-        {selectedMemberId && <MemberDetailItem member={selectedMember} />}
+        {selectedMemberId && (
+          <MemberDetailItem
+            liveAppointmentId={liveAppointmentId}
+            member={selectedMember}
+          />
+        )}
       </View>
     </View>
   )

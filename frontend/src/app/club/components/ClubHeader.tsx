@@ -45,7 +45,7 @@ const ClubHeader = ({
   const updateClubProfile = () => {
     router.push({
       pathname: '/club/updateProfile',
-      params: { clubId: clubId, memberId: user.id },
+      params: { clubId: clubId, memberId: user.memberId },
     })
   }
 

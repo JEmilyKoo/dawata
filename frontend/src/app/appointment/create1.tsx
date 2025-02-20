@@ -57,7 +57,7 @@ const AppointmentCreate1 = () => {
   }
 
   const isUser = (memberId: number) => {
-    return memberId === user.id
+    return memberId === user.memberId
   }
   const selectAll = () => {
     if (clubMembers.length == 0) return

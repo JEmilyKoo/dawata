@@ -19,7 +19,7 @@ api.interceptors.request.use(
 
     if (accessToken) {
       config.headers = config.headers || {}
-      config.headers.accessToken = `Bearer ${accessToken}`
+      config.headers.Authorization = `Bearer ${accessToken}`
     } else {
       delete config.headers.accessToken
     }

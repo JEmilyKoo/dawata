@@ -69,7 +69,7 @@ export default function Profile() {
   const { attendanceStatus } = useAttendanceStatus()
   const { t } = useTranslation()
   return (
-    <ScrollView>
+    <ScrollView className="bg-white">
       <ProfileHeader />
       <View className="p-4">
         <Calendar
