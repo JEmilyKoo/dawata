@@ -5,6 +5,9 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dawata.domain.fcm.enums.FCMNoticeType;
+import com.ssafy.dawata.domain.fcm.repository.FcmRepository;
+import com.ssafy.dawata.domain.fcm.service.FCMService;
 import com.ssafy.dawata.domain.member.service.MemberService;
 import com.ssafy.dawata.domain.notice.dto.response.NoticeResponse;
 import com.ssafy.dawata.domain.notice.entity.Notice;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class NoticeService {
 	private final NoticeRepository noticeRepository;
 	private final MemberService memberService;
+	private final FCMService fcmService;
 
 	public Slice<NoticeResponse> findNoticeList(Long memberId) {
 		return new SliceImpl<>(
@@ -27,10 +31,21 @@ public class NoticeService {
 					return NoticeResponse.builder()
 						.id(notice.getId())
 						.type(notice.getNoticeType().name())
-						// TODO(고) : 여기가 문제
-						.memberInfoResponse(memberService.findMemberInfo(notice.getMember().getId()))
+						// .memberInfoResponse(memberService.findMemberInfo(notice.getMember().getId()))
 						.read(notice.isRead())
 						.createdAt(notice.getCreatedAt())
+						.str(
+							String.format(
+								FCMNoticeType.fromCodeToNoticeType(
+									Integer.parseInt(notice.getNoticeType().getValue() + "" + notice.getMessageType())
+								).getBody(),
+								fcmService.findMessageValue(
+									Integer.parseInt(notice.getNoticeType().getValue() + "" + notice.getMessageType()),
+									notice.getReferenceId(),
+									memberId
+								)
+							)
+						)
 						.build();
 				}).toList()
 		);

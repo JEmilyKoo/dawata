@@ -14,11 +14,13 @@ public record NoticeResponse(
 	Long id,
 	@Schema(description = "알림 type", example = "11")
 	String type,
-	@Schema(description = "회원 response 데이터")
-	MemberInfoResponse memberInfoResponse,
+	// @Schema(description = "회원 response 데이터")
+	// MemberInfoResponse memberInfoResponse,
 	@Schema(description = "알림 읽음 유무", example = "false")
 	boolean read,
 	@Schema(description = "알림 생성 날짜", example = "2025-02-01T01:23:45")
-	LocalDateTime createdAt
+	LocalDateTime createdAt,
+	@Schema(description = "알림 문장", example = "~~함")
+	String str
 ) {
 }
