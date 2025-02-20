@@ -2,27 +2,12 @@
 import { useEffect, useState } from 'react'
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 
-import { getRoutine } from '@/apis/routine'
-import { Play } from '@/types/routine'
+import { getNowRoutine, getRoutine } from '@/apis/routine'
+import { NowRoutine, Play } from '@/types/routine'
 
 import MainPlayItem from './MainPlayItem'
 
 export default function MainPlayList() {
-  // 루틴 번호, 루틴 시작 시간을 가져왔다고 가정
-  const routineId = 1
-  const routineStartTime = '2025-02-18T15:50:00'
-  const dummyPlayList: Play[] = [
-    {
-      playId: 1,
-      playName: '샤워하기',
-      spendTime: 20,
-    },
-    {
-      playId: 2,
-      playName: '옷 갈아입기',
-      spendTime: 5,
-    },
-  ]
   // 이 페이지의 계획
   // 0. 시작해야 하는 루틴이 없으면 이 페이지는 비활성화
   // 1. 루틴이 시작되면 처음에 있던 첫 행동(Play)과 예상 소요 시간으로 타이머가 시작됨
@@ -31,18 +16,35 @@ export default function MainPlayList() {
   // 4. 이런 식으로 모든 행동이 끝날 때까지 반복
   // 예시: 현재 시간은 15:00, 루틴 시작 시간은 15:30, 루틴의 첫 행동은 샤워하기 00:15, 다음은 옷 갈아입기 00:05
 
+  const [routineId, setRoutineId] = useState<number | null>(null)
+  const [routineStartTime, setRoutineStartTime] = useState<string | null>(null)
   const [playList, setPlayList] = useState<Play[]>([])
   const [currentTime, setCurrentTime] = useState(new Date())
   const [currentPlayIndex, setCurrentPlayIndex] = useState<number | null>(null)
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  const [nowRoutine, setNowRoutine] = useState<NowRoutine | null>(null)
+
+  useEffect(() => {
+    const fetchNowRoutine = async () => {
+      const nowRoutine = await getNowRoutine()
+      setNowRoutine(nowRoutine)
+    }
+    fetchNowRoutine()
+  }, [])
+
+  useEffect(() => {
+    if (nowRoutine) {
+      setRoutineId(nowRoutine.routineId)
+      setRoutineStartTime(nowRoutine.routineStartTime)
+    }
+  }, [nowRoutine])
 
   useEffect(() => {
     const fetchRoutine = async () => {
-      const routine = await getRoutine(routineId)
-      setPlayList([
-        ...dummyPlayList,
-        // ...routine.playList,
-      ])
+      if (routineId) {
+        const routine = await getRoutine(routineId)
+        setPlayList(routine.playList)
+      }
     }
     fetchRoutine()
   }, [routineId])
@@ -57,38 +59,43 @@ export default function MainPlayList() {
   }, [])
 
   useEffect(() => {
-    const startDate = new Date(routineStartTime)
-    const timeDiff = Math.floor(
-      (startDate.getTime() - currentTime.getTime()) / 60000,
-    )
+    if (routineStartTime && playList.length > 0) {
+      // playList가 있을 때만 실행
+      const startDate = new Date(routineStartTime)
+      const timeDiff = Math.floor(
+        (startDate.getTime() - currentTime.getTime()) / 60000,
+      )
+      if (timeDiff <= 0) {
+        let elapsedTime = -timeDiff
+        let accumulatedTime = 0
+        let routineEnded = true
 
-    if (timeDiff <= 0) {
-      // 루틴이 시작된 경우에만 처리
-      let elapsedTime = -timeDiff
-      let accumulatedTime = 0
-      let routineEnded = true // 루틴 종료 여부를 확인하기 위한 플래그
+        for (let i = 0; i < playList.length; i++) {
+          accumulatedTime += playList[i].spendTime
+          if (elapsedTime < accumulatedTime) {
+            setCurrentPlayIndex(i)
+            setTimeLeft(accumulatedTime - elapsedTime)
+            routineEnded = false
+            break
+          }
+        }
 
-      for (let i = 0; i < playList.length; i++) {
-        accumulatedTime += playList[i].spendTime
-        if (elapsedTime < accumulatedTime) {
-          setCurrentPlayIndex(i)
-          setTimeLeft(accumulatedTime - elapsedTime)
-          routineEnded = false
-          break
+        if (routineEnded) {
+          setTimeLeft(null)
+          setCurrentPlayIndex(null)
+          setPlayList([])
+          setNowRoutine(null)
+          setRoutineId(null)
+          setRoutineStartTime(null)
         }
       }
-
-      // 모든 플레이가 끝났으면 timeLeft를 null로 설정
-      if (routineEnded) {
-        setTimeLeft(null)
-        setCurrentPlayIndex(null)
-      }
     }
-  }, [currentTime])
+  }, [currentTime, playList, routineStartTime])
 
   // 루틴이 시작되지 않았거나 루틴의 시간이 지났으면 아무것도 표시하지 않음
   if (
-    new Date(routineStartTime).getTime() > currentTime.getTime() ||
+    (routineStartTime &&
+      new Date(routineStartTime).getTime() > currentTime.getTime()) ||
     timeLeft === null
   ) {
     return null

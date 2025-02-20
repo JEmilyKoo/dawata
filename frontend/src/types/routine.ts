@@ -40,3 +40,8 @@ export interface RoutineCreate {
   routineName: string
   playList: CreatePlay[]
 }
+
+export interface NowRoutine {
+  routineId: number
+  routineStartTime: string
+}
