@@ -66,9 +66,11 @@ public class RecommendService {
 			.filter(entry -> !entry.getValue().isEmpty()) // 응답이 없는 경우 제외
 			.map(entry -> {
 				double stdDev = calculateStdDev(entry.getValue());
-				return new AbstractMap.SimpleEntry<>(entry.getKey(), stdDev);
+				int totalTime = entry.getValue().stream().mapToInt(Integer::intValue).sum();
+				return new AbstractMap.SimpleEntry<>(entry.getKey(), new double[] {stdDev, totalTime});
 			})
-			.sort(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue)) // 표준편차가 최소인 순으로 정렬
+			.sort(Comparator.comparingDouble((AbstractMap.SimpleEntry<Train, double[]> entry) -> entry.getValue()[0])
+				.thenComparingDouble(entry -> entry.getValue()[1])) // 표준편차가 최소인 순으로 정렬
 			.next() // 최적의 역 하나만 선택
 			.map(entry -> new double[] {entry.getKey().getLatitude(), entry.getKey().getLongitude()})
 			.defaultIfEmpty(new double[2]); // 예외 처리 (추천 역이 없는 경우 빈 배열 반환)
@@ -156,7 +158,7 @@ public class RecommendService {
 					new double[] {coordinate[0], coordinate[1]},
 					new double[] {train.getLatitude(), train.getLongitude()}
 				);
-				if (distance < 1000) {
+				if (distance < 100) {
 					isFiltered = true;
 					break;
 				}

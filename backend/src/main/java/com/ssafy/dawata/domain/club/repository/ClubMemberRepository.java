@@ -42,9 +42,13 @@ public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
 		)
 		FROM ClubMember cm
 			JOIN FETCH cm.member m
-			JOIN Photo ph
-				ON ph.entityCategory = 4 AND ph.entityId = cm.id
-		WHERE m.id = :memberId
+			JOIN Photo ph ON ph.entityCategory = 4 AND ph.entityId = m.id
+			JOIN Participant p ON cm.id = p.clubMember.id
+			JOIN Appointment a ON p.appointment.id = a.id
+		WHERE a.id = :appointmentId AND m.id = :memberId
 		""")
-	Optional<ParticipantDto> findByMemberIdToParticipantDto(@Param("memberId") Long memberId);
+	Optional<ParticipantDto> findByMemberIdToParticipantDto(
+		@Param("appointmentId") Long appointmentId,
+		@Param("memberId") Long memberId
+	);
 }

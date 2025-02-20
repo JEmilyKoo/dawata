@@ -110,9 +110,8 @@ public class LiveService {
 		List<LiveParticipantResponse> participantResponseList = new ArrayList<>();
 
 		for (Long memberId : memberList) {
-
 			ParticipantDto participantDto =
-				clubMemberRepository.findByMemberIdToParticipantDto(memberId)
+				clubMemberRepository.findByMemberIdToParticipantDto(appointmentId, memberId)
 					.orElseThrow(() -> new IllegalArgumentException("참여자가 없습니다."));
 
 			// 위치 2개
