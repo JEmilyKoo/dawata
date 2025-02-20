@@ -67,7 +67,7 @@ public class FCMService {
 					.setBody(String.format(noticeType.getBody(), messageValues))
 					.build())
 				.putData("action", String.valueOf(noticeType.getCode()))  // 추가된 data 필드
-				.putData("user_id", String.valueOf(entityId))  // 추가된 data 필드
+				.putData("user_id", String.valueOf(memberId))  // 추가된 data 필드
 				.setAndroidConfig(AndroidConfig.builder()
 					.setPriority(AndroidConfig.Priority.HIGH)  // priority 추가
 					.setNotification(AndroidNotification.builder()
@@ -103,7 +103,7 @@ public class FCMService {
 		);
 	}
 
-	private Object[] findMessageValue(int typeCode, Long entityId, Long memberId) {
+	public Object[] findMessageValue(int typeCode, Long entityId, Long memberId) {
 		switch (typeCode / 10) {
 			case 1, 2 -> {
 				return Arrays.asList(
