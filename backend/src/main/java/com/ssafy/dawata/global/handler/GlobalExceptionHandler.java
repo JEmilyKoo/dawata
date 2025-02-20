@@ -74,6 +74,7 @@ public class GlobalExceptionHandler {
 		final Exception e,
 		final HttpServletRequest request
 	) {
+		e.printStackTrace();
 		return ErrorResponse.toResponseEntity(CommonErrorCode.INTERNAL_SERVER_ERROR);
 	}
 }

@@ -214,7 +214,7 @@ public class AppointmentService {
 
 		if (requestDto.voteEndTime().isPresent()) {
 			// redis에 만료시간으로 in
-			redisService.updateDataUseTTL(
+			redisService.saveDataUseTTL(
 				redisTemplateForOthers,
 				RedisKeyCategory.APPOINTMENT_VOTE.getKey() + appointmentId,
 				"",

@@ -9,6 +9,8 @@ import lombok.Builder;
 @Schema(description = "회원 response 데이터")
 @Builder
 public record MemberInfoResponse(
+	@Schema(description = "회원 아이디", example = "1")
+	Long memberId,
 	@Schema(description = "이메일", example = "test@email.com")
 	String email,
 	@Schema(description = "이름", example = "userName")
