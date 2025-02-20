@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class FCMService {
 	private final ClubRepository clubRepository;
 	private final AppointmentRepository appointmentRepository;
@@ -89,7 +88,6 @@ public class FCMService {
 			log.error("예상치 못한 에러로 전송 실패: {}", e.getMessage(), e);
 		}
 	}
-
 
 	public void saveNotice(String type, String messageType, Long entityId, Long memberId) {
 		noticeRepository.save(

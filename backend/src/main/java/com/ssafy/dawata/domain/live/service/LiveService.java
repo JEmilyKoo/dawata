@@ -41,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class LiveService {
 	private final ClubMemberRepository clubMemberRepository;
 	private final AppointmentRepository appointmentRepository;
@@ -83,11 +82,9 @@ public class LiveService {
 		// 재촉알림 fcm
 		fcmService.sendNotification(
 			"4",
-			"3",
+			"2",
 			memberId,
-			memberRepository
-				.customFindByParticipantId(urgentRequest.targetParticipantId())
-				.orElseThrow(() -> new IllegalArgumentException("해당하는 약속 참가자가 없음둥~")));
+			urgentRequest.targetParticipantId());
 	}
 
 	/**
