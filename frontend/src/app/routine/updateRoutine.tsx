@@ -37,6 +37,8 @@ export default function UpdateRoutine() {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm({
     defaultValues: {
       routineName: create.routineName,
@@ -44,15 +46,42 @@ export default function UpdateRoutine() {
     },
   })
 
+  const onSubmit = async (data: {
+    routineName: string
+    playList: CreatePlay[]
+  }) => {
+    if (playList.length === 0) {
+      setError('playList', {
+        type: 'required',
+        message: '행동을 추가해주세요',
+      })
+      return
+    }
+
+    const routine: RoutineCreate = {
+      routineName: data.routineName,
+      playList: playList,
+    }
+    const response = await updateRoutine(Number(routineId), routine)
+    router.push({
+      pathname: '/routine/routineList',
+    })
+  }
+
   useEffect(() => {
-    setPlayList(
-      create.playList.map((item) => ({
-        playId: item.playId,
-        playName: item.playName,
-        spendTime: item.spendTime,
-      })),
-    )
-  }, [create])
+    if (playList.length > 0) {
+      clearErrors('playList')
+    }
+  }, [playList, clearErrors])
+
+  useEffect(() => {
+    const initialPlayList = create.playList.map((item: Play) => ({
+      playId: item.playId,
+      playName: item.playName,
+      spendTime: item.spendTime,
+    }))
+    setPlayList(initialPlayList)
+  }, [])
 
   useEffect(() => {
     setTotalTime(
@@ -63,23 +92,6 @@ export default function UpdateRoutine() {
   const [isSettingVisible, setIsSettingVisible] = useState(false)
   const [deletePlayId, setDeletePlayId] = useState(0)
   const [settingPlayId, setSettingPlayId] = useState(0)
-
-  const onSubmit = async (data: {
-    routineName: string
-    playList: CreatePlay[]
-  }) => {
-    // dispatch(setCreateRoutineName(data.routineName))
-    // dispatch(setCreatePlayList(data.playList))
-    // playlist 수정하는 것은 별도로 구현할 것
-    const routine: RoutineCreate = {
-      routineName: data.routineName,
-      playList: playList,
-    }
-    const response = await updateRoutine(Number(routineId), routine)
-    router.push({
-      pathname: '/routine/routineList',
-    })
-  }
 
   const editPlay = (playId: number) => {
     console.log('수정해야 할 playId', playId)
@@ -132,7 +144,9 @@ export default function UpdateRoutine() {
           )}
         />
         {errors.routineName && (
-          <Text className="text-light-red">{errors.routineName.message}</Text>
+          <Text className="text-light-red">
+            {(errors.routineName as { message: string }).message}
+          </Text>
         )}
         <Text className="text-lg font-bold">행동을 설정해주세요</Text>
         {playList.map((item) => (
@@ -146,6 +160,11 @@ export default function UpdateRoutine() {
             key={item.playId}
           />
         ))}
+        {errors.playList && (
+          <Text className="text-light-red">
+            {(errors.playList as { message: string }).message}
+          </Text>
+        )}
 
         <TouchableOpacity
           onPress={() => {
