@@ -415,6 +415,10 @@ public class AppointmentService {
 
 				String voteTitle = "장소 투표 중";
 
+				if (voteStatus == VoteStatus.EXPIRED && maxVoteItem == null) {
+					voteTitle = "투표 결과 없음";
+				}
+
 				if ((voteStatus == VoteStatus.EXPIRED
 					|| voteStatus == VoteStatus.PLACE_ONLY)
 					&& maxVoteItem != null) {
