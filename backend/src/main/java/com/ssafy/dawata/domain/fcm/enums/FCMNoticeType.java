@@ -9,7 +9,7 @@ public enum FCMNoticeType {
 	GROUP_PARTICIPATION_APPOINTMENT(13, "그룹", "%s 약속에 참여되었습니다."),
 	VOTE_UPDATE(21, "투표", "%s에서 투표가 변경되었습니다."),
 	VOTE_END(22, "투표", "%s에서 투표가 마감되었습니다."),
-	APPOINTMENT_HISTORY_NOTICE(31, "약속", "약속 알림~"), // 요건 fe과 상의필요
+	// APPOINTMENT_HISTORY_NOTICE(31, "약속", "약속"), // 요건 fe과 상의필요
 	APPOINTMENT_UPDATE(32, "약속", "%s 약속이 변경되었습니다."),
 	LIVE_START(33, "약속", "%s live가 시작 되었습니다."),
 	LIVE_OTHER_ARRIVED(41, "라이브", "%s님이 목적지에 도착했습니다."),
