@@ -1,6 +1,7 @@
 package com.ssafy.dawata.domain.notice.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 	@Query("""
 		    SELECT n
 		    FROM Notice n
-		    JOIN Member m ON n.member = m
+		    JOIN FETCH Member m ON n.member = m
 		    WHERE n.member.id = :memberId
 		    AND n.deleted = false
 		""")
