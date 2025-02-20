@@ -1,13 +1,28 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
-import { AttendanceState } from '@/types/live'
+import { AttendanceState, LiveData, WebSocketLiveResponse } from '@/types/live'
 
-const initialState = {
+const initialState: {
+  attendanceState: AttendanceState
+  liveAppointmentId: number | null
+  liveData: LiveData
+  liveLat: number
+  liveLog: number
+} = {
   attendanceState: {
     showArrived: true,
     showNotArrived: true,
     showAbsent: true,
-  } as AttendanceState,
+  },
+  liveAppointmentId: null as number | null,
+  liveData: {
+    latitude: 0,
+    longitude: 0,
+    appointmentTime: '',
+    participants: [],
+  },
+  liveLat: 0,
+  liveLog: 0,
 }
 
 const liveSlice = createSlice({
@@ -25,9 +40,56 @@ const liveSlice = createSlice({
     toggleShowAbsent(state) {
       state.attendanceState.showAbsent = !state.attendanceState.showAbsent
     },
+    setLiveAppointmentId(state, action) {
+      state.liveAppointmentId = action.payload
+    },
+    resetLiveData(state) {
+      state.liveAppointmentId = initialState.liveAppointmentId
+      state.liveData = initialState.liveData
+    },
+    setLiveData(state, action) {
+      state.liveData = action.payload
+    },
+    setLiveLat(state, action) {
+      state.liveLat = action.payload
+    },
+    setLiveLog(state, action) {
+      state.liveLog = action.payload
+    },
+    patchLiveData(state, action: PayloadAction<WebSocketLiveResponse[]>) {
+      const update = action.payload[0]
+
+      if (!state.liveData || !state.liveData.participants) return
+
+      const updatedParticipants = state.liveData.participants.map(
+        (participant) =>
+          participant.memberId === update.memberId
+            ? {
+                ...participant,
+                latitude: update.latitude,
+                longitude: update.longitude,
+                arrivalState: update.arrivalState,
+                estimatedTime: update.estimatedTime,
+              }
+            : participant,
+      )
+
+      state.liveData = {
+        ...state.liveData,
+        participants: updatedParticipants,
+      }
+    },
   },
 })
-
-export const { toggleShowArrived, toggleShowNotArrived, toggleShowAbsent } =
-  liveSlice.actions
+export const {
+  toggleShowArrived,
+  toggleShowNotArrived,
+  toggleShowAbsent,
+  setLiveAppointmentId,
+  resetLiveData,
+  setLiveData,
+  patchLiveData,
+  setLiveLat,
+  setLiveLog,
+} = liveSlice.actions
 export default liveSlice.reducer

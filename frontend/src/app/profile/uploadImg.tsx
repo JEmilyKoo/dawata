@@ -28,7 +28,6 @@ export default function UploadImg() {
 
   const uploadMemberImg = async (croppedImage: string) => {
     let fileName = new Date().toISOString()
-    console.log(croppedImage)
     const result = await patchMemberImg(fileName, base64ToBlob(croppedImage))
     if (result) {
       console.log('업로드 성공')

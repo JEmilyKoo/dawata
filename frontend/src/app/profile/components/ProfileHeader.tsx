@@ -7,6 +7,7 @@ import BellIcon from '@/assets/icons/bell.svg'
 import CameraIcon from '@/assets/icons/camera.svg'
 import SettingsIcon from '@/assets/icons/settings.svg'
 import BackButton from '@/components/BackButton'
+import ImageThumbnail from '@/components/ImageThumbnail'
 import { RootState } from '@/store/store'
 
 const ProfileHeader = () => {
@@ -15,7 +16,7 @@ const ProfileHeader = () => {
     if (Platform.OS === 'web') {
       router.push({
         pathname: '/profile/uploadImg',
-        params: { memberId: user.id },
+        params: { memberId: user.memberId },
       })
     } else {
       console.log('uploadImg')
@@ -26,7 +27,7 @@ const ProfileHeader = () => {
       <View className="flex-col justify-between p-4">
         <View className="flex-row justify-between">
           <BackButton />
-          <View className="flex-row gap-2">
+          <View className="flex-row gap-2 mr-5">
             <TouchableOpacity
               onPress={() => {
                 router.push({
@@ -44,15 +45,20 @@ const ProfileHeader = () => {
             />
           </View>
         </View>
-        <View className="flex-row justify-between">
-          <View>
-            <Text className="text-lg font-bold">최혁규</Text>
-            <Text className="text-sm text-gray-600">huk9uri@email.com</Text>
+        <View className="ml-4 flex-row justify-between">
+          <View className="">
+            <Text className="text-2xl text-text-primary font-bold">
+              {user.name}
+            </Text>
+            <Text className="text-xl text-text-secondary">{user.email}</Text>
           </View>
-          <View>
-            <Image
-              source={require('@/assets/avatars/user1.png')}
-              style={{ width: 72, height: 72 }}
+          <View className="mx-5">
+            <ImageThumbnail
+              img={user.img}
+              className="rounded-full"
+              width={75}
+              height={75}
+              defaultImg={require('@/assets/avatars/user1.png')}
             />
 
             <TouchableOpacity

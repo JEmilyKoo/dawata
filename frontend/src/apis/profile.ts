@@ -1,5 +1,16 @@
 import api from './api'
 
+// 내 정보 조회
+export const getMyInfo = async () => {
+  try {
+    const response = await api.get(`/members`)
+    return response.data
+  } catch (error) {
+    console.error('⛔ 네 정보 조회 실패:')
+    return null
+  }
+}
+
 export const getAttendanceStatus = async () => {
   try {
     const response = await api.get(`/members/appointment-info`)

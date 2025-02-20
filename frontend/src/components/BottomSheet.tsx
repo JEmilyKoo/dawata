@@ -32,6 +32,7 @@ const BottomSheet = ({ handleChange, children, snaps }: BottomSheetProps) => {
       enablePanDownToClose={false}
       enableDismissOnClose={false}
       enableDynamicSizing={false}
+      style={{ flex: 1 }}
       onChange={handleChange}
       handleComponent={renderHeaderHandle}>
       {children}

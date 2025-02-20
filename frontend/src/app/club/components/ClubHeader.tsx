@@ -10,6 +10,8 @@ import { useRouter } from 'expo-router'
 import CameraIcon from '@/assets/icons/camera.svg'
 import CopyIcon from '@/assets/icons/copy.svg'
 import MoreIcon from '@/assets/icons/more.svg'
+import BackButton from '@/components/BackButton'
+import ImageThumbnail from '@/components/ImageThumbnail'
 import MenuCustomOptions from '@/components/MenuCustomOptions'
 import UploadThumbnail from '@/components/UploadThumbnail'
 import Colors from '@/constants/Colors'
@@ -45,7 +47,7 @@ const ClubHeader = ({
   const updateClubProfile = () => {
     router.push({
       pathname: '/club/updateProfile',
-      params: { clubId: clubId, memberId: user.id },
+      params: { clubId: clubId, memberId: user.memberId },
     })
   }
 
@@ -68,11 +70,11 @@ const ClubHeader = ({
       onSelect: getMemberList,
       color: Colors.text.primary,
     },
-    {
-      title: t('club.updateClubProfile'),
-      onSelect: updateClubProfile,
-      color: Colors.text.primary,
-    },
+    // {
+    //   title: t('club.updateClubProfile'),
+    //   onSelect: updateClubProfile,
+    //   color: Colors.text.primary,
+    // },
     {
       title: t('club.deleteClub'),
       onSelect: deleteClub,
@@ -81,11 +83,11 @@ const ClubHeader = ({
   ]
 
   const memberMenu: MenuItem[] = [
-    {
-      title: t('club.updateClubProfile'),
-      onSelect: updateClubProfile,
-      color: Colors.text.primary,
-    },
+    // {
+    //   title: t('club.updateClubProfile'),
+    //   onSelect: updateClubProfile,
+    //   color: Colors.text.primary,
+    // },
     {
       title: t('club.leaveClub'),
       onSelect: leaveClub,
@@ -104,18 +106,33 @@ const ClubHeader = ({
       })
     } else {
       console.log('uploadImg')
+      router.push({
+        pathname: '/club/uploadClubImg',
+        params: { clubId: clubId },
+      })
     }
   }
   return (
-    <View className="flex-row p-4 border-b-2 border-bord">
-      <View className="flex-1 w-full">
-        <Text className="text-xl font-bold">{name}</Text>
-        <View className="flex-row items-center mt-1">
-          <Text className="text-sm text-secondary">#{category}</Text>
+    <View className="relative flex-col justify-between pt-4 border-b-2 border-bord bg-group-color1-secondary">
+      <View className="relative w-full h-[75px] mt-4 bg-group-color1-secondary">
+        <View className="flex-row items-center mt-4">
+          <View className="flex-row p-2 items-center">
+            <BackButton />
+            <View className="flex-row items-center w-1/2">
+              <Text className="text-xl font-bold mr-1">{name}</Text>
+              <Text className="text-sm text-secondary text-base font-medium bg-white rounded-full p-1">
+                #{t(`category.${category}`)}
+              </Text>
+            </View>
+          </View>
         </View>
-        <View className="flex-row items-center mt-1">
-          <Text className="text-sm text-secondary">그룹 초대 코드</Text>
-          <Text className="text-sm text-secondary mx-2">{teamCode}</Text>
+      </View>
+      <View className="flex-col justify-start mt-1 bg-white h-[80px]">
+        <Text className="text-sm text-secondary mx-4 mt-4">그룹 초대 코드</Text>
+        <View className="flex-row items-center">
+          <Text className="text-xl font-medium ml-[50px] text-group-color1-primary mx-2">
+            {teamCode}
+          </Text>
           <TouchableOpacity>
             <CopyIcon
               height={20}
@@ -124,27 +141,40 @@ const ClubHeader = ({
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity className="">
-        {isMember && (
-          <Menu>
-            <MenuTrigger>
-              <MoreIcon
-                height={24}
-                width={24}
-              />
-            </MenuTrigger>
-            <MenuOptions>
-              <MenuCustomOptions menuList={menu} />
-            </MenuOptions>
-          </Menu>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity onPress={uploadImg}>
-        <CameraIcon
-          width={18}
-          height={18}
+      <View className="absolute right-0 h-[200px] w-1/2 flex-row justify-end items-center">
+        <ImageThumbnail
+          img={img}
+          defaultImg={require('@/assets/clubs/club1.png')}
+          width={125}
+          height={125}
+          className="rounded-full border-2 border-white"
         />
-      </TouchableOpacity>
+        <View className="flex-col mt-4 pt-4">
+          <TouchableOpacity
+            onPress={uploadImg}
+            className="bg-white rounded-full w-8 h-8 justify-center items-center border border-bord mr-3 mb-3 mt-4">
+            <CameraIcon
+              width={18}
+              height={18}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity className="relative">
+            {isMember && (
+              <Menu>
+                <MenuTrigger>
+                  <MoreIcon
+                    height={24}
+                    width={24}
+                  />
+                </MenuTrigger>
+                <MenuOptions>
+                  <MenuCustomOptions menuList={menu} />
+                </MenuOptions>
+              </Menu>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
       <View>
         <ClubDeleteModal
           isVisible={isDeleteModalVisible}

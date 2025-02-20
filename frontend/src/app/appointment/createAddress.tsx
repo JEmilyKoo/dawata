@@ -52,10 +52,10 @@ export default function CreateAddress() {
   const [isEmpty, setIsEmpty] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const selectAddress = (address: Coord) => {
-    dispatch(setCreateAddressName(address.address_name))
-    dispatch(setCreateRoadAddress(address.address_name))
-    dispatch(setCreateLatitude(address.y))
-    dispatch(setCreateLongitude(address.x))
+    // dispatch(setCreateRoadAddress(address.address_name))
+    // dispatch(setCreateLatitude(address.y))
+    // dispatch(setCreateLongitude(address.x))
+
     router.push({
       pathname: '/appointment/create4',
     })
@@ -97,7 +97,7 @@ export default function CreateAddress() {
     }
   }
   return (
-    <SafeAreaView className="flex-1 bg-white justify-between">
+    <SafeAreaView className="flex-1 bg-white justify-between  pt-4">
       <View className="flex-1 justify-start pt-5">
         <TopHeader title="항목 추가" />
         <ScrollView className="flex-1 w-full">

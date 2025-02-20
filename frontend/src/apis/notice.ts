@@ -8,7 +8,7 @@ interface NoticeParams {
 export const getNotices = async () => {
   try {
     const response = await api.get('/notices')
-    return response
+    return response.data
   } catch (error) {
     console.error('⛔ 내 모든 알림 조회 실패:')
     return false

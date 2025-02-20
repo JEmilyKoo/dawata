@@ -113,9 +113,6 @@ export default function SettingPlayModal({
           : play,
       )
       setPlayList(updatedPlayList)
-      console.log('행동 수정하는 playName ', data.playName)
-      console.log('행동 수정하는 spendTime ', data.spendTime)
-      console.log('행동 수정하는 playId ', playId)
     }
     setIsVisible(false)
   }

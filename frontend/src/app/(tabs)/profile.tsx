@@ -69,37 +69,39 @@ export default function Profile() {
   const { attendanceStatus } = useAttendanceStatus()
   const { t } = useTranslation()
   return (
-    <ScrollView>
-      <ProfileHeader />
-      <View className="p-4">
-        <Calendar
-          className="border border-bord rounded-lg p-2"
-          theme={{
-            backgroundColor: '#ffffff',
-            calendarBackground: '#ffffff',
-            textSectionTitleColor: '#9c9c9c',
-            selectedDayBackgroundColor: '#ff8339',
-            selectedDayTextColor: '#ffffff',
-            todayTextColor: '#ff8339',
-            dayTextColor: '#1f1f1f',
-            textDisabledColor: '#e6e6e6',
-            dotColor: '#ff8339',
-            selectedDotColor: '#ffffff',
-            arrowColor: '#ff8339',
-            monthTextColor: '#1f1f1f',
-            textDayFontSize: 16,
-            textMonthFontSize: 16,
-            textDayHeaderFontSize: 14,
-          }}
-          markedDates={markedDates}
-          markingType={'dot'}
-          enableSwipeMonths={true}
-          current={currentMonth}
-          initialDate={currentMonth}
-          onMonthChange={handleMonthChange}
-        />
-      </View>
-      <ProfileStats attendanceStatus={attendanceStatus} />
-    </ScrollView>
+    <View className="bg-white flex-1">
+      <ScrollView className="bg-white  mt-4 pt-4">
+        <ProfileHeader />
+        <View className="p-4">
+          <Calendar
+            className="border border-bord rounded-lg p-2"
+            theme={{
+              backgroundColor: '#ffffff',
+              calendarBackground: '#ffffff',
+              textSectionTitleColor: '#9c9c9c',
+              selectedDayBackgroundColor: '#ff8339',
+              selectedDayTextColor: '#ffffff',
+              todayTextColor: '#ff8339',
+              dayTextColor: '#1f1f1f',
+              textDisabledColor: '#e6e6e6',
+              dotColor: '#ff8339',
+              selectedDotColor: '#ffffff',
+              arrowColor: '#ff8339',
+              monthTextColor: '#1f1f1f',
+              textDayFontSize: 16,
+              textMonthFontSize: 16,
+              textDayHeaderFontSize: 14,
+            }}
+            markedDates={markedDates}
+            markingType={'dot'}
+            enableSwipeMonths={true}
+            current={currentMonth}
+            initialDate={currentMonth}
+            onMonthChange={handleMonthChange}
+          />
+        </View>
+        <ProfileStats attendanceStatus={attendanceStatus} />
+      </ScrollView>
+    </View>
   )
 }

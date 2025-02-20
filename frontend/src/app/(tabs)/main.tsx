@@ -106,7 +106,7 @@ export default function MainScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white text-text-primary">
+    <SafeAreaView className="flex-1 bg-white text-text-primary pt-4">
       <ScrollView className="flex-1 bg-white text-text-primary">
         {/* 타이머 섹션 */}
         {/* <View className="items-center p-5">
@@ -128,7 +128,7 @@ export default function MainScreen() {
         {/* 내 그룹 섹션 */}
         <View className="p-5">
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lg font-bold">내 그룹</Text>
+            <Text className="text-xl font-bold text-text-primary">내 그룹</Text>
             <Link href="/club/list">
               <ChevronRightIcon
                 height={24}
@@ -178,7 +178,9 @@ export default function MainScreen() {
         {/* 다가오는 약속 섹션 */}
         <View className="p-5">
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lg font-bold">다가오는 약속</Text>
+            <Text className="text-xl font-bold text-text-primary">
+              다가오는 약속
+            </Text>
             <TouchableOpacity>
               <Link href="/appointment">
                 <ChevronRightIcon

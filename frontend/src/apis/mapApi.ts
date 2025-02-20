@@ -77,6 +77,7 @@ export const searchByKeyword = async (props: SearchByKeywordProps) => {
 
 export const searchByCategory = async (props: SearchByCategoryProps) => {
   try {
+    console.log('searchByCategory', props)
     const response = await kakaoApi.get(`/local/search/category.json`, {
       params: props,
     })

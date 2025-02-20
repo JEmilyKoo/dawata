@@ -13,7 +13,7 @@ const ClubMemberList = () => {
   const clubId = Number(params.clubId)
   const { clubMemberList } = useClubMemberList({ clubId })
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white  mt-4 pt-4">
       <ScrollView>
         <Text className="text-xl font-bold mb-2 text-text-primary flex-row justify-between items-center p-3 border border-bord rounded-lg mb-4">
           클럽 멤버 목록

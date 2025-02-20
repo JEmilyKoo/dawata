@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router'
 
 import TopHeader from '@/components/TopHeader'
 import { clearTokens } from '@/store/slices/authSlice'
+import { resetStore } from '@/store/store'
 
 export default function EditProfile() {
   const dispatch = useDispatch()
@@ -18,10 +19,11 @@ export default function EditProfile() {
 
   const logout = () => {
     dispatch(clearTokens())
+    dispatch(resetStore())
     router.push('/')
   }
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white pt-4">
       <TopHeader title="내 정보" />
       <ScrollView>
         <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-100">

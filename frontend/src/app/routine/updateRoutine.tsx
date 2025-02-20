@@ -94,7 +94,6 @@ export default function UpdateRoutine() {
   const [settingPlayId, setSettingPlayId] = useState(0)
 
   const editPlay = (playId: number) => {
-    console.log('수정해야 할 playId', playId)
     setSettingPlayId(playId)
     setIsCreate(false)
     setIsSettingVisible(true)
@@ -104,7 +103,6 @@ export default function UpdateRoutine() {
     setIsVisible(true)
   }
   const onPressDelete = () => {
-    console.log('삭제해야 하는 id', deletePlayId)
     const updatedPlayList = playList.filter(
       (play) => play.playId !== deletePlayId,
     )
@@ -116,7 +114,7 @@ export default function UpdateRoutine() {
   }
 
   return (
-    <View className="flex-1 bg-white ">
+    <View className="flex-1 bg-white pt-4">
       <TopHeader title="루틴 수정" />
       <View className="p-4 justify-between">
         <View className="flex-row justify-between items-center mb-4">

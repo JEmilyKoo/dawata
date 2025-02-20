@@ -14,9 +14,11 @@ import * as SplashScreen from 'expo-splash-screen'
 import 'global.css'
 import { PersistGate } from 'redux-persist/integration/react'
 
+import { getMyInfo } from '@/apis/profile'
 import ErrorModal from '@/components/ErrorModal'
 import { getFcmToken } from '@/services/firebaseService'
 import { setFCMToken } from '@/store/slices/authSlice'
+import { setUser } from '@/store/slices/memberSlice'
 import { RootState } from '@/store/store'
 import { FontProvider } from '@/utils/FontContext'
 
@@ -72,12 +74,19 @@ function RootLayoutNav() {
     (state: RootState) => state.auth,
   )
 
+  const fetchMyInfo = async () => {
+    const myInfo = await getMyInfo()
+    dispatch(setUser(myInfo))
+  }
+
   useEffect(() => {
     if (
       isInitialized &&
       socialLogin.accessToken &&
       pathname !== '/(tabs)/main'
     ) {
+      console.log('fetchMyInfo', socialLogin.accessToken)
+      fetchMyInfo()
       router.replace('/(tabs)/main')
     }
   }, [socialLogin.accessToken, isInitialized])

@@ -1,9 +1,5 @@
 import { useRef, useState } from 'react'
-import {
-  ActivityIndicator,
-  Image,
-  View,
-} from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
 
 import Colors from '@/constants/Colors'
 
@@ -31,7 +27,7 @@ const ImageThumbnail = ({
           source={imageError ? defaultImg : { uri: img }} // ✅ 직접 적용
           className={className}
           style={{ width: width || 80, height: height || 80 }}
-          resizeMode="stretch"
+          resizeMode="cover"
           defaultSource={defaultImg}
           onLoadStart={() => {
             isLoading.current = true

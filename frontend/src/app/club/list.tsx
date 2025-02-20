@@ -18,11 +18,13 @@ export default function ClubMain() {
   console.log('clubId:', params)
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white pt-4">
       <TopHeader title="내 그룹" />
       <ScrollView>
-        {clubList.map((club) => (
-          <View className="m-2 px-4 border-b border-bord">
+        {clubList.map((club, index) => (
+          <View
+            className="m-2 px-4 border-b border-bord"
+            key={index}>
             <ClubItem clubInfo={club} />
           </View>
         ))}

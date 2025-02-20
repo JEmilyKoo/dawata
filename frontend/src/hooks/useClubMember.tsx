@@ -27,7 +27,10 @@ export const useClubMember = ({ clubId, memberId }: UseClubMemberProps) => {
       const response = await getClubMembers({ clubId })
       if (!response) return
       const clubMembers: ClubMember[] = response.data
-      const targetMember = getTargetMember(clubMembers, memberId ?? user.id)
+      const targetMember = getTargetMember(
+        clubMembers,
+        memberId ?? user.memberId,
+      )
       if (targetMember) {
         setIsMember(true)
         if (targetMember.role === 0) {

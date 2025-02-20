@@ -38,16 +38,14 @@ export default function RoutineList() {
   }, [])
 
   const onPressDelete = async () => {
-    console.log('삭제해야 하는 id', deleteRoutineId)
     const response = await removeRoutine(deleteRoutineId)
-    console.log('response', response)
     setIsVisible(false)
     router.replace({
       pathname: '/routine/routineList',
     })
   }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white pt-4">
       <TopHeader title="내 루틴 목록" />
       <FlatList
         data={routines}
@@ -75,7 +73,6 @@ export default function RoutineList() {
         primaryButtonOnPress={onPressDelete}
         secondaryButtonText="취소"
         secondaryButtonOnPress={() => {
-          console.log('취소')
           setIsVisible(false)
         }}
       />

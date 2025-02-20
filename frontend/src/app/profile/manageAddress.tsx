@@ -44,7 +44,7 @@ export default function ManageAddress() {
     }
   }
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white pt-4">
       <TopHeader title="주소 관리" />
       <ScrollView className="flex-1">
         <TouchableOpacity

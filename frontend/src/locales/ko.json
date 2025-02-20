@@ -96,7 +96,8 @@
     "NOT_PARTICIPANT": "미참여",
     "EXPIRED": "투표 마감",
     "SELECTED": "투표 완료",
-    "NOT_SELECTED": "투표 가능"
+    "NOT_SELECTED": "투표 가능",
+    "PLACE_ONLY": "장소 확정"
   },
   "goToHome": "홈으로",
   "confirm": "확인",
@@ -123,5 +124,14 @@
     }
   },
   "recommand": "추천",
-  "list": "리스트"
+  "list": "리스트",
+  "categoryGroupCode": {
+    "SW8": "지하철역",
+    "FD6": "음식점",
+    "CE7": "카페",
+    "AT4": "관광 명소",
+    "CT1": "문화 시설",
+    "SC4": "학교",
+    "AC5": "학원"
+  }
 }

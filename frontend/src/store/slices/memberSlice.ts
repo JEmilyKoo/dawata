@@ -4,7 +4,7 @@ import { Member } from '../../types/member'
 
 const initialState = {
   user: {
-    id: 1,
+    memberId: 1,
     email: 'test@email.com',
     name: '주노리',
     img: 'profile1.png',
@@ -62,6 +62,7 @@ const memberSlice = createSlice({
 })
 
 // 각 액션을 exports
-export const { addMember, updateMember, setMemberData } = memberSlice.actions
+export const { addMember, updateMember, setMemberData, setUser } =
+  memberSlice.actions
 
 export default memberSlice.reducer

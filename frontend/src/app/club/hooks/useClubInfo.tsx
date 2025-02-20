@@ -7,6 +7,9 @@ export const useClub = ({ clubId }: { clubId: number }) => {
   const [clubInfo, setClubInfo] = useState<Club>()
   const [loading, setLoading] = useState(true)
   useEffect(() => {
+    if (!clubId || clubId === 0) {
+      return
+    }
     const getClubInfoByClubId = async ({ clubId }: { clubId: number }) => {
       try {
         const response = await api.get(`/clubs/${clubId}`)

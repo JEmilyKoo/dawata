@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, StatusBar, Text, View } from 'react-native'
+import { Platform, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 
 import Constants from 'expo-constants'
 import * as Location from 'expo-location'
+import { StatusBar } from 'expo-status-bar'
 
 import BottomSheetContent from '@/app/live/components/BottomSheetContent'
 import { MemberDetailItem } from '@/app/live/components/MemberDetailItem'
@@ -148,9 +149,9 @@ export default function createAddress2() {
   ) : (
     <View className="flex-1">
       <StatusBar
-        translucent={true}
+        style="dark"
+        translucent
         backgroundColor="transparent"
-        barStyle="dark-content"
       />
       <View className="relative flex-1">
         <WebView

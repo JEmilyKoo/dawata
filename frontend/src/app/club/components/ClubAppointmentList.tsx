@@ -1,6 +1,7 @@
 import React from 'react'
 import { Image, Text, TouchableOpacity, View } from 'react-native'
 
+import AppointmentItem from '@/components/AppointmentItem'
 import ImageThumbnail from '@/components/ImageThumbnail'
 import { ClubInfo } from '@/types/clubAppointment'
 
@@ -36,45 +37,10 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
         const isVoteEnded = voteEndTime < now
 
         return (
-          <TouchableOpacity
-            key={index}
-            className="flex-row p-4 border border-bord rounded-lg">
-            <ImageThumbnail
-              img={clubImg}
-              defaultImg={require('@/assets/clubs/club1.png')}
-              width={80}
-              height={80}
-              className="rounded-xl"
-            />
-            <View className="flex-1">
-              <Text className="font-bold">
-                {appointment.appointmentInfo.name}
-              </Text>
-              <Text className="text-sm text-secondary mt-1">
-                {new Date(
-                  appointment.appointmentInfo.scheduledAt,
-                ).toLocaleString()}
-              </Text>
-              <Text className="text-sm text-secondary">
-                역삼 투썸플레이스 #스터디
-              </Text>
-            </View>
-            <View className="items-end">
-              <Text className="text-sm text-secondary mb-1">
-                참석 인원:{' '}
-                {
-                  appointment.participantInfos.filter((p) => p.isAttending)
-                    .length
-                }
-                /{appointment.participantInfos.length}
-              </Text>
-              <View className="bg-gray-100 px-3 py-1 rounded">
-                <Text className="text-xs text-secondary">
-                  {isVoteEnded ? '투표 종료' : '투표 중'}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+          <AppointmentItem
+            key={appointment.appointmentInfo.appointmentId}
+            appointmentListInfo={appointment}
+          />
         )
       })}
     </View>

@@ -1,10 +1,11 @@
+import { CategoryGroupCodeTypes } from '@/constants/categoryGroupCode'
+
 export interface ClubInfo {
   clubId: number
   name: string
   img: any
   category: string
 }
-
 export interface AppointmentInfo {
   appointmentId: number
   name: string
@@ -67,6 +68,7 @@ export interface CreateVoteInfo {
   title: string
   category: string
   linkUrl: string
+  isOnly: boolean
 }
 
 interface Participant {
@@ -95,7 +97,37 @@ export interface Standard {
   title: string
   latitude: number
   longitude: number
-  isRecommanded: boolean
+  standardId: number
 }
+
+export interface RecommandList {
+  loading: number
+  category_group_code: CategoryGroupCodeType
+  recommand: Recommand[]
+}
+
+export interface StandardRecommand {
+  standard: Standard
+  recommandList: RecommandList[]
+}
+
+export interface Recommand {
+  id: string
+  place_name: string
+  category_name: string
+  category_group_code: CategoryGroupCodeType
+  category_group_name: string
+  phone: string
+  address_name: string
+  road_address_name: string
+  x: string
+  y: string
+  place_url: string
+  standardId?: number
+}
+
+export type CategoryGroupCodeType =
+  (typeof CategoryGroupCodeTypes)[keyof typeof CategoryGroupCodeTypes]
+
 //약속 조회로 받아온 데이터의 끝에는  Info를 붙인다.
 //clubInfo, appointmentInfo, participantInfo, voteInfo
