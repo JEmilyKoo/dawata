@@ -1,15 +1,14 @@
 package com.ssafy.dawata.domain.participant.repository;
 
-import com.ssafy.dawata.domain.live.dto.ParticipantDto;
-import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
-import com.ssafy.dawata.domain.participant.entity.Participant;
-
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.ssafy.dawata.domain.member.dto.response.AppointmentInfoResponse;
+import com.ssafy.dawata.domain.participant.entity.Participant;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
@@ -28,7 +27,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 		JOIN p.clubMember cm
 		JOIN cm.member m
 		JOIN p.appointment a
-		WHERE m.id = :memberId AND p.isAttending = true
+		WHERE m.id = :memberId AND p.isAttending = true AND p.dailyStatus != 'U'
 		GROUP BY p.clubMember.club.id, cm.clubName""")
 	List<AppointmentInfoResponse> countByMemberId(@Param("memberId") Long memberId);
 
