@@ -54,7 +54,7 @@ public class Photo extends BaseTimeEntity {
 	// photo table 에 데이터는 없지만 기본 이미지
 	public static Photo createDefaultPhoto(Long entityId, EntityCategory entityCategory) {
 		return Photo.builder()
-			.photoName(entityId % 2 + "_" + entityCategory + "_" + "default.png")
+			.photoName(((entityId % 8) + 1) + "_" + entityCategory + "_" + "default.png")
 			.build();
 	}
 
