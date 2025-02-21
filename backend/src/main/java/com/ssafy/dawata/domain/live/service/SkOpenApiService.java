@@ -91,11 +91,11 @@ public class SkOpenApiService {
 
 				return transitTotalTime <= walkTotalTime ?
 					BestTimeAndDistanceResponse.builder()
-						.totalTime(transitTotalTime)
+						.totalTime(transitTotalTime / 60)
 						.totalDistance(transitTotalDistance)
 						.build() :
 					BestTimeAndDistanceResponse.builder()
-						.totalTime(walkTotalTime)
+						.totalTime(walkTotalTime / 60)
 						.totalDistance(walkTotalDistance)
 						.build();
 			})
