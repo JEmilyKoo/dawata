@@ -42,8 +42,6 @@ public interface RoutineTemplateRepository extends JpaRepository<RoutineTemplate
 		""")
 	List<RoutineElementResponse> customFindByRoutineId(@Param("routineId") Long routineId);
 
-	RoutineTemplate save(RoutineTemplate routineTemplate);
-
 	List<RoutineTemplate> findAllByMember(Member member);
 
 	@Query("""

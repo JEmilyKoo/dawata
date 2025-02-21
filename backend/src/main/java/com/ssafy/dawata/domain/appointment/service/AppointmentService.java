@@ -106,7 +106,7 @@ public class AppointmentService {
 
 		});
 
-		return appointment.getId();
+		return appointmentEntity.getId();
 	}
 
 	// 내가 속해 있는 약속만 가져오기
